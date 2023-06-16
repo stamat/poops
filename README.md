@@ -1,2 +1,2 @@
-# poop
-Super simple bundler 💩
+# 💩 Poop
+Super simple bundler 
