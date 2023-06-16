@@ -1,0 +1,38 @@
+{
+  "name": "poop",
+  "description": "A super simple bundler for simple web projects.",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "poop.js",
+  "repository": "https://github.com/stamat/poop.git",
+  "bin": {
+    "gulp": "./bin/gulp.js"
+  },
+  "author": "OTILITO <nikola@otilito.com> (https://otilito.com)",
+  "homepage": "https://github.com/stamat/poop",
+  "private": false,
+  "keywords": [
+    "bundler",
+    "javascript",
+    "sass",
+    "toolchain-script"
+  ],
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "connect": "^3.7.0",
+    "livereload": "^0.9.3",
+    "resolve": "^1.22.2",
+    "sass": "^1.63.4",
+    "serve-static": "^1.15.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.42.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^16.0.0",
+    "eslint-plugin-promise": "^6.1.1"
+  }
+}
