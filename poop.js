@@ -10,6 +10,8 @@ const { pathToFileURL } = require('node:url')
 const sass = require('sass')
 const serveStatic = require('serve-static')
 
+const cwd = process.cwd()
+
 function readJsonFile(file) {
   return JSON.parse(fs.readFileSync(file, 'utf-8'))
 }
@@ -32,7 +34,7 @@ function tryToFindFile(filePath, extensions) {
 
 function sassImporter(url) {
   if (fs.existsSync(url)) return null
-  const importPath = path.relative(process.cwd(), path.join(pathToFileURL('node_modules').pathname, url))
+  const importPath = path.relative(cwd, path.join(pathToFileURL('node_modules').pathname, url))
 
   if (!fs.existsSync(importPath)) {
     const correctFile = tryToFindFile(importPath, ['sass', 'scss', 'css'])
@@ -78,7 +80,7 @@ function compileSass() {
 
 // Start local server with LiveReload
 const app = connect()
-app.use(serveStatic(__dirname))
+app.use(serveStatic(cwd))
 const port = 4040
 http.createServer(app).listen(port, () => {
   console.log(`Server is running on port ${port}`)
@@ -87,15 +89,15 @@ http.createServer(app).listen(port, () => {
 const lrserver = livereload.createServer({
   exclusions: ['.git/', '.svn/', '.hg/', 'node_modules/', 'src/']
 })
-lrserver.watch(__dirname)
+lrserver.watch(cwd)
 lrserver.watcher.on('all', (event, file) => {
   console.log(event, file)
 })
 
-const recompileWatcher = chokidar.watch('src')
+const sourceWatcher = chokidar.watch('src')
 compileSass()
 
-recompileWatcher.on('change', (event, file) => {
+sourceWatcher.on('change', (event, file) => {
   console.log(event, file)
   compileSass()
 })
