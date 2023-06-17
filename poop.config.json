@@ -1,0 +1,16 @@
+{
+  "watch": [
+    "src"
+  ],
+  "include_paths": [
+    "node_modules"
+  ],
+  "js": {
+    "input": "src/js/main.js",
+    "output": "dist/js/main.js"
+  },
+  "sass": {
+    "input": "src/scss/main.scss",
+    "output": "dist/css/main.css"
+  }
+}
