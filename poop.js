@@ -15,10 +15,6 @@ const cwd = process.cwd() // Current Working Directory
 const pkg = require('./package.json')
 
 class Styled {
-  constructor(string) {
-    this.value = String(string)
-  }
-
   hexToRgb(hex) {
     const sanitizedHex = hex.replace('#', '')
     const red = parseInt(sanitizedHex.substring(0, 2), 16)
@@ -38,41 +34,56 @@ class Styled {
   color(hex) {
     const [red, green, blue] = this.hexToRgb(hex)
 
-    this.value = `\x1b[38;5;${this.terminalColorIndex(red, green, blue)}m${this.value}`
-    return this
+    return `\x1b[38;5;${this.terminalColorIndex(red, green, blue)}m`
   }
 
   background(hex) {
     const [red, green, blue] = this.hexToRgb(hex)
 
-    this.value = `\x1b[48;5;${this.terminalColorIndex(red, green, blue)}m${this.value}`
-    return this
-  }
-
-  reset() {
-    this.value = `${this.value}\x1b[0m`
-    return this
-  }
-
-  toString() {
-    return this.value
-  }
-
-  valueOf() {
-    return this.value
+    return `\x1b[48;5;${this.terminalColorIndex(red, green, blue)}m`
   }
 }
 
+const style = {
+  reset: '\x1b[0m',
+  bold: '\x1b[1m',
+  dim: '\x1b[2m',
+  italic: '\x1b[3m',
+  underline: '\x1b[4m',
+  inverse: '\x1b[7m',
+  hidden: '\x1b[8m',
+  strikethrough: '\x1b[9m',
+  black: '\x1b[30m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m',
+  white: '\x1b[37m',
+  gray: '\x1b[90m',
+  bgBlack: '\x1b[40m',
+  bgRed: '\x1b[41m',
+  bgGreen: '\x1b[42m',
+  bgYellow: '\x1b[43m',
+  bgBlue: '\x1b[44m',
+  bgMagenta: '\x1b[45m',
+  bgCyan: '\x1b[46m',
+  bgWhite: '\x1b[47m',
+  color: (hex) => new Styled().color(hex),
+  background: (hex) => new Styled().background(hex)
+}
+
 console.log('')
-console.log(new Styled(`💩 Poop — v${pkg.version}`).color('#8b4513').toString())
-console.log(new Styled('----------------').reset().toString())
+console.log(`${style.color('#8b4513')}💩 Poop — v${pkg.version}`)
+console.log(`----------------${style.reset}`)
 console.log('')
 
 const app = connect()
 app.use(serveStatic(cwd))
 const port = 4040
 http.createServer(app).listen(port, () => {
-  console.log(`\x1b[2m🌍 Local server:\x1b[0m \x1b[4mhttp://localhost:${port}\x1b[0m`)
+  console.log(`${style.dim}🌍 Local server:${style.reset} ${style.italic + style.underline}http://localhost:${port}${style.reset}`)
 })
 
 function readJsonFile(file) {
