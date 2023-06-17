@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const chokidar = require('chokidar')
 const connect = require('connect')
 const fs = require('node:fs')
 const http = require('node:http')
@@ -32,8 +33,6 @@ function tryToFindFile(filePath, extensions) {
 function sassImporter(url) {
   if (fs.existsSync(url)) return null
   const importPath = path.relative(process.cwd(), path.join(pathToFileURL('node_modules').pathname, url))
-  console.log(fs.existsSync(importPath), importPath)
-  console.log(path.basename(importPath))
 
   if (!fs.existsSync(importPath)) {
     const correctFile = tryToFindFile(importPath, ['sass', 'scss', 'css'])
@@ -41,49 +40,41 @@ function sassImporter(url) {
   }
 
   if (pathIsDirectory(importPath) && !pathExists(importPath, 'index.sass') && !pathExists(importPath, 'index.scss')) {
-    console.log('no index.sass or index.scss', pathExists(importPath, 'package.json'))
-
     const correctFile = tryToFindFile(importPath, ['sass', 'scss', 'css'])
     if (correctFile) return new URL(correctFile, pathToFileURL('node_modules'))
 
-    if (pathExists(importPath, 'package.json')) {
-      const pkg = readJsonFile(path.join(importPath, 'package.json'))
+    if (!pathExists(importPath, 'package.json')) return null
 
-      if (pkg.sass) {
-        return new URL(path.join(importPath, pkg.sass), pathToFileURL('node_modules'))
-      }
+    const pkg = readJsonFile(path.join(importPath, 'package.json'))
 
-      if (pkg.css) {
-        return new URL(path.join(importPath, pkg.css), pathToFileURL('node_modules'))
-      }
+    if (pkg.sass) return new URL(path.join(importPath, pkg.sass), pathToFileURL('node_modules'))
+    if (pkg.css) return new URL(path.join(importPath, pkg.css), pathToFileURL('node_modules'))
 
-      const basename = path.basename(pkg.main)
-      if (pkg.main && /(\.sass|\.scss|\.css)$/i.test(basename)) {
-        return new URL(path.join(importPath, pkg.main), pathToFileURL('node_modules'))
-      }
-    } else {
-      return null
-    }
+    const basename = path.basename(pkg.main)
+    if (pkg.main && /(\.sass|\.scss|\.css)$/i.test(basename)) return new URL(path.join(importPath, pkg.main), pathToFileURL('node_modules'))
+    return null
   }
 
   return new URL(importPath, pathToFileURL('node_modules'))
 }
 
-// Compile Sass to CSS
-const compiledSass = sass.compile('src/scss/index.scss', {
-  style: 'compressed',
-  sourceMap: true,
-  sourceMapIncludeSources: true,
-  importers: [{
-    // Resolve `node_modules`.
-    findFileUrl(url) {
-      return sassImporter(url)
-    }
-  }]
-})
+function compileSass() {
+  // Compile Sass to CSS
+  const compiledSass = sass.compile('src/scss/index.scss', {
+    style: 'compressed',
+    sourceMap: true,
+    sourceMapIncludeSources: true,
+    importers: [{
+      // Resolve `node_modules`.
+      findFileUrl(url) {
+        return sassImporter(url)
+      }
+    }]
+  })
 
-fs.writeFileSync('dist/styles.css.map', JSON.stringify(compiledSass.sourceMap))
-fs.writeFileSync('dist/styles.css', compiledSass.css)
+  fs.writeFileSync('dist/styles.css.map', JSON.stringify(compiledSass.sourceMap))
+  fs.writeFileSync('dist/styles.css', compiledSass.css)
+}
 
 // Start local server with LiveReload
 const app = connect()
@@ -93,7 +84,18 @@ http.createServer(app).listen(port, () => {
   console.log(`Server is running on port ${port}`)
 })
 
-const lrserver = livereload.createServer()
+const lrserver = livereload.createServer({
+  exclusions: ['.git/', '.svn/', '.hg/', 'node_modules/', 'src/']
+})
 lrserver.watch(__dirname)
+lrserver.watcher.on('all', (event, file) => {
+  console.log(event, file)
+})
 
-console.log(lrserver)
+const recompileWatcher = chokidar.watch('src')
+compileSass()
+
+recompileWatcher.on('change', (event, file) => {
+  console.log(event, file)
+  compileSass()
+})
