@@ -6,7 +6,7 @@
   "main": "poop.js",
   "repository": "https://github.com/stamat/poop.git",
   "bin": {
-    "gulp": "./bin/gulp.js"
+    "gulp": "./poop.js"
   },
   "author": "OTILITO <nikola@otilito.com> (https://otilito.com)",
   "homepage": "https://github.com/stamat/poop",
@@ -18,13 +18,13 @@
     "toolchain-script"
   ],
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint ./poop.js"
   },
   "dependencies": {
     "chokidar": "^3.5.3",
     "connect": "^3.7.0",
+    "esbuild": "^0.18.4",
     "livereload": "^0.9.3",
-    "resolve": "^1.22.2",
     "sass": "^1.63.4",
     "serve-static": "^1.15.0"
   },
