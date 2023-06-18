@@ -234,8 +234,8 @@ function compileStyleEntry(infilePath, outfilePath, options = {}) {
   }
 
   const compiledSass = sass.compile(infilePath, opts)
-
-  fs.writeFileSync(outfilePath, compiledSass.css)
+  const mapsrc = options.sourcemap ? `\n/*# sourceMappingURL=${path.basename(outfilePath)}.map */` : ''
+  fs.writeFileSync(outfilePath, compiledSass.css + mapsrc)
   if (compiledSass.sourceMap) {
     fs.writeFileSync(`${outfilePath}.map`, JSON.stringify(compiledSass.sourceMap))
   }
