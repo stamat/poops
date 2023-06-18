@@ -18,6 +18,8 @@ const Terser = require('terser')
 const cwd = process.cwd() // Current Working Directory
 const pkg = require('./package.json')
 
+// Helpers
+
 class Style {
   reset = '\x1b[0m'
   bold = '\x1b[1m'
@@ -76,24 +78,6 @@ class Style {
   }
 }
 
-const style = new Style()
-
-console.log('')
-console.log(`${style.color('#8b4513')}💩 Poop — v${pkg.version}`)
-console.log(`----------------${style.reset + style.bell}`)
-console.log('')
-
-const app = connect()
-app.use(serveStatic(cwd))
-const port = 4040
-http.createServer(app).listen(port, () => {
-  console.log(`${style.dim}🌍 Local server:${style.reset} ${style.italic + style.underline}http://localhost:${port}${style.reset}`)
-})
-
-function readJsonFile(file) {
-  return JSON.parse(fs.readFileSync(file, 'utf-8'))
-}
-
 function pathExists() {
   return fs.existsSync(path.join(...arguments))
 }
@@ -101,6 +85,45 @@ function pathExists() {
 function pathIsDirectory() {
   return fs.lstatSync(path.join(...arguments)).isDirectory()
 }
+
+const style = new Style()
+
+// CLI Header
+console.log('')
+console.log(`${style.color('#8b4513')}💩 Poop — v${pkg.version}`)
+console.log(`----------------${style.reset + style.bell}`)
+console.log('')
+
+const configPath = path.join(cwd, 'poop.json')
+
+// Check if poop.json exists
+if (!pathExists(configPath)) {
+  console.log(`${style.red + style.bold}[error]${style.reset} \`poop.json\` not found.${style.reset}
+${style.dim}Configuration file \`poop.json\` not found in your working directory: ${style.underline}${cwd}${style.reset}\n
+${style.dim}Please create a \`poop.json\` file in your working directory and try again.\n
+For information about the structure of the configuration file, please visit: \n${style.underline}https://stamat.github.com/poop${style.reset}\n`)
+  process.exit(1)
+}
+
+// Load poop.json
+const config = require(configPath)
+
+if (config.serve) {
+  const app = connect()
+
+  if (config.serve.base && pathExists(cwd, config.serve.base)) {
+    app.use(serveStatic(path.join(cwd, config.serve.base)))
+  } else {
+    app.use(serveStatic(cwd))
+  }
+
+  const port = parseInt(config.serve.port, 10) || 4040
+  http.createServer(app).listen(port, () => {
+    console.log(`${style.dim}🌍 Local server:${style.reset} ${style.italic + style.underline}http://localhost:${port}${style.reset}`)
+  })
+}
+
+// SASS Compiler
 
 function tryToFindFile(filePath, extensions) {
   const fileExt = extensions.find(ext => fs.existsSync(`${filePath}.${ext}`))
@@ -125,7 +148,7 @@ function sassImporter(url) {
 
     if (!pathExists(importPath, 'package.json')) return null
 
-    const pkg = readJsonFile(path.join(importPath, 'package.json'))
+    const pkg = require(path.join(importPath, 'package.json'))
 
     if (pkg.sass) return new URL(path.join(importPath, pkg.sass), pathToFileURL('node_modules'))
     if (pkg.css) return new URL(path.join(importPath, pkg.css), pathToFileURL('node_modules'))

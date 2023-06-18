@@ -1,4 +1,8 @@
 {
+  "serve" : {
+    "port": 4040,
+    "base": "/"
+  },
   "watch": [
     "src"
   ],
