@@ -1,15 +1,19 @@
 #!/usr/bin/env node
 
+const autoprefixer = require('autoprefixer')
+const { build } = require('esbuild')
 const chokidar = require('chokidar')
 const connect = require('connect')
-const { build } = require('esbuild')
+const cssnano = require('cssnano')
 const fs = require('node:fs')
 const http = require('node:http')
 const livereload = require('livereload')
 const path = require('node:path')
 const { pathToFileURL } = require('node:url')
+const postcss = require('postcss')
 const sass = require('sass')
 const serveStatic = require('serve-static')
+const Terser = require('terser')
 
 const cwd = process.cwd() // Current Working Directory
 const pkg = require('./package.json')
@@ -135,8 +139,12 @@ function sassImporter(url) {
 }
 
 function compileSass() {
-  // Compile Sass to CSS
-  const compiledSass = sass.compile('src/scss/index.scss', {
+  console.log(`${style.green+style.bold}[Style]${style.reset} Compiling SASS...`)
+  compileSassEntry('src/scss/index.scss', 'dist/styles.css')
+}
+
+function compileSassEntry(infilePath, outfilePath) {
+  const compiledSass = sass.compile(infilePath, {
     style: 'compressed',
     sourceMap: true,
     sourceMapIncludeSources: true,
@@ -148,21 +156,42 @@ function compileSass() {
     }]
   })
 
-  fs.writeFileSync('dist/styles.css.map', JSON.stringify(compiledSass.sourceMap))
-  fs.writeFileSync('dist/styles.css', compiledSass.css)
+  fs.writeFileSync(outfilePath, compiledSass.css)
+  fs.writeFileSync(`${outfilePath}.map`, JSON.stringify(compiledSass.sourceMap))
+
+  postcss([autoprefixer, cssnano]).process(compiledSass.css, {
+    from: outfilePath,
+    to: outfilePath.replace('.css', '.min.css'),
+  }).then(result => {
+    fs.writeFileSync(outfilePath.replace('.css', '.min.css'), result.css)
+  }).catch((error) => {
+    console.error('Error occurred during CSS minification:', error)
+  })
 }
 
 function compileJs() {
+  compileJsEntry('src/js/main.ts', 'dist/scripts.js')
+}
+
+function compileJsEntry(infilePath, outfilePath) {
   build({
-    logLevel: 'info',
-    entryPoints: ['src/js/main.ts'],
+    logLevel: 'error',
+    entryPoints: [infilePath],
     bundle: true,
-    outfile: 'dist/scripts.js',
+    outfile: outfilePath,
     sourcemap: true,
     minify: false,
     format: 'iife',
     target: 'es2019'
-  }).catch(() => process.exit(1))
+  }).then(() => {
+    Terser.minify(fs.readFileSync(outfilePath, 'utf-8')).then((result) => {
+      if (result.error) {
+        console.error('Error occurred during JS minification:', result.error)
+      } else {
+        fs.writeFileSync(outfilePath.replace('.js', '.min.js'), result.code)
+      }
+    })
+  })
 }
 
 const lrserver = livereload.createServer({

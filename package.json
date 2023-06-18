@@ -21,18 +21,23 @@
     "lint": "eslint ./poop.js"
   },
   "dependencies": {
+    "autoprefixer": "^10.4.14",
     "chokidar": "^3.5.3",
     "connect": "^3.7.0",
+    "cssnano": "^6.0.1",
     "esbuild": "^0.18.4",
     "livereload": "^0.9.3",
+    "postcss": "^8.4.24",
     "sass": "^1.63.4",
-    "serve-static": "^1.15.0"
+    "serve-static": "^1.15.0",
+    "terser": "^5.18.0"
   },
   "devDependencies": {
     "eslint": "^8.42.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^16.0.0",
-    "eslint-plugin-promise": "^6.1.1"
+    "eslint-plugin-promise": "^6.1.1",
+    "sulphuris": "^1.0.5"
   }
 }

@@ -4,14 +4,92 @@
   <meta charset="UTF-8">
   <title>💩 POOP</title>
   <link rel="stylesheet" href="dist/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script type="text/javascript" src="dist/scripts.js"></script>
+  <style>
+    body {
+      background-color: burlywood;
+      margin: 0;
+      padding: 0;
+      font-family: Helvetica, Arial, sans-serif !important;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    header h1 {
+      font-family: Helvetica, Arial, sans-serif !important;
+      font-weight: 700 !important;
+    }
+
+    #poop {
+      font-size: 10rem;
+      display: inline-block;
+      margin-bottom: 24px;
+    }
+  </style>
 </head>
 <body>
-  <h1>💩<br>POOP</h1>
+  <header>
+    <h1><span id="poop">💩</span><br>POOP</h1>
+  </header>
+  
 
   <script>document.write('<script src="http://'
     + (location.host || 'localhost').split(':')[0]
     + ':35729/livereload.js"></'
     + 'script>')</script>
+
+  <script type="text/javascript">
+    var poop = document.getElementById('poop');
+
+    function getPosition(element) {
+      var clientRect = element.getBoundingClientRect();
+      return {
+        left: clientRect.left + document.body.scrollLeft,
+        top: clientRect.top + document.body.scrollTop
+      };
+    }
+
+    var poopPosition = getPosition(poop);
+
+    var count = 200;
+    var defaults = {
+      origin: { 
+        y: ((poopPosition.top + poop.offsetHeight/2) * 100 / window.innerHeight) / 100,
+        x: ((poopPosition.left + poop.offsetWidth/2) * 100 / window.innerWidth) / 100
+      }
+    };
+
+    function fire(particleRatio, opts) {
+      confetti(Object.assign({}, defaults, opts, {
+        particleCount: Math.floor(count * particleRatio)
+      }));
+    }
+
+    fire(0.25, {
+      spread: 26,
+      startVelocity: 55,
+    });
+    fire(0.2, {
+      spread: 60,
+    });
+    fire(0.35, {
+      spread: 100,
+      decay: 0.91,
+      scalar: 0.8
+    });
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 25,
+      decay: 0.92,
+      scalar: 1.2
+    });
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 45,
+    });
+  </script>
 </body>
 </html>
