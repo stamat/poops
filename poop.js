@@ -17,6 +17,14 @@ const Terser = require('terser')
 
 const cwd = process.cwd() // Current Working Directory
 const pkg = require('./package.json')
+const args = process.argv.slice(2)
+console.log(args)
+
+let defaultConfigPath = 'poop.json'
+
+if (args.length) {
+  defaultConfigPath = args[0]
+}
 
 // Helpers
 
@@ -112,12 +120,12 @@ const style = new Style()
 console.log(`\n${style.color('#8b4513')}💩 Poop — v${pkg.version}
 ----------------${style.reset + style.bell}\n`)
 
-const configPath = path.join(cwd, 'poop.json')
+const configPath = path.join(cwd, defaultConfigPath)
 
 // Check if poop.json exists
 if (!pathExists(configPath)) {
-  console.log(`${style.red + style.bold}[error]${style.reset} \`poop.json\` not found.${style.reset}
-${style.dim}Configuration file \`poop.json\` not found in your working directory: ${style.underline}${cwd}${style.reset}\n
+  console.log(`${style.red + style.bold}[error]${style.reset} \`${defaultConfigPath}\` not found.${style.reset}
+${style.dim}Configuration file \`${defaultConfigPath}\` not found in your working directory: ${style.underline}${cwd}${style.reset}\n
 ${style.dim}Please create a \`poop.json\` file in your working directory and try again.\n
 For information about the structure of the configuration file, please visit: \n${style.underline}https://stamat.github.com/poop${style.reset}\n`)
   process.exit(1)
@@ -293,5 +301,9 @@ function poop() {
       if (/(\.js|\.ts)$/i.test(file)) compileScript()
       if (/(\.sass|\.scss|\.css)$/i.test(file)) compileStyle()
     })
+  }
+
+  if (!config.watch || !config.livereload || !config.serve) {
+    process.exit(1)
   }
 }
