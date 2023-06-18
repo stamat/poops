@@ -27,7 +27,7 @@
     "options": {
       "sourcemap": true,
       "minify": true,
-      "rmNonMinified": true
+      "rmNonMinified": false
     }
   }
 }

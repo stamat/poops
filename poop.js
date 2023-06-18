@@ -207,7 +207,7 @@ function compileStyle() {
   for (const styleEntry of config.style) {
     if (styleEntry.in && styleEntry.out) {
       mkPath(styleEntry.out)
-      compileStyleEntry(styleEntry.in, styleEntry.out)
+      compileStyleEntry(styleEntry.in, styleEntry.out, styleEntry.options)
     }
   }
 }
@@ -236,7 +236,9 @@ function compileStyleEntry(infilePath, outfilePath, options = {}) {
   const compiledSass = sass.compile(infilePath, opts)
 
   fs.writeFileSync(outfilePath, compiledSass.css)
-  fs.writeFileSync(`${outfilePath}.map`, JSON.stringify(compiledSass.sourceMap))
+  if (compiledSass.sourceMap) {
+    fs.writeFileSync(`${outfilePath}.map`, JSON.stringify(compiledSass.sourceMap))
+  }
 
   if (options.minify) {
     postcss([autoprefixer, cssnano]).process(compiledSass.css, {
