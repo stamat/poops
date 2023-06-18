@@ -26,26 +26,41 @@ class Style {
   dim = '\x1b[2m'
   italic = '\x1b[3m'
   underline = '\x1b[4m'
+  blink = '\x1b[5m'
   inverse = '\x1b[7m'
   hidden = '\x1b[8m'
   strikethrough = '\x1b[9m'
   black = '\x1b[30m'
   red = '\x1b[31m'
+  redBright = '\x1b[91m'
   green = '\x1b[32m'
+  greenBright = '\x1b[92m'
   yellow = '\x1b[33m'
+  yellowBright = '\x1b[93m'
   blue = '\x1b[34m'
+  blueBright = '\x1b[94m'
   magenta = '\x1b[35m'
+  magentaBright = '\x1b[95m'
   cyan = '\x1b[36m'
+  cyanBright = '\x1b[96m'
   white = '\x1b[37m'
+  whiteBright = '\x1b[97m'
   gray = '\x1b[90m'
   bgBlack = '\x1b[40m'
   bgRed = '\x1b[41m'
+  bgRedBright = '\x1b[101m'
   bgGreen = '\x1b[42m'
+  bgGreenBright = '\x1b[102m'
   bgYellow = '\x1b[43m'
+  bgYellowBright = '\x1b[103m'
   bgBlue = '\x1b[44m'
+  bgBlueBright = '\x1b[104m'
   bgMagenta = '\x1b[45m'
+  bgMagentaBright = '\x1b[105m'
   bgCyan = '\x1b[46m'
+  bgCyanBright = '\x1b[106m'
   bgWhite = '\x1b[47m'
+  bgWhiteBright = '\x1b[107m'
   bgGray = '\x1b[100m'
   bell = '\x07'
 
@@ -86,13 +101,16 @@ function pathIsDirectory() {
   return fs.lstatSync(path.join(...arguments)).isDirectory()
 }
 
+function mkPath(filePath) {
+  const dirPath = path.dirname(filePath)
+  if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true })
+}
+
 const style = new Style()
 
 // CLI Header
-console.log('')
-console.log(`${style.color('#8b4513')}💩 Poop — v${pkg.version}`)
-console.log(`----------------${style.reset + style.bell}`)
-console.log('')
+console.log(`\n${style.color('#8b4513')}💩 Poop — v${pkg.version}
+----------------${style.reset + style.bell}\n`)
 
 const configPath = path.join(cwd, 'poop.json')
 
@@ -108,6 +126,17 @@ For information about the structure of the configuration file, please visit: \n$
 // Load poop.json
 const config = require(configPath)
 
+if (config.watch) {
+  config.watch = Array.isArray(config.watch) ? config.watch : [config.watch]
+}
+
+if (config.include_paths) {
+  config.include_paths = Array.isArray(config.include_paths) ? config.include_paths : [config.include_paths]
+} else {
+  config.include_paths = ['node_modules']
+}
+
+// Start the webserver
 if (config.serve) {
   const app = connect()
 
@@ -119,12 +148,14 @@ if (config.serve) {
 
   const port = parseInt(config.serve.port, 10) || 4040
   http.createServer(app).listen(port, () => {
-    console.log(`${style.dim}🌍 Local server:${style.reset} ${style.italic + style.underline}http://localhost:${port}${style.reset}`)
+    console.log(`${style.cyanBright + style.bold}[info]${style.reset} ${style.dim}🌍 Local server:${style.reset} ${style.italic + style.underline}http://localhost:${port}${style.reset}`)
+    poop()
   })
+} else {
+  poop()
 }
 
-// SASS Compiler
-
+// SCSS/SASS Compiler
 function tryToFindFile(filePath, extensions) {
   const fileExt = extensions.find(ext => fs.existsSync(`${filePath}.${ext}`))
   if (fileExt) {
@@ -133,48 +164,56 @@ function tryToFindFile(filePath, extensions) {
   return null
 }
 
-function sassImporter(url) {
-  if (fs.existsSync(url)) return null
-  const importPath = path.relative(cwd, path.join(pathToFileURL('node_modules').pathname, url))
+function sassPathResolver(url, resolvePath) {
+  if (fs.existsSync(url)) return new URL(url)
+  const resolvedPath = pathToFileURL(resolvePath)
+  if (!fs.existsSync(resolvedPath.pathname)) return null
+  const importPath = path.relative(cwd, path.join(resolvedPath.pathname, url))
 
   if (!fs.existsSync(importPath)) {
     const correctFile = tryToFindFile(importPath, ['sass', 'scss', 'css'])
-    if (correctFile) return new URL(correctFile, pathToFileURL('node_modules'))
+    if (correctFile) return new URL(correctFile, resolvedPath)
   }
 
   if (pathIsDirectory(importPath) && !pathExists(importPath, 'index.sass') && !pathExists(importPath, 'index.scss')) {
     const correctFile = tryToFindFile(importPath, ['sass', 'scss', 'css'])
-    if (correctFile) return new URL(correctFile, pathToFileURL('node_modules'))
+    if (correctFile) return new URL(correctFile, resolvedPath)
 
     if (!pathExists(importPath, 'package.json')) return null
 
     const pkg = require(path.join(importPath, 'package.json'))
 
-    if (pkg.sass) return new URL(path.join(importPath, pkg.sass), pathToFileURL('node_modules'))
-    if (pkg.css) return new URL(path.join(importPath, pkg.css), pathToFileURL('node_modules'))
+    if (pkg.sass) return new URL(path.join(importPath, pkg.sass), resolvedPath)
+    if (pkg.css) return new URL(path.join(importPath, pkg.css), resolvedPath)
 
     const basename = path.basename(pkg.main)
-    if (pkg.main && /(\.sass|\.scss|\.css)$/i.test(basename)) return new URL(path.join(importPath, pkg.main), pathToFileURL('node_modules'))
+    if (pkg.main && /(\.sass|\.scss|\.css)$/i.test(basename)) return new URL(path.join(importPath, pkg.main), resolvedPath)
     return null
   }
 
-  return new URL(importPath, pathToFileURL('node_modules'))
+  return new URL(importPath, resolvedPath)
 }
 
-function compileSass() {
-  console.log(`${style.green+style.bold}[Style]${style.reset} Compiling SASS...`)
-  compileSassEntry('src/scss/index.scss', 'dist/styles.css')
+function compileStyle() {
+  if (!config.style) return
+  config.style = Array.isArray(config.style) ? config.style : [config.style]
+  for (const styleEntry of config.style) {
+    if (styleEntry.in && styleEntry.out) {
+      mkPath(styleEntry.out)
+      compileStyleEntry(styleEntry.in, styleEntry.out)
+    }
+  }
 }
 
-function compileSassEntry(infilePath, outfilePath) {
+function compileStyleEntry(infilePath, outfilePath) {
   const compiledSass = sass.compile(infilePath, {
-    style: 'compressed',
+    // style: 'compressed',
     sourceMap: true,
     sourceMapIncludeSources: true,
     importers: [{
       // Resolve `node_modules`.
       findFileUrl(url) {
-        return sassImporter(url)
+        return sassPathResolver(url, 'node_modules')
       }
     }]
   })
@@ -184,7 +223,7 @@ function compileSassEntry(infilePath, outfilePath) {
 
   postcss([autoprefixer, cssnano]).process(compiledSass.css, {
     from: outfilePath,
-    to: outfilePath.replace('.css', '.min.css'),
+    to: outfilePath.replace('.css', '.min.css')
   }).then(result => {
     fs.writeFileSync(outfilePath.replace('.css', '.min.css'), result.css)
   }).catch((error) => {
@@ -192,11 +231,19 @@ function compileSassEntry(infilePath, outfilePath) {
   })
 }
 
-function compileJs() {
-  compileJsEntry('src/js/main.ts', 'dist/scripts.js')
+// JS/TS Compiler
+function compileScript() {
+  if (!config.script) return
+  config.script = Array.isArray(config.script) ? config.script : [config.script]
+  for (const scriptEntry of config.script) {
+    if (scriptEntry.in && scriptEntry.out) {
+      mkPath(scriptEntry.out)
+      compileScriptEntry(scriptEntry.in, scriptEntry.out)
+    }
+  }
 }
 
-function compileJsEntry(infilePath, outfilePath) {
+function compileScriptEntry(infilePath, outfilePath) {
   build({
     logLevel: 'error',
     entryPoints: [infilePath],
@@ -205,7 +252,8 @@ function compileJsEntry(infilePath, outfilePath) {
     sourcemap: true,
     minify: false,
     format: 'iife',
-    target: 'es2019'
+    target: 'es2019',
+    nodePaths: config.include_paths
   }).then(() => {
     Terser.minify(fs.readFileSync(outfilePath, 'utf-8')).then((result) => {
       if (result.error) {
@@ -217,16 +265,33 @@ function compileJsEntry(infilePath, outfilePath) {
   })
 }
 
-const lrserver = livereload.createServer({
-  exclusions: ['.git/', '.svn/', '.hg/', 'node_modules/', 'src/']
-})
-lrserver.watch(cwd)
+// Main function
+function poop() {
+  if (config.livereload) {
+    const lrExcludes = ['.git', '.svn', '.hg']
 
-const sourceWatcher = chokidar.watch('src')
-compileSass()
-compileJs()
+    if (config.watch) {
+      lrExcludes.push(...config.watch)
+    }
 
-sourceWatcher.on('change', (file) => {
-  if (/(\.js|\.ts)$/i.test(file)) compileJs()
-  if (/(\.sass|\.scss|\.css)$/i.test(file)) compileSass()
-})
+    if (config.include_paths) {
+      lrExcludes.push(...config.include_paths)
+    }
+
+    const lrserver = livereload.createServer({
+      exclusions: [...new Set(lrExcludes)]
+    })
+    console.log(`${style.cyanBright + style.bold}[info]${style.reset} ${style.dim}🔃 LiveReload server:${style.reset} ${style.italic + style.underline}http://localhost:${lrserver.config.port}${style.reset}`)
+    lrserver.watch(cwd)
+  }
+
+  compileStyle()
+  compileScript()
+
+  if (config.watch) {
+    chokidar.watch(config.watch).on('change', (file) => {
+      if (/(\.js|\.ts)$/i.test(file)) compileScript()
+      if (/(\.sass|\.scss|\.css)$/i.test(file)) compileStyle()
+    })
+  }
+}

@@ -3,18 +3,19 @@
     "port": 4040,
     "base": "/"
   },
+  "livereload": true,
   "watch": [
     "src"
   ],
   "include_paths": [
     "node_modules"
   ],
-  "js": {
-    "input": "src/js/main.js",
-    "output": "dist/js/main.js"
+  "script": {
+    "in": "src/js/main.ts",
+    "out": "dist/scripts.js"
   },
-  "sass": {
-    "input": "src/scss/main.scss",
-    "output": "dist/css/main.css"
+  "style": {
+    "in": "src/scss/index.scss",
+    "out": "dist/styles.css"
   }
 }

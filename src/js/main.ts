@@ -22,7 +22,6 @@ const person = new Person("Stamat", new Date().getFullYear() - 1988);
 // Accessing properties and calling methods
 person.greet();
 
-
 console.log(capitalize('hello')); // Output: Hello
 console.log(calculateSum([1, 2, 3, 4, 5])); // Output: 15
 
