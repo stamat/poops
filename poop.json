@@ -7,15 +7,27 @@
   "watch": [
     "src"
   ],
-  "include_paths": [
+  "includePaths": [
     "node_modules"
   ],
   "script": {
     "in": "src/js/main.ts",
-    "out": "dist/scripts.js"
+    "out": "dist/scripts.js",
+    "options": {
+      "sourceMap": true,
+      "minify": true,
+      "rmNonMinified": true,
+      "format": "iife",
+      "target": "es2019"
+    }
   },
   "style": {
     "in": "src/scss/index.scss",
-    "out": "dist/styles.css"
+    "out": "dist/styles.css",
+    "options": {
+      "sourceMap": true,
+      "minify": true,
+      "rmNonMinified": true
+    }
   }
 }
