@@ -64,6 +64,7 @@
 
     function fire(particleRatio, opts) {
       confetti(Object.assign({}, defaults, opts, {
+        shapes: ['square'],
         particleCount: Math.floor(count * particleRatio)
       }));
     }

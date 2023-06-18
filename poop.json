@@ -14,9 +14,9 @@
     "in": "src/js/main.ts",
     "out": "dist/scripts.js",
     "options": {
-      "sourceMap": true,
+      "sourcemap": true,
       "minify": true,
-      "rmNonMinified": true,
+      "rmNonMinified": false,
       "format": "iife",
       "target": "es2019"
     }
@@ -25,7 +25,7 @@
     "in": "src/scss/index.scss",
     "out": "dist/styles.css",
     "options": {
-      "sourceMap": true,
+      "sourcemap": true,
       "minify": true,
       "rmNonMinified": true
     }

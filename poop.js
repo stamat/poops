@@ -18,7 +18,6 @@ const Terser = require('terser')
 const cwd = process.cwd() // Current Working Directory
 const pkg = require('./package.json')
 const args = process.argv.slice(2)
-console.log(args)
 
 let defaultConfigPath = 'poop.json'
 
@@ -213,11 +212,10 @@ function compileStyle() {
   }
 }
 
-function compileStyleEntry(infilePath, outfilePath) {
-  const compiledSass = sass.compile(infilePath, {
-    // style: 'compressed',
-    sourceMap: true,
-    sourceMapIncludeSources: true,
+function compileStyleEntry(infilePath, outfilePath, options = {}) {
+  const opts = {
+    sourceMap: false,
+    sourceMapIncludeSources: false,
     importers: [{
       // Resolve `includePaths`.
       findFileUrl(url) {
@@ -228,19 +226,34 @@ function compileStyleEntry(infilePath, outfilePath) {
         return null
       }
     }]
-  })
+  }
+
+  if (options.sourcemap) {
+    opts.sourceMap = options.sourcemap
+    opts.sourceMapIncludeSources = options.sourcemap
+  }
+
+  const compiledSass = sass.compile(infilePath, opts)
 
   fs.writeFileSync(outfilePath, compiledSass.css)
   fs.writeFileSync(`${outfilePath}.map`, JSON.stringify(compiledSass.sourceMap))
 
-  postcss([autoprefixer, cssnano]).process(compiledSass.css, {
-    from: outfilePath,
-    to: outfilePath.replace('.css', '.min.css')
-  }).then(result => {
-    fs.writeFileSync(outfilePath.replace('.css', '.min.css'), result.css)
-  }).catch((error) => {
-    console.error('Error occurred during CSS minification:', error)
-  })
+  if (options.minify) {
+    postcss([autoprefixer, cssnano]).process(compiledSass.css, {
+      from: outfilePath,
+      to: outfilePath.replace('.css', '.min.css')
+    }).then(result => {
+      fs.writeFileSync(outfilePath.replace('.css', '.min.css'), result.css)
+    }).catch((error) => {
+      console.error('Error occurred during CSS minification:', error)
+    })
+  } else {
+    fs.unlinkSync(outfilePath.replace('.css', '.min.css'))
+  }
+
+  if (options.rmNonMinified) {
+    fs.unlinkSync(outfilePath)
+  }
 }
 
 // JS/TS Compiler
@@ -250,30 +263,45 @@ function compileScript() {
   for (const scriptEntry of config.script) {
     if (scriptEntry.in && scriptEntry.out) {
       mkPath(scriptEntry.out)
-      compileScriptEntry(scriptEntry.in, scriptEntry.out)
+      compileScriptEntry(scriptEntry.in, scriptEntry.out, scriptEntry.options)
     }
   }
 }
 
-function compileScriptEntry(infilePath, outfilePath) {
-  build({
+function compileScriptEntry(infilePath, outfilePath, options = {}) {
+  const opts = {
     logLevel: 'error',
     entryPoints: [infilePath],
     bundle: true,
     outfile: outfilePath,
-    sourcemap: true,
+    sourcemap: false,
     minify: false,
     format: 'iife',
     target: 'es2019',
     nodePaths: config.includePaths // Resolve `includePaths`
-  }).then(() => {
-    Terser.minify(fs.readFileSync(outfilePath, 'utf-8')).then((result) => {
-      if (result.error) {
-        console.error('Error occurred during JS minification:', result.error)
-      } else {
-        fs.writeFileSync(outfilePath.replace('.js', '.min.js'), result.code)
-      }
-    })
+  }
+
+  if (options.format) opts.format = options.format
+  if (options.target) opts.target = options.target
+  if (options.nodePaths) opts.nodePaths = [...new Set([...opts.nodePaths, ...options.nodePaths])]
+  if (options.sourcemap) opts.sourcemap = options.sourcemap
+
+  build(opts).then(() => {
+    if (options.minify) {
+      Terser.minify(fs.readFileSync(outfilePath, 'utf-8')).then((result) => {
+        if (result.error) {
+          console.error('Error occurred during JS minification:', result.error)
+        } else {
+          fs.writeFileSync(outfilePath.replace('.js', '.min.js'), result.code)
+        }
+      })
+    } else {
+      fs.unlinkSync(outfilePath.replace('.js', '.min.js'))
+    }
+
+    if (options.rmNonMinified) {
+      fs.unlinkSync(outfilePath)
+    }
   })
 }
 
