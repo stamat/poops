@@ -307,7 +307,7 @@ function poop() {
     })
   }
 
-  if (!config.watch || !config.livereload || !config.serve) {
+  if (!config.watch && !config.livereload && !config.serve) {
     process.exit(1)
   }
 }
