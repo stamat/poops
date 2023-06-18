@@ -138,10 +138,10 @@ if (config.watch) {
   config.watch = Array.isArray(config.watch) ? config.watch : [config.watch]
 }
 
-if (config.include_paths) {
-  config.include_paths = Array.isArray(config.include_paths) ? config.include_paths : [config.include_paths]
+if (config.includePaths) {
+  config.includePaths = Array.isArray(config.includePaths) ? config.includePaths : [config.includePaths]
 } else {
-  config.include_paths = ['node_modules']
+  config.includePaths = ['node_modules']
 }
 
 // Start the webserver
@@ -219,9 +219,13 @@ function compileStyleEntry(infilePath, outfilePath) {
     sourceMap: true,
     sourceMapIncludeSources: true,
     importers: [{
-      // Resolve `node_modules`.
+      // Resolve `includePaths`.
       findFileUrl(url) {
-        return sassPathResolver(url, 'node_modules')
+        for (const includePath of config.includePaths) {
+          const resolvedPath = sassPathResolver(url, includePath)
+          if (resolvedPath) return resolvedPath
+        }
+        return null
       }
     }]
   })
@@ -261,7 +265,7 @@ function compileScriptEntry(infilePath, outfilePath) {
     minify: false,
     format: 'iife',
     target: 'es2019',
-    nodePaths: config.include_paths
+    nodePaths: config.includePaths // Resolve `includePaths`
   }).then(() => {
     Terser.minify(fs.readFileSync(outfilePath, 'utf-8')).then((result) => {
       if (result.error) {
@@ -273,7 +277,7 @@ function compileScriptEntry(infilePath, outfilePath) {
   })
 }
 
-// Main function
+// Main function 💩
 function poop() {
   if (config.livereload) {
     const lrExcludes = ['.git', '.svn', '.hg']
@@ -282,8 +286,8 @@ function poop() {
       lrExcludes.push(...config.watch)
     }
 
-    if (config.include_paths) {
-      lrExcludes.push(...config.include_paths)
+    if (config.includePaths) {
+      lrExcludes.push(...config.includePaths)
     }
 
     const lrserver = livereload.createServer({
