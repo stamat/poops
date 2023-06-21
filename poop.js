@@ -271,7 +271,7 @@ function compileStyleEntry(infilePath, outfilePath, options = {}) {
     fs.unlinkSync(minPath)
   }
 
-  if (options.rmNonMinified) {
+  if (options.justMinified) {
     fs.unlinkSync(outfilePath)
   }
 }
@@ -326,7 +326,7 @@ function compileScriptEntry(infilePath, outfilePath, options = {}) {
       fs.unlinkSync(minPath)
     }
 
-    if (options.rmNonMinified) {
+    if (options.justMinified) {
       fs.unlinkSync(outfilePath)
     }
   })

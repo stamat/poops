@@ -16,7 +16,7 @@
     "options": {
       "sourcemap": true,
       "minify": true,
-      "rmNonMinified": false,
+      "justMinified": false,
       "format": "iife",
       "target": "es2019",
       "mangle": true
@@ -28,7 +28,7 @@
     "options": {
       "sourcemap": true,
       "minify": true,
-      "rmNonMinified": false
+      "justMinified": false
     }
   }
 }
