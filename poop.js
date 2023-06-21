@@ -113,6 +113,21 @@ function mkPath(filePath) {
   if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true })
 }
 
+function pathForFile(filePath) {
+  return /\./.test(path.basename(filePath))
+}
+
+function insertMinSuffix(filePath) {
+  const { name, ext } = path.parse(filePath)
+  return path.join(path.dirname(filePath), `${name}.min${ext}`)
+}
+
+function buildStyleOutputFilePath(inputPath, outputPath) {
+  if (pathForFile(outputPath)) return outputPath
+  const { name } = path.parse(inputPath)
+  return path.join(path.join(outputPath, `${name}.css`))
+}
+
 const style = new Style()
 
 // CLI Header
@@ -233,6 +248,8 @@ function compileStyleEntry(infilePath, outfilePath, options = {}) {
     opts.sourceMapIncludeSources = options.sourcemap
   }
 
+  outfilePath = buildStyleOutputFilePath(infilePath, outfilePath, options)
+
   const compiledSass = sass.compile(infilePath, opts)
   const mapsrc = options.sourcemap ? `\n/*# sourceMappingURL=${path.basename(outfilePath)}.map */` : ''
   fs.writeFileSync(outfilePath, compiledSass.css + mapsrc)
@@ -240,17 +257,18 @@ function compileStyleEntry(infilePath, outfilePath, options = {}) {
     fs.writeFileSync(`${outfilePath}.map`, JSON.stringify(compiledSass.sourceMap))
   }
 
+  const minPath = insertMinSuffix(outfilePath)
   if (options.minify) {
     postcss([autoprefixer, cssnano]).process(compiledSass.css, {
       from: outfilePath,
-      to: outfilePath.replace('.css', '.min.css')
+      to: minPath
     }).then(result => {
-      fs.writeFileSync(outfilePath.replace('.css', '.min.css'), result.css)
+      fs.writeFileSync(minPath, result.css)
     }).catch((error) => {
       console.error('Error occurred during CSS minification:', error)
     })
   } else {
-    fs.unlinkSync(outfilePath.replace('.css', '.min.css'))
+    fs.unlinkSync(minPath)
   }
 
   if (options.rmNonMinified) {
@@ -293,17 +311,19 @@ function compileScriptEntry(infilePath, outfilePath, options = {}) {
   if (options.sourcemap) opts.sourcemap = options.sourcemap
   if (options.mangle) terserOpts.mangle = options.mangle
 
+  const minPath = insertMinSuffix(outfilePath)
+
   build(opts).then(() => {
     if (options.minify) {
       Terser.minify(fs.readFileSync(outfilePath, 'utf-8'), { mangle: terserOpts.mangle }).then((result) => {
         if (result.error) {
           console.error('Error occurred during JS minification:', result.error)
         } else {
-          fs.writeFileSync(outfilePath.replace('.js', '.min.js'), result.code)
+          fs.writeFileSync(minPath, result.code)
         }
       })
     } else {
-      fs.unlinkSync(outfilePath.replace('.js', '.min.js'))
+      fs.unlinkSync(minPath)
     }
 
     if (options.rmNonMinified) {
