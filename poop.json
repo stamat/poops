@@ -18,7 +18,8 @@
       "minify": true,
       "rmNonMinified": false,
       "format": "iife",
-      "target": "es2019"
+      "target": "es2019",
+      "mangle": true
     }
   },
   "style": {

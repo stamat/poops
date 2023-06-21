@@ -283,14 +283,19 @@ function compileScriptEntry(infilePath, outfilePath, options = {}) {
     nodePaths: config.includePaths // Resolve `includePaths`
   }
 
+  const terserOpts = {
+    mangle: false
+  }
+
   if (options.format) opts.format = options.format
   if (options.target) opts.target = options.target
   if (options.nodePaths) opts.nodePaths = [...new Set([...opts.nodePaths, ...options.nodePaths])]
   if (options.sourcemap) opts.sourcemap = options.sourcemap
+  if (options.mangle) terserOpts.mangle = options.mangle
 
   build(opts).then(() => {
     if (options.minify) {
-      Terser.minify(fs.readFileSync(outfilePath, 'utf-8')).then((result) => {
+      Terser.minify(fs.readFileSync(outfilePath, 'utf-8'), { mangle: terserOpts.mangle }).then((result) => {
         if (result.error) {
           console.error('Error occurred during JS minification:', result.error)
         } else {
