@@ -128,6 +128,13 @@ function buildStyleOutputFilePath(inputPath, outputPath) {
   return path.join(path.join(outputPath, `${name}.css`))
 }
 
+function buildScriptOutputFilePath(inputPath, outputPath) {
+  if (pathForFile(outputPath)) return outputPath
+  const { name, ext } = path.parse(inputPath)
+  ext.replace('t', 'j')
+  return path.join(path.join(outputPath, `${name}${ext}`))
+}
+
 const style = new Style()
 
 // CLI Header
@@ -288,12 +295,13 @@ function compileScript() {
   }
 }
 
-function compileScriptEntry(infilePath, outfilePath, options = {}) {
+async function compileScriptEntry(infilePath, outfilePath, options = {}) {
+  if (!Array.isArray(infilePath)) infilePath = [infilePath]
+
   const opts = {
     logLevel: 'error',
-    entryPoints: [infilePath],
+    entryPoints: infilePath,
     bundle: true,
-    outfile: outfilePath,
     sourcemap: false,
     minify: false,
     format: 'iife',
@@ -305,29 +313,39 @@ function compileScriptEntry(infilePath, outfilePath, options = {}) {
     mangle: false
   }
 
+  if (!pathForFile(outfilePath)) {
+    opts.outdir = outfilePath
+  } else {
+    opts.outfile = outfilePath
+  }
+
   if (options.format) opts.format = options.format
   if (options.target) opts.target = options.target
   if (options.nodePaths) opts.nodePaths = [...new Set([...opts.nodePaths, ...options.nodePaths])]
   if (options.sourcemap) opts.sourcemap = options.sourcemap
+
   if (options.mangle) terserOpts.mangle = options.mangle
 
-  const minPath = insertMinSuffix(outfilePath)
-
   build(opts).then(() => {
-    if (options.minify) {
-      Terser.minify(fs.readFileSync(outfilePath, 'utf-8'), { mangle: terserOpts.mangle }).then((result) => {
-        if (result.error) {
-          console.error('Error occurred during JS minification:', result.error)
-        } else {
-          fs.writeFileSync(minPath, result.code)
-        }
-      })
-    } else {
-      fs.unlinkSync(minPath)
-    }
+    for (const entry of infilePath) {
+      const minPath = insertMinSuffix(entry)
+      const newOutFilePath = buildScriptOutputFilePath(entry, outfilePath)
 
-    if (options.justMinified) {
-      fs.unlinkSync(outfilePath)
+      if (options.minify) {
+        Terser.minify(fs.readFileSync(newOutFilePath, 'utf-8'), { mangle: terserOpts.mangle }).then((result) => {
+          if (result.error) {
+            console.error('Error occurred during JS minification:', result.error)
+          } else {
+            fs.writeFileSync(minPath, result.code)
+          }
+        })
+
+        if (options.justMinified) {
+          fs.unlinkSync(newOutFilePath)
+        }
+      } else {
+        fs.unlinkSync(minPath)
+      }
     }
   })
 }
