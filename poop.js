@@ -132,8 +132,7 @@ function buildStyleOutputFilePath(inputPath, outputPath) {
 function buildScriptOutputFilePath(inputPath, outputPath) {
   if (pathForFile(outputPath)) return outputPath
   const { name, ext } = path.parse(inputPath)
-  ext.replace('t', 'j')
-  return path.join(path.join(outputPath, `${name}${ext}`))
+  return path.join(path.join(outputPath, `${name}${ext.replace('t', 'j')}`))
 }
 
 const style = new Style()
@@ -376,12 +375,6 @@ function poop() {
     })
     console.log(`${style.cyanBright + style.bold}[info]${style.reset} ${style.dim}🔃 LiveReload server:${style.reset} ${style.italic + style.underline}http://localhost:${lrserver.config.port}${style.reset}`)
     lrserver.watch(cwd)
-
-    console.log(lrserver)
-
-    lrserver.watcher.on('all', (event, file) => {
-      console.log(event, file)
-    })
   }
 
   compileStyle()
