@@ -275,12 +275,12 @@ function compileStyleEntry(infilePath, outfilePath, options = {}) {
     }).catch((error) => {
       console.error('Error occurred during CSS minification:', error)
     })
+
+    if (options.justMinified) {
+      fs.unlinkSync(outfilePath)
+    }
   } else {
     fs.unlinkSync(minPath)
-  }
-
-  if (options.justMinified) {
-    fs.unlinkSync(outfilePath)
   }
 }
 
