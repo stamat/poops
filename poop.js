@@ -145,10 +145,10 @@ const configPath = path.join(cwd, defaultConfigPath)
 
 // Check if poop.json exists
 if (!pathExists(configPath)) {
-  console.log(`${style.red + style.bold}[error]${style.reset} \`${defaultConfigPath}\` not found.${style.reset}
-${style.dim}Configuration file \`${defaultConfigPath}\` not found in your working directory: ${style.underline}${cwd}${style.reset}\n
-${style.dim}Please create a \`poop.json\` file in your working directory and try again.\n
-For information about the structure of the configuration file, please visit: \n${style.underline}https://stamat.github.com/poop${style.reset}\n`)
+  console.log(`${style.redBright + style.bold}[error]${style.reset} \`${style.underline}${defaultConfigPath}${style.reset}\` not found.
+${style.dim}Configuration file \`${style.underline}${defaultConfigPath}${style.reset}${style.dim}\` not found in your working directory: ${style.underline}${cwd}${style.reset}\n
+${style.dim}Please specify another file path or create a \`poop.js\` file in your working directory and try again.\n
+${style.dim}For information on the structure of the configuration file, please visit: \n${style.underline}https://stamat.github.io/poop${style.reset}\n`)
   process.exit(1)
 }
 
@@ -316,6 +316,10 @@ async function compileScriptEntry(infilePath, outfilePath, options = {}) {
   if (!pathForFile(outfilePath)) {
     opts.outdir = outfilePath
   } else {
+    if (infilePath.length > 1) {
+      console.log(`${style.redBright + style.bold}[error]${style.reset} Cannot output multiple ${style.bold + style.underline}script${style.reset} files to a single file. Please specify an output directory path instead.`)
+      process.exit(1)
+    }
     opts.outfile = outfilePath
   }
 
