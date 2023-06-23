@@ -336,8 +336,8 @@ async function compileScriptEntry(infilePath, outfilePath, options = {}) {
 
   build(opts).then(() => {
     for (const entry of infilePath) {
-      const minPath = insertMinSuffix(entry)
       const newOutFilePath = buildScriptOutputFilePath(entry, outfilePath)
+      const minPath = insertMinSuffix(newOutFilePath)
 
       if (options.minify) {
         Terser.minify(fs.readFileSync(newOutFilePath, 'utf-8'), { mangle: terserOpts.mangle }).then((result) => {
@@ -376,6 +376,12 @@ function poop() {
     })
     console.log(`${style.cyanBright + style.bold}[info]${style.reset} ${style.dim}🔃 LiveReload server:${style.reset} ${style.italic + style.underline}http://localhost:${lrserver.config.port}${style.reset}`)
     lrserver.watch(cwd)
+
+    console.log(lrserver)
+
+    lrserver.watcher.on('all', (event, file) => {
+      console.log(event, file)
+    })
   }
 
   compileStyle()
