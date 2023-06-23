@@ -5,6 +5,7 @@ const { build } = require('esbuild')
 const chokidar = require('chokidar')
 const connect = require('connect')
 const cssnano = require('cssnano')
+const deepmerge = require('deepmerge')
 const fs = require('node:fs')
 const http = require('node:http')
 const livereload = require('livereload')
@@ -329,6 +330,9 @@ async function compileScriptEntry(infilePath, outfilePath, options = {}) {
   if (options.sourcemap) opts.sourcemap = options.sourcemap
 
   if (options.mangle) terserOpts.mangle = options.mangle
+
+  delete options.mangle
+  deepmerge(opts, options) // ability to pass other esbuild options `node_modules/esbuild/lib/main.d.ts`
 
   build(opts).then(() => {
     for (const entry of infilePath) {
