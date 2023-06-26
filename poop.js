@@ -223,18 +223,18 @@ function sassPathResolver(url, resolvePath) {
   return new URL(importPath, resolvedPath)
 }
 
-function compileStyle() {
-  if (!config.style) return
-  config.style = Array.isArray(config.style) ? config.style : [config.style]
-  for (const styleEntry of config.style) {
+function compileStyles() {
+  if (!config.styles) return
+  config.styles = Array.isArray(config.styles) ? config.styles : [config.styles]
+  for (const styleEntry of config.styles) {
     if (styleEntry.in && styleEntry.out) {
       mkPath(styleEntry.out)
-      compileStyleEntry(styleEntry.in, styleEntry.out, styleEntry.options)
+      compileStylesEntry(styleEntry.in, styleEntry.out, styleEntry.options)
     }
   }
 }
 
-function compileStyleEntry(infilePath, outfilePath, options = {}) {
+function compileStylesEntry(infilePath, outfilePath, options = {}) {
   const opts = {
     sourceMap: false,
     sourceMapIncludeSources: false,
@@ -284,18 +284,18 @@ function compileStyleEntry(infilePath, outfilePath, options = {}) {
 }
 
 // JS/TS Compiler
-function compileScript() {
-  if (!config.script) return
-  config.script = Array.isArray(config.script) ? config.script : [config.script]
-  for (const scriptEntry of config.script) {
+function compileScripts() {
+  if (!config.scripts) return
+  config.scripts = Array.isArray(config.scripts) ? config.scripts : [config.scripts]
+  for (const scriptEntry of config.scripts) {
     if (scriptEntry.in && scriptEntry.out) {
       mkPath(scriptEntry.out)
-      compileScriptEntry(scriptEntry.in, scriptEntry.out, scriptEntry.options)
+      compileScriptsEntry(scriptEntry.in, scriptEntry.out, scriptEntry.options)
     }
   }
 }
 
-async function compileScriptEntry(infilePath, outfilePath, options = {}) {
+async function compileScriptsEntry(infilePath, outfilePath, options = {}) {
   if (!Array.isArray(infilePath)) infilePath = [infilePath]
 
   const opts = {
@@ -381,13 +381,13 @@ function poop() {
     lrserver.watch(cwd)
   }
 
-  compileStyle()
-  compileScript()
+  compileStyles()
+  compileScripts()
 
   if (config.watch) {
     chokidar.watch(config.watch).on('change', (file) => {
-      if (/(\.js|\.ts)$/i.test(file)) compileScript()
-      if (/(\.sass|\.scss|\.css)$/i.test(file)) compileStyle()
+      if (/(\.js|\.ts)$/i.test(file)) compileScripts()
+      if (/(\.sass|\.scss|\.css)$/i.test(file)) compileStyles()
     })
   }
 

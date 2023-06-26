@@ -10,7 +10,7 @@
   "includePaths": [
     "node_modules"
   ],
-  "script": {
+  "scripts": {
     "in": "src/js/main.ts",
     "out": "dist/scripts.js",
     "options": {
@@ -22,7 +22,7 @@
       "mangle": true
     }
   },
-  "style": {
+  "styles": {
     "in": "src/scss/index.scss",
     "out": "dist/styles.css",
     "options": {
