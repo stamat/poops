@@ -272,7 +272,7 @@ function compileStyleEntry(infilePath, outfilePath, options = {}) {
     }).then(result => {
       fs.writeFileSync(minPath, result.css)
     }).catch((error) => {
-      console.error('Error occurred during CSS minification:', error)
+      console.log(`${style.redBright + style.bold}[error]${style.reset} Error occurred during CSS minification: ${style.dim}${error}${style.reset}`)
     })
 
     if (options.justMinified) {
@@ -341,7 +341,7 @@ async function compileScriptEntry(infilePath, outfilePath, options = {}) {
       if (options.minify) {
         Terser.minify(fs.readFileSync(newOutFilePath, 'utf-8'), { mangle: terserOpts.mangle }).then((result) => {
           if (result.error) {
-            console.error('Error occurred during JS minification:', result.error)
+            console.log(`${style.redBright + style.bold}[error]${style.reset} Error occurred during JS minification: ${style.dim}${result.error}${style.reset}`)
           } else {
             fs.writeFileSync(minPath, result.code)
           }
