@@ -175,7 +175,7 @@ if (config.serve) {
     app.use(serveStatic(cwd))
   }
 
-  const port = parseInt(config.serve.port, 10) || 4040
+  const port = config.serve.port ? parseInt(config.serve.port, 10) : 4040
   http.createServer(app).listen(port, () => {
     console.log(`${style.cyanBright + style.bold}[info]${style.reset} ${style.dim}🌍 Local server:${style.reset} ${style.italic + style.underline}http://localhost:${port}${style.reset}`)
     poop()
@@ -368,6 +368,10 @@ function poop() {
 
     if (config.includePaths) {
       lrExcludes.push(...config.includePaths)
+    }
+
+    if (config.livereload.exclude) {
+      lrExcludes.push(...config.livereload.exclude)
     }
 
     const lrserver = livereload.createServer({
