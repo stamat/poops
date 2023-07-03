@@ -227,7 +227,7 @@ function compileStyles() {
   if (!config.styles) return
   config.styles = Array.isArray(config.styles) ? config.styles : [config.styles]
   for (const styleEntry of config.styles) {
-    if (styleEntry.in && styleEntry.out) {
+    if (styleEntry.in && styleEntry.out && pathExists(styleEntry.in)) {
       mkPath(styleEntry.out)
       compileStylesEntry(styleEntry.in, styleEntry.out, styleEntry.options)
     }
@@ -288,7 +288,7 @@ function compileScripts() {
   if (!config.scripts) return
   config.scripts = Array.isArray(config.scripts) ? config.scripts : [config.scripts]
   for (const scriptEntry of config.scripts) {
-    if (scriptEntry.in && scriptEntry.out) {
+    if (scriptEntry.in && scriptEntry.out && pathExists(scriptEntry.in)) {
       mkPath(scriptEntry.out)
       compileScriptsEntry(scriptEntry.in, scriptEntry.out, scriptEntry.options)
     }
