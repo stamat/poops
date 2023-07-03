@@ -40,7 +40,7 @@ npm i -D poops
 If you have installed Poops globally, create a `poops.json` configuration file in the project root (see [Configuration](#configuration) on how to configure) and run:
 
 ```bash
-s
+poops
 ```
 
 or pass a custom config. This is usefull when you have multiple environments:
