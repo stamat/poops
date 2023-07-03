@@ -281,6 +281,7 @@ function compileStylesEntry(infilePath, outfilePath, options = {}) {
   if (banner) compiledSass.css = banner + '\n' + compiledSass.css
   fs.writeFileSync(outfilePath, compiledSass.css + mapsrc)
   if (compiledSass.sourceMap) {
+    if (banner) compiledSass.sourceMap.mappings = ';' + compiledSass.sourceMap.mappings
     fs.writeFileSync(`${outfilePath}.map`, JSON.stringify(compiledSass.sourceMap))
   }
 
