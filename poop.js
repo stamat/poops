@@ -334,6 +334,13 @@ function compileScriptsEntry(infilePath, outfilePath, options = {}) {
     mangle: false
   }
 
+  if (banner) {
+    opts.banner = {
+      js: banner,
+      css: banner
+    }
+  }
+
   if (!pathForFile(outfilePath)) {
     opts.outdir = outfilePath
   } else {
@@ -364,6 +371,7 @@ function compileScriptsEntry(infilePath, outfilePath, options = {}) {
           if (result.error) {
             console.log(`${style.redBright + style.bold}[error]${style.reset} Error occurred during JS minification: ${style.dim}${result.error}${style.reset}`)
           } else {
+            if (banner) result.code = banner + '\n' + result.code
             fs.writeFileSync(minPath, result.code)
           }
         })

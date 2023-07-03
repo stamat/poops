@@ -10,7 +10,7 @@
   "includePaths": [
     "node_modules"
   ],
-  "banner": "/* {{ name }} v{{ version }}  | {{ homepage }} | {{ license }} License */",
+  "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
   "scripts": {
     "in": "src/js/main.ts",
     "out": "dist/scripts.js",
