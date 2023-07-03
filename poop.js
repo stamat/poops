@@ -172,7 +172,7 @@ ${style.dim}For information on the structure of the configuration file, please v
 
 // Load poop.json
 const config = require(configPath)
-const banner = fillBannerTemplate(config.banner)
+const banner = config.banner ? fillBannerTemplate(config.banner) : null
 
 if (config.watch) {
   config.watch = Array.isArray(config.watch) ? config.watch : [config.watch]
@@ -278,6 +278,7 @@ function compileStylesEntry(infilePath, outfilePath, options = {}) {
 
   const compiledSass = sass.compile(infilePath, opts)
   const mapsrc = options.sourcemap ? `\n/*# sourceMappingURL=${path.basename(outfilePath)}.map */` : ''
+  if (banner) compiledSass.css = banner + '\n' + compiledSass.css
   fs.writeFileSync(outfilePath, compiledSass.css + mapsrc)
   if (compiledSass.sourceMap) {
     fs.writeFileSync(`${outfilePath}.map`, JSON.stringify(compiledSass.sourceMap))
@@ -289,6 +290,7 @@ function compileStylesEntry(infilePath, outfilePath, options = {}) {
       from: outfilePath,
       to: minPath
     }).then(result => {
+      if (banner) result.css = banner + '\n' + result.css
       fs.writeFileSync(minPath, result.css)
     }).catch((error) => {
       console.log(`${style.redBright + style.bold}[error]${style.reset} Error occurred during CSS minification: ${style.dim}${error}${style.reset}`)
