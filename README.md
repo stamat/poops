@@ -297,3 +297,5 @@ Why doesn't anyone maintain GULP anymore? Why does Parcel hate config files? Why
 I'm tired... Tired of bullshit... I just want to bundle my scss/sass and/or my js/ts to css and iife/esm js, by providing input and output paths for both/one. And to be able to have minimal easily maintainable dependancies. I don't need plugins, I'll add the features manually for the practice I use. That's it. The f**king end.
 
 This is a bundler written by me for myself and those like me. Hopefully it's helpful to you too.
+
+Love :heart: and peace :v:.
