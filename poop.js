@@ -153,6 +153,13 @@ function fillBannerTemplate(template, packagesPath) {
     .replace(/{{\s?year\s?}}/g, year)
 }
 
+function buildTime(start, end) {
+  const time = Math.round(end - start)
+  if (time < 1000) return `${time}ms`
+  if (time < 60 * 1000) return `${(time / 1000).toFixed(0)}s ${time % 1000}ms`
+  return `${(time / 1000 / 60).toFixed(0)}m ${((time / 1000) % 60).toFixed(0)}s ${time % 1000}ms`
+}
+
 const style = new Style()
 
 // CLI Header
@@ -276,17 +283,21 @@ function compileStylesEntry(infilePath, outfilePath, options = {}) {
 
   outfilePath = buildStyleOutputFilePath(infilePath, outfilePath, options)
 
+  const cssStart = performance.now()
   const compiledSass = sass.compile(infilePath, opts)
   const mapsrc = options.sourcemap ? `\n/*# sourceMappingURL=${path.basename(outfilePath)}.map */` : ''
   if (banner) compiledSass.css = banner + '\n' + compiledSass.css
   fs.writeFileSync(outfilePath, compiledSass.css + mapsrc)
-  if (!options.justMinified) console.log(`${style.magentaBright + style.bold}[style]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${outfilePath}${style.reset}`)
+  const cssEnd = performance.now()
+  if (!options.justMinified) console.log(`${style.magentaBright + style.bold}[style]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${outfilePath}${style.reset} ${style.greenBright}(${buildTime(cssStart, cssEnd)})${style.reset}`)
+
   if (compiledSass.sourceMap) {
     if (banner) compiledSass.sourceMap.mappings = ';' + compiledSass.sourceMap.mappings
     fs.writeFileSync(`${outfilePath}.map`, JSON.stringify(compiledSass.sourceMap))
     console.log(`${style.magentaBright + style.bold}[style]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${outfilePath}.map${style.reset}`)
   }
 
+  const cssMinStart = performance.now()
   const minPath = insertMinSuffix(outfilePath)
   if (options.minify) {
     postcss([autoprefixer, cssnano]).process(compiledSass.css, {
@@ -295,7 +306,8 @@ function compileStylesEntry(infilePath, outfilePath, options = {}) {
     }).then(result => {
       if (banner) result.css = banner + '\n' + result.css
       fs.writeFileSync(minPath, result.css)
-      console.log(`${style.magentaBright + style.bold}[style]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${minPath}${style.reset}`)
+      const cssMinEnd = performance.now()
+      console.log(`${style.magentaBright + style.bold}[style]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${minPath}${style.reset} ${style.greenBright}(${buildTime(cssMinStart, cssMinEnd)})${style.reset}`)
     }).catch((error) => {
       console.log(`${style.redBright + style.bold}[error]${style.reset} Error occurred during CSS minification: ${style.dim}${error}${style.reset}`)
     })
@@ -365,22 +377,27 @@ function compileScriptsEntry(infilePath, outfilePath, options = {}) {
   delete options.mangle
   deepmerge(opts, options) // ability to pass other esbuild options `node_modules/esbuild/lib/main.d.ts`
 
+  // TODO: Actually loop the build process for each entry point!!!
+  const esbuildStart = performance.now()
   build(opts).then(() => {
+    const esbuildEnd = performance.now()
     for (const entry of infilePath) {
       const newOutFilePath = buildScriptOutputFilePath(entry, outfilePath)
       const minPath = insertMinSuffix(newOutFilePath)
 
-      if (!options.justMinified) console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${newOutFilePath}${style.reset}`)
+      if (!options.justMinified) console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${newOutFilePath}${style.reset} ${style.greenBright}(${buildTime(esbuildStart, esbuildEnd)})${style.reset}`)
       if (options.sourcemap) console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${newOutFilePath}.map${style.reset}`)
 
       if (options.minify) {
+        const terserStart = performance.now()
         Terser.minify(fs.readFileSync(newOutFilePath, 'utf-8'), { mangle: terserOpts.mangle }).then((result) => {
           if (result.error) {
             console.log(`${style.redBright + style.bold}[error]${style.reset} Error occurred during JS minification: ${style.dim}${result.error}${style.reset}`)
           } else {
             if (banner) result.code = banner + '\n' + result.code
             fs.writeFileSync(minPath, result.code)
-            console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${minPath}${style.reset}`)
+            const terserEnd = performance.now()
+            console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${minPath}${style.reset} ${style.greenBright}(${buildTime(terserStart, terserEnd)})${style.reset}`)
           }
         })
 
