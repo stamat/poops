@@ -26,7 +26,7 @@
     "connect": "^3.7.0",
     "cssnano": "^6.0.1",
     "deepmerge": "^4.3.1",
-    "esbuild": "^0.18.4",
+    "esbuild": "^0.18.11",
     "livereload": "^0.9.3",
     "postcss": "^8.4.24",
     "sass": "^1.63.4",
