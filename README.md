@@ -15,6 +15,7 @@ It uses a simple config file where you define your input and output paths and it
 * Bundles JS/TS to IIFE/ESM/CJS
 * Uses [esbuild](https://esbuild.github.io/) for ES bundling
 * Uses [terser](https://terser.org/) for JS minification and mangling
+* Can produce minified code simultaneously with non-minified code!
 * Supports multiple input and output paths
 * Resolves node modules
 * Can add a templatable banner to output files (optional)
