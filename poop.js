@@ -135,6 +135,24 @@ function buildScriptOutputFilePath(inputPath, outputPath) {
   return path.join(path.join(outputPath, `${name}${ext.replace('t', 'j')}`))
 }
 
+function fillBannerTemplate(template, packagesPath) {
+  packagesPath = packagesPath || cwd
+  const packagesFilePath = path.join(packagesPath, 'package.json')
+  if (!pathExists(packagesFilePath)) return template
+  const pkg = require(packagesFilePath)
+  const { name, version, homepage, description, license, author } = pkg
+  const year = new Date().getFullYear()
+
+  return template
+    .replace(/{{\s?name\s?}}/g, name)
+    .replace(/{{\s?version\s?}}/g, version)
+    .replace(/{{\s?homepage\s?}}/g, homepage)
+    .replace(/{{\s?description\s?}}/g, description)
+    .replace(/{{\s?author\s?}}/g, author)
+    .replace(/{{\s?license\s?}}/g, license)
+    .replace(/{{\s?year\s?}}/g, year)
+}
+
 const style = new Style()
 
 // CLI Header
@@ -154,6 +172,7 @@ ${style.dim}For information on the structure of the configuration file, please v
 
 // Load poop.json
 const config = require(configPath)
+const banner = fillBannerTemplate(config.banner)
 
 if (config.watch) {
   config.watch = Array.isArray(config.watch) ? config.watch : [config.watch]
@@ -295,7 +314,7 @@ function compileScripts() {
   }
 }
 
-async function compileScriptsEntry(infilePath, outfilePath, options = {}) {
+function compileScriptsEntry(infilePath, outfilePath, options = {}) {
   if (!Array.isArray(infilePath)) infilePath = [infilePath]
 
   const opts = {
