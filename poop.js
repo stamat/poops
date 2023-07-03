@@ -280,9 +280,11 @@ function compileStylesEntry(infilePath, outfilePath, options = {}) {
   const mapsrc = options.sourcemap ? `\n/*# sourceMappingURL=${path.basename(outfilePath)}.map */` : ''
   if (banner) compiledSass.css = banner + '\n' + compiledSass.css
   fs.writeFileSync(outfilePath, compiledSass.css + mapsrc)
+  if (!options.justMinified) console.log(`${style.magentaBright + style.bold}[style]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${outfilePath}${style.reset}`)
   if (compiledSass.sourceMap) {
     if (banner) compiledSass.sourceMap.mappings = ';' + compiledSass.sourceMap.mappings
     fs.writeFileSync(`${outfilePath}.map`, JSON.stringify(compiledSass.sourceMap))
+    console.log(`${style.magentaBright + style.bold}[style]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${outfilePath}.map${style.reset}`)
   }
 
   const minPath = insertMinSuffix(outfilePath)
@@ -293,6 +295,7 @@ function compileStylesEntry(infilePath, outfilePath, options = {}) {
     }).then(result => {
       if (banner) result.css = banner + '\n' + result.css
       fs.writeFileSync(minPath, result.css)
+      console.log(`${style.magentaBright + style.bold}[style]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${minPath}${style.reset}`)
     }).catch((error) => {
       console.log(`${style.redBright + style.bold}[error]${style.reset} Error occurred during CSS minification: ${style.dim}${error}${style.reset}`)
     })
@@ -367,6 +370,9 @@ function compileScriptsEntry(infilePath, outfilePath, options = {}) {
       const newOutFilePath = buildScriptOutputFilePath(entry, outfilePath)
       const minPath = insertMinSuffix(newOutFilePath)
 
+      if (!options.justMinified) console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${newOutFilePath}${style.reset}`)
+      if (options.sourcemap) console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${newOutFilePath}.map${style.reset}`)
+
       if (options.minify) {
         Terser.minify(fs.readFileSync(newOutFilePath, 'utf-8'), { mangle: terserOpts.mangle }).then((result) => {
           if (result.error) {
@@ -374,6 +380,7 @@ function compileScriptsEntry(infilePath, outfilePath, options = {}) {
           } else {
             if (banner) result.code = banner + '\n' + result.code
             fs.writeFileSync(minPath, result.code)
+            console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${minPath}${style.reset}`)
           }
         })
 
