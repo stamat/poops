@@ -429,7 +429,8 @@ function poop() {
     }
 
     const lrserver = livereload.createServer({
-      exclusions: [...new Set(lrExcludes)]
+      exclusions: [...new Set(lrExcludes)],
+      port: config.livereload.port || 35729
     })
     console.log(`${style.cyanBright + style.bold}[info]${style.reset} ${style.dim}🔃 LiveReload server:${style.reset} ${style.italic + style.underline}http://localhost:${lrserver.config.port}${style.reset}`)
     lrserver.watch(cwd)

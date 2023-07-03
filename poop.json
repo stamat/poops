@@ -1,4 +1,26 @@
 {
+  "scripts": [{
+    "in": "src/js/main.ts",
+    "out": "dist/js/scripts.js",
+    "options": {
+      "sourcemap": true,
+      "minify": true,
+      "justMinified": false,
+      "format": "iife",
+      "target": "es2019",
+      "mangle": true
+    }
+  }],
+  "styles": [{
+    "in": "src/scss/index.scss",
+    "out": "dist/css/styles.css",
+    "options": {
+      "sourcemap": true,
+      "minify": true,
+      "justMinified": false
+    }
+  }],
+  "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
   "serve" : {
     "port": 4040,
     "base": "/"
@@ -9,27 +31,5 @@
   ],
   "includePaths": [
     "node_modules"
-  ],
-  "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
-  "scripts": {
-    "in": "src/js/main.ts",
-    "out": "dist/scripts.js",
-    "options": {
-      "sourcemap": true,
-      "minify": true,
-      "justMinified": false,
-      "format": "iife",
-      "target": "es2019",
-      "mangle": true
-    }
-  },
-  "styles": {
-    "in": "src/scss/index.scss",
-    "out": "dist/styles.css",
-    "options": {
-      "sourcemap": true,
-      "minify": true,
-      "justMinified": false
-    }
-  }
+  ]
 }
