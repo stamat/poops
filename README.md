@@ -103,22 +103,9 @@ Just create a `poop.json` file in the root of your project and add the following
 }
 ```
 
-All config properties are optional except `scripts` or `styles`. You have to specify at least one of them. If you don't have anything to consume, you won't poop. 🤷‍♂️
+All config properties are optional except `scripts` or `styles`. You have to specify at least one of them. If you don't have anything to consume, you won't poop. 💩
 
 You can freely remove the properies that you don't need. For example, if you don't want to run a local server, just remove the `serve` property from the config.
-
-### Banner (optional)
-
-Here you can specify a banner that will be added to the top of the output files. It is templatable via mustache. The following variables are available from your project's `package.json`:
-
-* `name`
-* `version`
-* `homepage`
-* `license`
-* `author`
-* `description`
-
-If you don't want to add a banner, just remove the `banner` property from the config.
 
 ### Scripts
 
@@ -213,6 +200,19 @@ Options:
 ```
 
 As noted earlier, if you don't want to bundle styles, just remove the `styles` property from the config.
+
+### Banner (optional)
+
+Here you can specify a banner that will be added to the top of the output files. It is templatable via mustache. The following variables are available from your project's `package.json`:
+
+* `name`
+* `version`
+* `homepage`
+* `license`
+* `author`
+* `description`
+
+If you don't want to add a banner, just remove the `banner` property from the config.
 
 ### Local Server (optional)
 Sets up a local server for your project.
