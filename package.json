@@ -1,15 +1,15 @@
 {
-  "name": "poop",
+  "name": "poops",
   "description": "A super simple bundler for simple web projects.",
   "version": "1.0.0",
   "license": "MIT",
-  "main": "poop.js",
-  "repository": "https://github.com/stamat/poop.git",
+  "main": "poops.js",
+  "repository": "https://github.com/stamat/poops.git",
   "bin": {
-    "gulp": "./poop.js"
+    "poops": "./poops.js"
   },
-  "author": "OTILITO <nikola@otilito.com> (https://otilito.com)",
-  "homepage": "https://github.com/stamat/poop",
+  "author": "Stamat <@stamat> (http://stamat.info)",
+  "homepage": "https://github.com/stamat/poops",
   "private": false,
   "keywords": [
     "bundler",
@@ -18,7 +18,7 @@
     "toolchain-script"
   ],
   "scripts": {
-    "lint": "eslint ./poop.js"
+    "lint": "eslint ./poops.js"
   },
   "dependencies": {
     "autoprefixer": "^10.4.14",

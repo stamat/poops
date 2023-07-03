@@ -1,4 +1,4 @@
-# 💩 Poop
+# 💩 Poops
 > A super simple bundler for simple web projects.
 
 ----
@@ -25,45 +25,45 @@ It uses a simple config file where you define your input and output paths and it
 * Live reloads on file changes (optional)
 
 ## Quick Start
-You can install poop globally:
+You can install Poops globally:
 
 ```bash
-npm i -g poop
+npm i -g poops
 ```
 
 or locally:
 
 ```bash
-npm i -D poop
+npm i -D poops
 ```
 
-If you have installed Poop globally, create a `poop.json` configuration file in the project root (see [Configuration](#configuration) on how to configure) and run:
+If you have installed Poops globally, create a `poops.json` configuration file in the project root (see [Configuration](#configuration) on how to configure) and run:
 
 ```bash
-poop
+s
 ```
 
 or pass a custom config. This is usefull when you have multiple environments:
 
 ```bash
-poop yourAwesomeConfig.json
+poops yourAwesomeConfig.json
 ```
 
-If you have installed Poop locally you can run it with `npx poop` or add a script to your `package.json`:
+If you have installed Poop locally you can run it with `npx poops` or add a script to your `package.json`:
 
 ```json
 {
   "scripts": {
-    "build": "npx poop"
+    "build": "npx poops"
   }
 }
 ```
 
 ## Configuration
 
-Configuring poop is simple 😌. Let's presume that we have a `src/scss` and `src/js` directories and we want to bundle the files into `dist/css` and `dist/js`.
+Configuring Poops is simple 😌. Let's presume that we have a `src/scss` and `src/js` directories and we want to bundle the files into `dist/css` and `dist/js`.
 
-Just create a `poop.json` file in the root of your project and add the following (you can see this sample config in this repo's root):
+Just create a `poops.json` file in the root of your project and add the following (you can see this sample config in this repo's root):
 
 ```json
 {
@@ -113,7 +113,7 @@ Scripts are bundled with [esbuild](https://esbuild.github.io/). You can specify 
 
 * `in` - the input path, can be an array of file paths, but please just use one file path per script
 * `out` - the output path, can be a directory or a file path, but please just use it as a filename
-* `options` - the options for the bundler. You can apply most of the esbuild options that are not in conflict with poop. See [esbuild's options](https://esbuild.github.io/api/#build-api) for more info.
+* `options` - the options for the bundler. You can apply most of the esbuild options that are not in conflict with Poops. See [esbuild's options](https://esbuild.github.io/api/#build-api) for more info.
 
 Options:
 * `sourcemap` - whether to generate sourcemaps or not, sourcemaps are generated only for non-minified files since they are useful for debugging. Default is `false`
