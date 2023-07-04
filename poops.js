@@ -160,56 +160,6 @@ function buildTime(start, end) {
   return `${(time / 1000 / 60).toFixed(0)}m ${((time / 1000) % 60).toFixed(0)}s ${time % 1000}ms`
 }
 
-const style = new Style()
-
-// CLI Header
-console.log(`\n${style.color('#8b4513')}💩 Poops — v${pkg.version}
-----------------${style.reset + style.bell}\n`)
-
-const configPath = path.join(cwd, defaultConfigPath)
-
-// Check if poops.json exists
-if (!pathExists(configPath)) {
-  console.log(`${style.redBright + style.bold}[error]${style.reset} \`${style.underline}${defaultConfigPath}${style.reset}\` not found.
-${style.dim}Configuration file \`${style.underline}${defaultConfigPath}${style.reset}${style.dim}\` not found in your working directory: ${style.underline}${cwd}${style.reset}\n
-${style.dim}Please specify another file path or create a \`poops.json\` file in your working directory and try again.\n
-${style.dim}For information on the structure of the configuration file, please visit: \n${style.underline}https://stamat.github.io/poops${style.reset}\n`)
-  process.exit(1)
-}
-
-// Load poops.json
-const config = require(configPath)
-const banner = config.banner ? fillBannerTemplate(config.banner) : null
-
-if (config.watch) {
-  config.watch = Array.isArray(config.watch) ? config.watch : [config.watch]
-}
-
-if (config.includePaths) {
-  config.includePaths = Array.isArray(config.includePaths) ? config.includePaths : [config.includePaths]
-} else {
-  config.includePaths = ['node_modules']
-}
-
-// Start the webserver
-if (config.serve) {
-  const app = connect()
-
-  if (config.serve.base && pathExists(cwd, config.serve.base)) {
-    app.use(serveStatic(path.join(cwd, config.serve.base)))
-  } else {
-    app.use(serveStatic(cwd))
-  }
-
-  const port = config.serve.port ? parseInt(config.serve.port, 10) : 4040
-  http.createServer(app).listen(port, () => {
-    console.log(`${style.cyanBright + style.bold}[info]${style.reset} ${style.dim}🌍 Local server:${style.reset} ${style.italic + style.underline}http://localhost:${port}${style.reset}`)
-    poops()
-  })
-} else {
-  poops()
-}
-
 // SCSS/SASS Compiler
 function tryToFindFile(filePath, extensions) {
   const fileExt = extensions.find(ext => fs.existsSync(`${filePath}.${ext}`))
@@ -449,4 +399,54 @@ function poops() {
   if (!config.watch && !config.livereload && !config.serve) {
     process.exit(1)
   }
+}
+
+const style = new Style()
+
+// CLI Header
+console.log(`\n${style.color('#8b4513')}💩 Poops — v${pkg.version}
+----------------${style.reset + style.bell}\n`)
+
+const configPath = path.join(cwd, defaultConfigPath)
+
+// Check if poops.json exists
+if (!pathExists(configPath)) {
+  console.log(`${style.redBright + style.bold}[error]${style.reset} \`${style.underline}${defaultConfigPath}${style.reset}\` not found.
+${style.dim}Configuration file \`${style.underline}${defaultConfigPath}${style.reset}${style.dim}\` not found in your working directory: ${style.underline}${cwd}${style.reset}\n
+${style.dim}Please specify another file path or create a \`poops.json\` file in your working directory and try again.\n
+${style.dim}For information on the structure of the configuration file, please visit: \n${style.underline}https://stamat.github.io/poops${style.reset}\n`)
+  process.exit(1)
+}
+
+// Load poops.json
+const config = require(configPath)
+const banner = config.banner ? fillBannerTemplate(config.banner) : null
+
+if (config.watch) {
+  config.watch = Array.isArray(config.watch) ? config.watch : [config.watch]
+}
+
+if (config.includePaths) {
+  config.includePaths = Array.isArray(config.includePaths) ? config.includePaths : [config.includePaths]
+} else {
+  config.includePaths = ['node_modules']
+}
+
+// Start the webserver
+if (config.serve) {
+  const app = connect()
+
+  if (config.serve.base && pathExists(cwd, config.serve.base)) {
+    app.use(serveStatic(path.join(cwd, config.serve.base)))
+  } else {
+    app.use(serveStatic(cwd))
+  }
+
+  const port = config.serve.port ? parseInt(config.serve.port, 10) : 4040
+  http.createServer(app).listen(port, () => {
+    console.log(`${style.cyanBright + style.bold}[info]${style.reset} ${style.dim}🌍 Local server:${style.reset} ${style.italic + style.underline}http://localhost:${port}${style.reset}`)
+    poops()
+  })
+} else {
+  poops()
 }
