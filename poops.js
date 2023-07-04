@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-const { build } = require('esbuild')
+
 const chokidar = require('chokidar')
 const connect = require('connect')
-const deepmerge = require('deepmerge')
 const helpers = require('./lib/utils/helpers.js')
 const fs = require('node:fs')
 const glob = require('glob')
@@ -11,20 +10,13 @@ const livereload = require('livereload')
 const nunjucks = require('nunjucks')
 const path = require('node:path')
 const serveStatic = require('serve-static')
+const Scripts = require('./lib/scripts.js')
 const Style = require('./lib/utils/style.js')
 const Styles = require('./lib/styles.js')
-const Terser = require('terser')
 
 const {
   pathExists,
-  pathIsDirectory,
-  mkPath,
-  pathForFile,
-  insertMinSuffix,
-  buildScriptOutputFilePath,
-  fillBannerTemplate,
-  buildTime,
-  fileSize
+  pathIsDirectory
 } = helpers
 
 const cwd = process.cwd() // Current Working Directory
@@ -46,95 +38,6 @@ const config = require(configPath)
 const style = new Style()
 
 // JS/TS Compiler
-function compileScripts() {
-  if (!config.scripts) return
-  config.scripts = Array.isArray(config.scripts) ? config.scripts : [config.scripts]
-  for (const scriptEntry of config.scripts) {
-    if (scriptEntry.in && scriptEntry.out && pathExists(scriptEntry.in)) {
-      mkPath(scriptEntry.out)
-      compileScriptsEntry(scriptEntry.in, scriptEntry.out, scriptEntry.options)
-    }
-  }
-}
-
-function compileScriptsEntry(infilePath, outfilePath, options = {}) {
-  if (!Array.isArray(infilePath)) infilePath = [infilePath]
-
-  const opts = {
-    logLevel: 'error',
-    entryPoints: infilePath,
-    bundle: true,
-    sourcemap: false,
-    minify: false,
-    format: 'iife',
-    target: 'es2019',
-    nodePaths: config.includePaths // Resolve `includePaths`
-  }
-
-  const terserOpts = {
-    mangle: false
-  }
-
-  if (banner) {
-    opts.banner = {
-      js: banner,
-      css: banner
-    }
-  }
-
-  if (!pathForFile(outfilePath)) {
-    opts.outdir = outfilePath
-  } else {
-    if (infilePath.length > 1) {
-      console.log(`${style.redBright + style.bold}[error]${style.reset} Cannot output multiple ${style.bold + style.underline}script${style.reset} files to a single file. Please specify an output directory path instead.`)
-      process.exit(1)
-    }
-    opts.outfile = outfilePath
-  }
-
-  if (options.format) opts.format = options.format
-  if (options.target) opts.target = options.target
-  if (options.nodePaths) opts.nodePaths = [...new Set([...opts.nodePaths, ...options.nodePaths])]
-  if (options.sourcemap) opts.sourcemap = options.sourcemap
-
-  if (options.mangle) terserOpts.mangle = options.mangle
-
-  delete options.mangle
-  deepmerge(opts, options) // ability to pass other esbuild options `node_modules/esbuild/lib/main.d.ts`
-
-  // TODO: Actually loop the build process for each entry point!!!
-  const esbuildStart = performance.now()
-  build(opts).then(() => {
-    const esbuildEnd = performance.now()
-    for (const entry of infilePath) {
-      const newOutFilePath = buildScriptOutputFilePath(entry, outfilePath)
-      const minPath = insertMinSuffix(newOutFilePath)
-
-      if (!options.justMinified) console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${newOutFilePath}${style.reset} ${style.greenBright}${fileSize(newOutFilePath)}${style.reset} ${style.green}(${buildTime(esbuildStart, esbuildEnd)})${style.reset}`)
-      if (options.sourcemap) console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${newOutFilePath}.map${style.reset}`)
-
-      if (options.minify) {
-        const terserStart = performance.now()
-        Terser.minify(fs.readFileSync(newOutFilePath, 'utf-8'), { mangle: terserOpts.mangle }).then((result) => {
-          if (result.error) {
-            console.log(`${style.redBright + style.bold}[error]${style.reset} Error occurred during JS minification: ${style.dim}${result.error}${style.reset}`)
-          } else {
-            if (banner) result.code = banner + '\n' + result.code
-            fs.writeFileSync(minPath, result.code)
-            const terserEnd = performance.now()
-            console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${minPath}${style.reset} ${style.greenBright}${fileSize(minPath)}${style.reset} ${style.green}(${buildTime(terserStart, terserEnd)})${style.reset}`)
-          }
-        })
-
-        if (options.justMinified) {
-          fs.unlinkSync(newOutFilePath)
-        }
-      } else {
-        fs.unlinkSync(minPath)
-      }
-    }
-  })
-}
 
 // Main function 💩
 function poops() {
@@ -162,12 +65,12 @@ function poops() {
   }
 
   styles.compile()
-  compileScripts()
+  scripts.compile()
   compileHTML()
 
   if (config.watch) {
     chokidar.watch(config.watch).on('change', (file) => {
-      if (/(\.js|\.ts)$/i.test(file)) compileScripts()
+      if (/(\.js|\.ts)$/i.test(file)) scripts.compile()
       if (/(\.sass|\.scss|\.css)$/i.test(file)) styles.compile()
       if (/(\.html|\.njk)$/i.test(file)) compileHTML()
     })
@@ -254,8 +157,6 @@ ${style.dim}For information on the structure of the configuration file, please v
   process.exit(1)
 }
 
-const banner = config.banner ? fillBannerTemplate(config.banner) : null
-
 class RelativeLoader extends nunjucks.Loader {
   constructor(templatesDir, includePaths) {
     super()
@@ -310,6 +211,7 @@ if (config.includePaths) {
 }
 
 const styles = new Styles(config)
+const scripts = new Scripts(config)
 
 // Start the webserver
 if (config.serve) {
