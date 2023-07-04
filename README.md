@@ -274,12 +274,12 @@ If you don't want to watch for file changes, just remove the `watch` property fr
 ### Include Paths (optional)
 This property is used to specify paths that you want to resolve your imports from. Like `node_modules`. You don't need to specify the `includePaths`, `node_modules` are included by default. But if you do specify `includePaths`, you need to include `node_modules` as well, since this change will override the default behaviour.
 
-Same as `watch` property, `includePaths` accepts an array of paths to include. If you want to include `src` directory, just add it to the `includePaths` array:
+Same as `watch` property, `includePaths` accepts an array of paths to include. If you want to include `lib` directory for instance, just add it to the `includePaths` array:
 
 ```json
 {
   "includePaths": [
-    "src"
+    "node_modules", "lib"
   ]
 }
 ```
