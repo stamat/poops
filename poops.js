@@ -465,13 +465,13 @@ function compileHTML() {
 
       compileTemplate(file, pkg).then((result) => {
         fs.writeFileSync(markupOut, result)
-        console.log(`${style.cyanBright + style.bold}[markup]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${markupOut}${style.reset}`)
+        console.log(`${style.cyanBright + style.bold}[markup]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${path.relative(cwd, markupOut)}${style.reset}`)
       })
     })
   } else {
     compileTemplate(markupIn, pkg).then((result) => {
       fs.writeFileSync(path.join(cwd, config.markup.out, path.basename(markupIn)), result)
-      console.log(`${style.cyanBright + style.bold}[markup]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${path.join(cwd, config.markup.out, path.basename(markupIn))}${style.reset}`)
+      console.log(`${style.cyanBright + style.bold}[markup]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${path.relative(cwd, path.join(cwd, config.markup.out, path.basename(markupIn)))}${style.reset}`)
     })
   }
 }
