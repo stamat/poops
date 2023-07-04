@@ -7,8 +7,10 @@ const connect = require('connect')
 const cssnano = require('cssnano')
 const deepmerge = require('deepmerge')
 const fs = require('node:fs')
+const glob = require('glob')
 const http = require('node:http')
 const livereload = require('livereload')
+const nunjucks = require('nunjucks')
 const path = require('node:path')
 const { pathToFileURL } = require('node:url')
 const postcss = require('postcss')
@@ -20,11 +22,17 @@ const cwd = process.cwd() // Current Working Directory
 const pkg = require('./package.json')
 const args = process.argv.slice(2)
 
+let nunjucksEnv
+
 let defaultConfigPath = 'poops.json'
 
 if (args.length) {
   defaultConfigPath = args[0]
 }
+
+const configPath = path.join(cwd, defaultConfigPath)
+// Load poops.json
+const config = require(configPath)
 
 // Helpers
 
@@ -100,6 +108,8 @@ class Style {
     return `\x1b[48;5;${this.terminalColorIndex(red, green, blue)}m`
   }
 }
+
+const style = new Style()
 
 function pathExists() {
   return fs.existsSync(path.join(...arguments))
@@ -388,11 +398,13 @@ function poops() {
 
   compileStyles()
   compileScripts()
+  compileHTML()
 
   if (config.watch) {
     chokidar.watch(config.watch).on('change', (file) => {
       if (/(\.js|\.ts)$/i.test(file)) compileScripts()
       if (/(\.sass|\.scss|\.css)$/i.test(file)) compileStyles()
+      if (/(\.html|\.njk)$/i.test(file)) compileHTML()
     })
   }
 
@@ -401,13 +413,71 @@ function poops() {
   }
 }
 
-const style = new Style()
+function generateMarkupGlobPattern(excludes) {
+  let markupDefaultExcludes = ['node_modules', '.git', '.svn', '.hg']
+
+  if (excludes) {
+    markupDefaultExcludes.push(...excludes)
+  }
+
+  if (config.includePaths) {
+    markupDefaultExcludes.push(...config.includePaths)
+  }
+
+  markupDefaultExcludes = [...new Set(markupDefaultExcludes)] // Remove duplicates
+
+  return `!(${markupDefaultExcludes.join('|')}|_*)/**/*.+(html|njk)`
+}
+
+function compileTemplate(templateName, context) {
+  return new Promise((resolve, reject) => {
+    nunjucksEnv.getTemplate(templateName).render(context, (error, result) => {
+      if (!error) {
+        resolve(result)
+      } else {
+        reject(error)
+      }
+    })
+  })
+}
+
+function compileHTML() {
+  if (!config.markup && !config.markup.in) return
+
+  const markupIn = path.join(cwd, config.markup.in)
+
+  if (!pathExists(markupIn)) {
+    console.log(`${style.redBright + style.bold}[error]${style.reset} Markup path does not exist: ${style.dim}${markupIn}${style.reset}`)
+    return
+  }
+
+  if (pathIsDirectory(markupIn)) {
+    const markupFiles = [...glob.sync(path.join(markupIn, generateMarkupGlobPattern(config.markup.exclude))), ...glob.sync(path.join(markupIn, '*.+(html|njk)'))]
+    markupFiles.forEach((file) => {
+      const markupOut = path.join(cwd, path.relative(config.markup.in, file))
+      const markupOutDir = path.dirname(markupOut)
+
+      if (!pathExists(markupOutDir)) {
+        fs.mkdirSync(markupOutDir, { recursive: true })
+      }
+
+      compileTemplate(file, pkg).then((result) => {
+        fs.writeFileSync(markupOut, result)
+        //console.log(result)
+      })
+    })
+  } else {
+    console.log(markupIn)
+    compileTemplate(markupIn, pkg).then((result) => {
+      fs.writeFileSync(path.join(cwd, config.markup.out, path.basename(markupIn)), result)
+      //console.log(result)
+    })
+  }
+}
 
 // CLI Header
 console.log(`\n${style.color('#8b4513')}💩 Poops — v${pkg.version}
 ----------------${style.reset + style.bell}\n`)
-
-const configPath = path.join(cwd, defaultConfigPath)
 
 // Check if poops.json exists
 if (!pathExists(configPath)) {
@@ -418,9 +488,42 @@ ${style.dim}For information on the structure of the configuration file, please v
   process.exit(1)
 }
 
-// Load poops.json
-const config = require(configPath)
 const banner = config.banner ? fillBannerTemplate(config.banner) : null
+
+class RelativeLoader extends nunjucks.Loader {
+  constructor(templatesDir) {
+    super()
+    this.templatesDir = templatesDir
+  }
+
+  getSource(name) {
+    let fullPath = name
+    if (!fs.existsSync(name)) {
+      fullPath = glob.sync(path.join(this.templatesDir, `**/${name}`))[0]
+    }
+    if (!fs.existsSync(fullPath)) {
+      throw new Error(`Template not found: ${name}`)
+    }
+    const source = fs.readFileSync(fullPath, 'utf-8')
+    return { src: source, path: fullPath, noCache: false }
+  }
+
+  resolve(from, to) {
+    return path.resolve(path.dirname(from), to)
+  }
+}
+
+if (config.markup && config.markup.in) {
+  nunjucksEnv = new nunjucks.Environment(new RelativeLoader(path.join(cwd, config.markup.in)), {
+    autoescape: true,
+    watch: false,
+    noCache: true
+  })
+
+  if (!config.markup.out) {
+    config.markup.out = cwd
+  }
+}
 
 if (config.watch) {
   config.watch = Array.isArray(config.watch) ? config.watch : [config.watch]

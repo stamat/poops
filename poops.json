@@ -20,6 +20,14 @@
       "justMinified": false
     }
   }],
+  "markup": {
+    "in": "src/markup",
+    "out": "/",
+    "exclude": [
+      "layouts",
+      "partials"
+    ]
+  },
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
   "serve" : {
     "port": 4040,
