@@ -288,8 +288,10 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
 
 * [ ] Run esbuild for each input path individually if there are multiple input paths
 * [ ] Styles `in` should be able to support array of inputs like we have it on scripts
+* [x] Add nunjucs static templating
+  * [ ] Refactor nunjucks implementation
+* [ ] Refactor!!!!
 * [ ] Add more argv options like config creation, etc.
-* [ ] Add nunjucs or liquid static templating
 
 ## Why?
 
