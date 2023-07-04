@@ -290,6 +290,8 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
 * [ ] Styles `in` should be able to support array of inputs like we have it on scripts
 * [x] Add nunjucs static templating
   * [ ] Refactor nunjucks implementation
+  * [ ] Complete documentation for nunjucks
+  * [ ] Future implementation: add Front Matter and posts and custom collections, so we can have a real static site generator
 * [ ] Refactor!!!!
 * [ ] Add more argv options like config creation, etc.
 
