@@ -18,6 +18,20 @@ const sass = require('sass')
 const serveStatic = require('serve-static')
 const Style = require('./lib/style.js')
 const Terser = require('terser')
+const helpers = require('./lib/helpers.js')
+
+const {
+  pathExists,
+  pathIsDirectory,
+  mkPath,
+  pathForFile,
+  insertMinSuffix,
+  buildStyleOutputFilePath,
+  buildScriptOutputFilePath,
+  fillBannerTemplate,
+  buildTime,
+  fileSize
+} = helpers
 
 const cwd = process.cwd() // Current Working Directory
 const pkg = require('./package.json')
@@ -35,68 +49,7 @@ const configPath = path.join(cwd, defaultConfigPath)
 // Load poops.json
 const config = require(configPath)
 
-// Helpers
-
 const style = new Style()
-
-function pathExists() {
-  return fs.existsSync(path.join(...arguments))
-}
-
-function pathIsDirectory() {
-  return fs.lstatSync(path.join(...arguments)).isDirectory()
-}
-
-function mkPath(filePath) {
-  const dirPath = path.dirname(filePath)
-  if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true })
-}
-
-function pathForFile(filePath) {
-  return /\./.test(path.basename(filePath))
-}
-
-function insertMinSuffix(filePath) {
-  const { name, ext } = path.parse(filePath)
-  return path.join(path.dirname(filePath), `${name}.min${ext}`)
-}
-
-function buildStyleOutputFilePath(inputPath, outputPath) {
-  if (pathForFile(outputPath)) return outputPath
-  const { name } = path.parse(inputPath)
-  return path.join(path.join(outputPath, `${name}.css`))
-}
-
-function buildScriptOutputFilePath(inputPath, outputPath) {
-  if (pathForFile(outputPath)) return outputPath
-  const { name, ext } = path.parse(inputPath)
-  return path.join(path.join(outputPath, `${name}${ext.replace('t', 'j')}`))
-}
-
-function fillBannerTemplate(template, packagesPath) {
-  packagesPath = packagesPath || cwd
-  const packagesFilePath = path.join(packagesPath, 'package.json')
-  if (!pathExists(packagesFilePath)) return template
-  const pkg = require(packagesFilePath)
-  const { name, version, homepage, description, license, author } = pkg
-  const year = new Date().getFullYear()
-
-  return template
-    .replace(/{{\s?name\s?}}/g, name)
-    .replace(/{{\s?version\s?}}/g, version)
-    .replace(/{{\s?homepage\s?}}/g, homepage)
-    .replace(/{{\s?description\s?}}/g, description)
-    .replace(/{{\s?author\s?}}/g, author)
-    .replace(/{{\s?license\s?}}/g, license)
-    .replace(/{{\s?year\s?}}/g, year)
-}
-
-function buildTime(start, end) {
-  const time = Math.round(end - start)
-  if (time < 1000) return `${time}ms`
-  if (time < 60 * 1000) return `${(time / 1000).toFixed(0)}s ${time % 1000}ms`
-  return `${(time / 1000 / 60).toFixed(0)}m ${((time / 1000) % 60).toFixed(0)}s ${time % 1000}ms`
-}
 
 // SCSS/SASS Compiler
 function tryToFindFile(filePath, extensions) {
@@ -177,7 +130,7 @@ function compileStylesEntry(infilePath, outfilePath, options = {}) {
   if (banner) compiledSass.css = banner + '\n' + compiledSass.css
   fs.writeFileSync(outfilePath, compiledSass.css + mapsrc)
   const cssEnd = performance.now()
-  if (!options.justMinified) console.log(`${style.magentaBright + style.bold}[style]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${outfilePath}${style.reset} ${style.greenBright}(${buildTime(cssStart, cssEnd)})${style.reset}`)
+  if (!options.justMinified) console.log(`${style.magentaBright + style.bold}[style]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${outfilePath}${style.reset} ${style.greenBright}${fileSize(outfilePath)}${style.reset} ${style.green}(${buildTime(cssStart, cssEnd)})${style.reset}`)
 
   if (compiledSass.sourceMap) {
     if (banner) compiledSass.sourceMap.mappings = ';' + compiledSass.sourceMap.mappings
@@ -195,7 +148,7 @@ function compileStylesEntry(infilePath, outfilePath, options = {}) {
       if (banner) result.css = banner + '\n' + result.css
       fs.writeFileSync(minPath, result.css)
       const cssMinEnd = performance.now()
-      console.log(`${style.magentaBright + style.bold}[style]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${minPath}${style.reset} ${style.greenBright}(${buildTime(cssMinStart, cssMinEnd)})${style.reset}`)
+      console.log(`${style.magentaBright + style.bold}[style]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${minPath}${style.reset} ${style.greenBright}${fileSize(minPath)}${style.reset} ${style.green}(${buildTime(cssMinStart, cssMinEnd)})${style.reset}`)
     }).catch((error) => {
       console.log(`${style.redBright + style.bold}[error]${style.reset} Error occurred during CSS minification: ${style.dim}${error}${style.reset}`)
     })
@@ -273,7 +226,7 @@ function compileScriptsEntry(infilePath, outfilePath, options = {}) {
       const newOutFilePath = buildScriptOutputFilePath(entry, outfilePath)
       const minPath = insertMinSuffix(newOutFilePath)
 
-      if (!options.justMinified) console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${newOutFilePath}${style.reset} ${style.greenBright}(${buildTime(esbuildStart, esbuildEnd)})${style.reset}`)
+      if (!options.justMinified) console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${newOutFilePath}${style.reset} ${style.greenBright}${fileSize(newOutFilePath)}${style.reset} ${style.green}(${buildTime(esbuildStart, esbuildEnd)})${style.reset}`)
       if (options.sourcemap) console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${newOutFilePath}.map${style.reset}`)
 
       if (options.minify) {
@@ -285,7 +238,7 @@ function compileScriptsEntry(infilePath, outfilePath, options = {}) {
             if (banner) result.code = banner + '\n' + result.code
             fs.writeFileSync(minPath, result.code)
             const terserEnd = performance.now()
-            console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${minPath}${style.reset} ${style.greenBright}(${buildTime(terserStart, terserEnd)})${style.reset}`)
+            console.log(`${style.yellowBright + style.bold}[script]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${minPath}${style.reset} ${style.greenBright}${fileSize(minPath)}${style.reset} ${style.green}(${buildTime(terserStart, terserEnd)})${style.reset}`)
           }
         })
 
