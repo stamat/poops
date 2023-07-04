@@ -3,7 +3,7 @@
 
 ----
 
-Intuitive with a minimal learning curve and minimal docs, utilising the most efficient transpilers and compilers available (like [dart-sass](https://sass-lang.com/dart-sass) and [esbuild](https://esbuild.github.io/)) Poop aims to be the simplest bundler option there is. If it's not, please do contribute so we can make it so! 🙏 All ideas and contributions are welcome.
+Intuitive with a minimal learning curve and minimal docs, utilising the most efficient transpilers and compilers available (like [dart-sass](https://sass-lang.com/dart-sass) and [esbuild](https://esbuild.github.io/)) Poops aims to be the simplest bundler option there is. If it's not, please do contribute so we can make it so! 🙏 All ideas and contributions are welcome.
 
 It uses a simple config file where you define your input and output paths and it poops out your bundled files. Simple as that.
 
@@ -50,7 +50,7 @@ or pass a custom config. This is usefull when you have multiple environments:
 poops yourAwesomeConfig.json
 ```
 
-If you have installed Poop locally you can run it with `npx poops` or add a script to your `package.json`:
+If you have installed Poops locally you can run it with `npx poops` or add a script to your `package.json`:
 
 ```json
 {
