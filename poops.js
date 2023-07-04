@@ -6,6 +6,7 @@ const chokidar = require('chokidar')
 const connect = require('connect')
 const cssnano = require('cssnano')
 const deepmerge = require('deepmerge')
+const helpers = require('./lib/utils/helpers.js')
 const fs = require('node:fs')
 const glob = require('glob')
 const http = require('node:http')
@@ -16,9 +17,8 @@ const { pathToFileURL } = require('node:url')
 const postcss = require('postcss')
 const sass = require('sass')
 const serveStatic = require('serve-static')
-const Style = require('./lib/style.js')
+const Style = require('./lib/utils/style.js')
 const Terser = require('terser')
-const helpers = require('./lib/helpers.js')
 
 const {
   pathExists,
