@@ -1,7 +1,7 @@
 {
   "scripts": [{
-    "in": "src/js/main.ts",
-    "out": "dist/js/scripts.js",
+    "in": "example/src/js/main.ts",
+    "out": "example/dist/js/scripts.js",
     "options": {
       "sourcemap": true,
       "minify": true,
@@ -12,8 +12,8 @@
     }
   }],
   "styles": [{
-    "in": "src/scss/index.scss",
-    "out": "dist/css/styles.css",
+    "in": "example/src/scss/index.scss",
+    "out": "example/dist/css/styles.css",
     "options": {
       "sourcemap": true,
       "minify": true,
@@ -21,7 +21,7 @@
     }
   }],
   "markup": {
-    "in": "src/markup",
+    "in": "example/src/markup",
     "out": "/",
     "includePaths": [
       "_layouts",
@@ -35,7 +35,7 @@
   },
   "livereload": true,
   "watch": [
-    "src"
+    "example/src"
   ],
   "includePaths": [
     "node_modules"

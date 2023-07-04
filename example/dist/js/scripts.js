@@ -1,7 +1,7 @@
 /* poops v1.0.2 | https://github.com/stamat/poops | MIT License */
 "use strict";
 (() => {
-  // src/js/scripts/utils.ts
+  // example/src/js/scripts/utils.ts
   function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
@@ -15,7 +15,7 @@
     return `${year}-${month}-${day}`;
   }
 
-  // src/js/main.ts
+  // example/src/js/main.ts
   var Person = class {
     constructor(name, age) {
       this.name = name;
