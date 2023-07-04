@@ -13,13 +13,7 @@
   <script type="text/javascript" src="dist/js/scripts.js"></script>
 </head>
 <body>
-  
-  <header>
-  <h1><span id="poop">💩</span><br>POOPS</h1>
-  <p>Straightforward, no-bullshit, bundler for the web.</p>
-</header>
-
-
+  {% block content %} {% endblock %}
 
   <script>document.write('<script src="http://'
     + (location.host || 'localhost').split(':')[0]
