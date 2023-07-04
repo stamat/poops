@@ -392,7 +392,7 @@ function poops() {
       exclusions: [...new Set(lrExcludes)],
       port: config.livereload.port || 35729
     })
-    console.log(`${style.cyanBright + style.bold}[info]${style.reset} ${style.dim}🔃 LiveReload server:${style.reset} ${style.italic + style.underline}http://localhost:${lrserver.config.port}${style.reset}`)
+    console.log(`${style.blue + style.bold}[info]${style.reset} ${style.dim}🔃 LiveReload server:${style.reset} ${style.italic + style.underline}http://localhost:${lrserver.config.port}${style.reset}`)
     lrserver.watch(cwd)
   }
 
@@ -424,9 +424,11 @@ function generateMarkupGlobPattern(excludes) {
     markupDefaultExcludes.push(...config.includePaths)
   }
 
+  markupDefaultExcludes.push('_*')
+
   markupDefaultExcludes = [...new Set(markupDefaultExcludes)] // Remove duplicates
 
-  return `!(${markupDefaultExcludes.join('|')}|_*)/**/*.+(html|njk)`
+  return `!(${markupDefaultExcludes.join('|')})/**/*.+(html|njk)`
 }
 
 function compileTemplate(templateName, context) {
@@ -452,7 +454,7 @@ function compileHTML() {
   }
 
   if (pathIsDirectory(markupIn)) {
-    const markupFiles = [...glob.sync(path.join(markupIn, generateMarkupGlobPattern(config.markup.exclude))), ...glob.sync(path.join(markupIn, '*.+(html|njk)'))]
+    const markupFiles = [...glob.sync(path.join(markupIn, generateMarkupGlobPattern(config.markup.includePaths))), ...glob.sync(path.join(markupIn, '*.+(html|njk)'))]
     markupFiles.forEach((file) => {
       const markupOut = path.join(cwd, path.relative(config.markup.in, file))
       const markupOutDir = path.dirname(markupOut)
@@ -463,14 +465,13 @@ function compileHTML() {
 
       compileTemplate(file, pkg).then((result) => {
         fs.writeFileSync(markupOut, result)
-        //console.log(result)
+        console.log(`${style.cyanBright + style.bold}[markup]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${markupOut}${style.reset}`)
       })
     })
   } else {
-    console.log(markupIn)
     compileTemplate(markupIn, pkg).then((result) => {
       fs.writeFileSync(path.join(cwd, config.markup.out, path.basename(markupIn)), result)
-      //console.log(result)
+      console.log(`${style.cyanBright + style.bold}[markup]${style.reset} ${style.dim}Compiled:${style.reset} ${style.italic + style.underline}${path.join(cwd, config.markup.out, path.basename(markupIn))}${style.reset}`)
     })
   }
 }
@@ -491,21 +492,29 @@ ${style.dim}For information on the structure of the configuration file, please v
 const banner = config.banner ? fillBannerTemplate(config.banner) : null
 
 class RelativeLoader extends nunjucks.Loader {
-  constructor(templatesDir) {
+  constructor(templatesDir, includePaths) {
     super()
     this.templatesDir = templatesDir
+    this.includePaths = includePaths || []
+    this.includePaths.push('_*')
   }
 
   getSource(name) {
     let fullPath = name
     if (!fs.existsSync(name)) {
-      fullPath = glob.sync(path.join(this.templatesDir, `**/${name}`))[0]
+      let pattern = `**/${name}`
+      if (this.includePaths) {
+        pattern = `{${this.includePaths.join(',')}}/${pattern}`
+      }
+      fullPath = glob.sync(path.join(this.templatesDir, pattern))[0]
     }
     if (!fs.existsSync(fullPath)) {
       throw new Error(`Template not found: ${name}`)
     }
+
+    // TODO: Here we can interpret header yaml and pass it as a context, just like Jekyll does
     const source = fs.readFileSync(fullPath, 'utf-8')
-    return { src: source, path: fullPath, noCache: false }
+    return { src: source, path: fullPath, noCache: true }
   }
 
   resolve(from, to) {
@@ -514,7 +523,7 @@ class RelativeLoader extends nunjucks.Loader {
 }
 
 if (config.markup && config.markup.in) {
-  nunjucksEnv = new nunjucks.Environment(new RelativeLoader(path.join(cwd, config.markup.in)), {
+  nunjucksEnv = new nunjucks.Environment(new RelativeLoader(path.join(cwd, config.markup.in), config.markup.includePaths), {
     autoescape: true,
     watch: false,
     noCache: true
@@ -547,7 +556,7 @@ if (config.serve) {
 
   const port = config.serve.port ? parseInt(config.serve.port, 10) : 4040
   http.createServer(app).listen(port, () => {
-    console.log(`${style.cyanBright + style.bold}[info]${style.reset} ${style.dim}🌍 Local server:${style.reset} ${style.italic + style.underline}http://localhost:${port}${style.reset}`)
+    console.log(`${style.blue + style.bold}[info]${style.reset} ${style.dim}🌍 Local server:${style.reset} ${style.italic + style.underline}http://localhost:${port}${style.reset}`)
     poops()
   })
 } else {

@@ -23,9 +23,9 @@
   "markup": {
     "in": "src/markup",
     "out": "/",
-    "exclude": [
-      "layouts",
-      "partials"
+    "includePaths": [
+      "_layouts",
+      "_partials"
     ]
   },
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
