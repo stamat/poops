@@ -1,5 +1,16 @@
 # 💩 Poops
-> A super simple bundler for simple web projects.
+Straightforward, no-bullshit bundler for the web.
+
+> When your day is long
+> And the night, the night is yours alone
+> When you're sure you've had enough
+> Of these bundlers, well hang on
+>
+> Don't let yourself go
+> 'Cause everybody poops
+> Everybody poops sometimes
+
+R.E.M. - Everybody Poops :poop:
 
 ----
 
