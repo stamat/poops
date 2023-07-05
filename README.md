@@ -221,7 +221,9 @@ Poops can generate static pages for you. This feature is still under development
 * `data` (optional) - is an array of JSON data files, that will be transformed into JS objects and will be available to all templates in the markup directory. If you provide a path to a file for instance `links.json` with a `facebook` property, you can then use this data in your templates `{{ links.facebook }}`. The base name of the file will be used as the variable name, with spaces, dashes and dots replaced with underscores. So `the awesome-links.json` will be available as `{{ the_awesome_links.facebook }}` in your templates.
 * `includePaths` (optional and WIP 🚧) - an array of paths to directories that will be added to the nunjucks include paths. Useful if you want to include templates from other directories. For instance, if you have a `includes` directory with some templates that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the template. All paths that begin with an underscore `_` are ignored by default are currently all interpreted as `includePaths` automatically. This will change in the future, to procide ignore patterns for the markup directories.
 
-**💡 NOTE:** In order to pass the current version to your markup files, Poops reads your `package.json` if it exists in your working directory and sets the golobal variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
+**💡 NOTE:** If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the golobal variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
+
+If your project doesn't have markups, you can remove the `markups` property from the config entirely. No code will be executed for this property.
 
 ### Banner (optional)
 
@@ -282,6 +284,19 @@ You can also exclude files and directories from livereload:
   }
 }
 ```
+
+In order for Livereload to work, you need to add the following script snippet to your HTML files in your development environment:
+
+```html
+<script>document.write('<script src="http://'
+    + (location.host || 'localhost').split(':')[0]
+    + ':35729/livereload.js?snipver=1"></'
+    + 'script>')</script>
+```
+
+Be mindful of the port, if you have specified a custom port, you need to change the port in the snippet as well.
+
+You can also use a browser extension for livereload, for instance here is one for [Chrome](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei?hl=en). You can find also extensions for Firefox and Opera, but NOT for Safari.
 
 If you don't want to run livereload, just remove the `livereload` property from the config, or set it to false.
 
