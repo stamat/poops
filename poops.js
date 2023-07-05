@@ -9,12 +9,10 @@ const Markups = require('./lib/markups.js')
 const path = require('node:path')
 const serveStatic = require('serve-static')
 const Scripts = require('./lib/scripts.js')
-const Style = require('./lib/utils/style.js')
+const PrintStyle = require('./lib/utils/print-style.js')
 const Styles = require('./lib/styles.js')
 
-const {
-  pathExists
-} = helpers
+const { pathExists } = helpers
 
 const cwd = process.cwd() // Current Working Directory
 const pkg = require('./package.json')
@@ -30,12 +28,16 @@ const configPath = path.join(cwd, defaultConfigPath)
 // Load poops.json
 const config = require(configPath)
 
-const style = new Style()
+const pstyle = new PrintStyle()
 
 // JS/TS Compiler
 
 // Main function 💩
 function poops() {
+  const styles = new Styles(config)
+  const scripts = new Scripts(config)
+  const markups = new Markups(config)
+
   if (config.livereload) {
     const lrExcludes = ['.git', '.svn', '.hg']
 
@@ -55,7 +57,7 @@ function poops() {
       exclusions: [...new Set(lrExcludes)],
       port: config.livereload.port || 35729
     })
-    console.log(`${style.blue + style.bold}[info]${style.reset} ${style.dim}🔃 LiveReload server:${style.reset} ${style.italic + style.underline}http://localhost:${lrserver.config.port}${style.reset}`)
+    console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} ${pstyle.dim}🔃 LiveReload server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${lrserver.config.port}${pstyle.reset}`)
     lrserver.watch(cwd)
   }
 
@@ -77,15 +79,15 @@ function poops() {
 }
 
 // CLI Header
-console.log(`\n${style.color('#8b4513')}💩 Poops — v${pkg.version}
-----------------${style.reset + style.bell}\n`)
+console.log(`\n${pstyle.color('#8b4513')}💩 Poops — v${pkg.version}
+----------------${pstyle.reset + pstyle.bell}\n`)
 
 // Check if poops.json exists
 if (!pathExists(configPath)) {
-  console.log(`${style.redBright + style.bold}[error]${style.reset} \`${style.underline}${defaultConfigPath}${style.reset}\` not found.
-${style.dim}Configuration file \`${style.underline}${defaultConfigPath}${style.reset}${style.dim}\` not found in your working directory: ${style.underline}${cwd}${style.reset}\n
-${style.dim}Please specify another file path or create a \`poops.json\` file in your working directory and try again.\n
-${style.dim}For information on the structure of the configuration file, please visit: \n${style.underline}https://stamat.github.io/poops${style.reset}\n`)
+  console.log(`${pstyle.redBright + pstyle.bold}[error]${pstyle.reset} \`${pstyle.underline}${defaultConfigPath}${pstyle.reset}\` not found.
+${pstyle.dim}Configuration file \`${pstyle.underline}${defaultConfigPath}${pstyle.reset}${pstyle.dim}\` not found in your working directory: ${pstyle.underline}${cwd}${pstyle.reset}\n
+${pstyle.dim}Please specify another file path or create a \`poops.json\` file in your working directory and try again.\n
+${pstyle.dim}For information on the structure of the configuration file, please visit: \n${pstyle.underline}https://stamat.github.io/poops${pstyle.reset}\n`)
   process.exit(1)
 }
 
@@ -99,10 +101,6 @@ if (config.includePaths) {
   config.includePaths = ['node_modules']
 }
 
-const styles = new Styles(config)
-const scripts = new Scripts(config)
-const markups = new Markups(config)
-
 // Start the webserver
 if (config.serve) {
   const app = connect()
@@ -115,7 +113,7 @@ if (config.serve) {
 
   const port = config.serve.port ? parseInt(config.serve.port, 10) : 4040
   http.createServer(app).listen(port, () => {
-    console.log(`${style.blue + style.bold}[info]${style.reset} ${style.dim}🌍 Local server:${style.reset} ${style.italic + style.underline}http://localhost:${port}${style.reset}`)
+    console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} ${pstyle.dim}🌍 Local server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${port}${pstyle.reset}`)
     poops()
   })
 } else {
