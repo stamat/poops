@@ -23,6 +23,10 @@
   "markup": {
     "in": "example/src/markup",
     "out": "/",
+    "site": {
+      "title": "💩 Poops",
+      "description": "Straightforward, no-bullshit bundler for the web."
+    },
     "includePaths": [
       "_layouts",
       "_partials"
