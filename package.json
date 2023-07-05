@@ -15,7 +15,8 @@
     "bundler",
     "javascript",
     "sass",
-    "toolchain-script"
+    "toolchain-script",
+    "static-site-generator"
   ],
   "scripts": {
     "lint": "eslint ./poops.js"
