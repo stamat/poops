@@ -2,15 +2,20 @@
 Straightforward, no-bullshit bundler for the web.
 
 > When your day is long
+>
 > And the night, the night is yours alone
+>
 > When you're sure you've had enough
+>
 > Of these bundlers, well hang on
 >
 > Don't let yourself go
+>
 > 'Cause everybody poops
+>
 > Everybody poops sometimes
 
-R.E.M. - Everybody Poops :poop:
+[R.E.M. - Everybody Poops :poop:](https://www.youtube.com/watch?v=5rOiW_xY-kc)
 
 ----
 
