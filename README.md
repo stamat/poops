@@ -21,6 +21,7 @@ It uses a simple config file where you define your input and output paths and it
 * Can add a templatable banner to output files (optional)
 * Supports source maps (optional)
 * Supports minification (optional)
+* Static site generation with [nunjucks](https://mozilla.github.io/nunjucks/) templating (optional)
 * Has a configurable local server (optional)
 * Rebuilds on file changes (optional)
 * Live reloads on file changes (optional)
@@ -62,15 +63,15 @@ If you have installed Poops locally you can run it with `npx poops` or add a scr
 
 ## Configuration
 
-Configuring Poops is simple 😌. Let's presume that we have a `src/scss` and `src/js` directories and we want to bundle the files into `dist/css` and `dist/js`.
+Configuring Poops is simple 😌. Let's presume that we have a `example/src/scss` and `example/src/js` directories and we want to bundle the files into `example/dist/css` and `example/dist/js`. If you also have markup files, you can use [nunjucks](https://mozilla.github.io/nunjucks/) templating engine to generate HTML files from your templates. Let's presume that we have a `example/src/markup` directory and we want to generate HTML files in the root of the your directory.
 
 Just create a `poops.json` file in the root of your project and add the following (you can see this sample config in this repo's root):
 
 ```json
 {
   "scripts": [{
-    "in": "src/js/main.ts",
-    "out": "dist/js/scripts.js",
+    "in": "example/src/js/main.ts",
+    "out": "example/dist/js/scripts.js",
     "options": {
       "sourcemap": true,
       "minify": true,
@@ -81,14 +82,22 @@ Just create a `poops.json` file in the root of your project and add the followin
     }
   }],
   "styles": [{
-    "in": "src/scss/index.scss",
-    "out": "dist/css/styles.css",
+    "in": "example/src/scss/index.scss",
+    "out": "example/dist/css/styles.css",
     "options": {
       "sourcemap": true,
       "minify": true,
       "justMinified": false
     }
   }],
+  "markup": {
+    "in": "example/src/markup",
+    "out": "/",
+    "site": {
+      "title": "Poops",
+      "description": "A super simple bundler for simple web projects."
+    }
+  },
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
   "serve" : {
     "port": 4040,
@@ -104,7 +113,7 @@ Just create a `poops.json` file in the root of your project and add the followin
 }
 ```
 
-All config properties are optional except `scripts` or `styles`. You have to specify at least one of them. If you don't have anything to consume, you won't poop. 💩
+All config properties are optional except `scripts`, `styles` or `markups`. You have to specify at least one of them. If you don't have anything to consume, you won't poop. 💩
 
 You can freely remove the properies that you don't need. For example, if you don't want to run a local server, just remove the `serve` property from the config.
 
@@ -202,6 +211,18 @@ Options:
 
 As noted earlier, if you don't want to bundle styles, just remove the `styles` property from the config.
 
+### Markups 🚧
+
+Poops can generate static pages for you. This feature is still under development, but available for testing from the  v1.0.2. Your markup is templated with [nunjucks](https://mozilla.github.io/nunjucks/). You can specify multiple markup directories to template. **It's currently recommended to specify only one markup directory since this feature is still WIP 🚧.** Each markup directory has the following properties:
+
+* `in` - the input path, can be a directory or a file path, but please just use it as a directory path
+* `out` - the output path, can be only a directory path (for now)
+* `site` (otpional) - global data that will be available to all templates in the markup directory. Like site title, description, social media links, etc. You can then use this data in your templates `{{ site.title }}` for instance.
+* `data` (optional) - is an array of JSON data files, that will be transformed into JS objects and will be available to all templates in the markup directory. If you provide a path to a file for instance `links.json` with a `facebook` property, you can then use this data in your templates `{{ links.facebook }}`. The base name of the file will be used as the variable name, with spaces, dashes and dots replaced with underscores. So `the awesome-links.json` will be available as `{{ the_awesome_links.facebook }}` in your templates.
+* `includePaths` (optional and WIP 🚧) - an array of paths to directories that will be added to the nunjucks include paths. Useful if you want to include templates from other directories. For instance, if you have a `includes` directory with some templates that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the template. All paths that begin with an underscore `_` are ignored by default are currently all interpreted as `includePaths` automatically. This will change in the future, to procide ignore patterns for the markup directories.
+
+**💡 NOTE:** In order to pass the current version to your markup files, Poops reads your `package.json` if it exists in your working directory and sets the golobal variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
+
 ### Banner (optional)
 
 Here you can specify a banner that will be added to the top of the output files. It is templatable via mustache. The following variables are available from your project's `package.json`:
@@ -212,6 +233,14 @@ Here you can specify a banner that will be added to the top of the output files.
 * `license`
 * `author`
 * `description`
+
+
+Here is a samle banner template.
+```
+/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */
+```
+
+You can always pass just a string, you don't have to template it.
 
 If you don't want to add a banner, just remove the `banner` property from the config.
 
@@ -291,7 +320,10 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
 * [x] Add nunjucs static templating
   * [ ] Refactor nunjucks implementation
   * [ ] Complete documentation for nunjucks
-  * [ ] Future implementation: add Front Matter and posts and custom collections, so we can have a real static site generator
+  * [ ] Add markdown support
+  * [ ] Front Matter support
+  * [ ] Future implementation: alternative templating engine liquidjs
+  * [ ] Future implementation: posts and custom collections, so we can have a real static site generator
 * [ ] Refactor!!!!
 * [ ] Add more argv options like config creation, etc.
 
