@@ -27,6 +27,9 @@
       "title": "💩 Poops",
       "description": "Straightforward, no-bullshit bundler for the web."
     },
+    "data": [
+      "_data/links.json"
+    ],
     "includePaths": [
       "_layouts",
       "_partials"

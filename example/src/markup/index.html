@@ -2,4 +2,10 @@
 
 {% block content %}
   {% include "header.html" %}
+
+  <!-- Links loaded from example/markup/_data/links.json -->
+  {{ links }}
+  {% for link in links %}
+    <a href="{{ link.url }}">{{ link.title }}</a>
+  {% endfor %}
 {% endblock %}
