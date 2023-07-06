@@ -6,7 +6,8 @@
   "main": "poops.js",
   "repository": "https://github.com/stamat/poops.git",
   "bin": {
-    "poops": "./poops.js"
+    "poops": "./poops.js",
+    "💩": "./poops.js"
   },
   "author": "Stamat <@stamat> (http://stamat.info)",
   "homepage": "https://github.com/stamat/poops",
