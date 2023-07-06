@@ -70,7 +70,11 @@ function poops() {
     chokidar.watch(config.watch).on('change', (file) => {
       if (/(\.js|\.ts)$/i.test(file)) scripts.compile()
       if (/(\.sass|\.scss|\.css)$/i.test(file)) styles.compile()
-      if (/(\.html|\.njk|\.json|\.yml)$/i.test(file)) markups.compile()
+      if (/(\.html|\.njk)$/i.test(file)) markups.compile()
+      if (/(\.json|\.yml)$/i.test(file)) {
+        markups.reloadDataFiles()
+        markups.compile()
+      }
     })
   }
 
