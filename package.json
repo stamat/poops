@@ -15,6 +15,9 @@
     "bundler",
     "javascript",
     "sass",
+    "nunjucks",
+    "esbuild",
+    "dart-sass",
     "toolchain-script",
     "static-site-generator"
   ],
