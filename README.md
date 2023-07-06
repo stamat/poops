@@ -1,4 +1,4 @@
-# 💩 Poops [![npm](https://badge.fury.io/js/poops.svg)](https://badge.fury.io/js/poops)
+# 💩 Poops [![npm version](https://img.shields.io/npm/v/poops)](https://www.npmjs.com/package/poops)
 Straightforward, no-bullshit bundler for the web.
 
 > When your day is long
