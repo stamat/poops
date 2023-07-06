@@ -272,6 +272,10 @@ Here is a sample markup configuration:
 
 If your project doesn't have markups, you can remove the `markups` property from the config entirely. No code will be executed for this property.
 
+#### Custom Filters
+
+* `slugify` - slugifies a string. Usage: `{{ "My Awesome Title" | slugify }}` will output `my-awesome-title`
+
 ### Banner (optional)
 
 Here you can specify a banner that will be added to the top of the output files. It is templatable via mustache. The following variables are available from your project's `package.json`:
