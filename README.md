@@ -112,7 +112,15 @@ Just create a `poops.json` file in the root of your project and add the followin
     "site": {
       "title": "Poops",
       "description": "A super simple bundler for simple web projects."
-    }
+    },
+     "data": [
+      "_data/links.json",
+      "_data/poops.yaml"
+    ],
+    "includePaths": [
+      "_layouts",
+      "_partials"
+    ]
   },
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
   "serve" : {
@@ -231,13 +239,36 @@ As noted earlier, if you don't want to bundle styles, just remove the `styles` p
 
 Poops can generate static pages for you. This feature is still under development, but available for testing from the  v1.0.2. Your markup is templated with [nunjucks](https://mozilla.github.io/nunjucks/). You can specify multiple markup directories to template. **It's currently recommended to specify only one markup directory since this feature is still WIP 🚧.** Each markup directory has the following properties:
 
-* `in` - the input path, can be a directory or a file path, but please just use it as a directory path
+* `in` - the input path, can be a directory or a file path, but please just use it as a directory path. All files in this directory will be procided and the structure of the directory will be preserved in the output directory. All direcotries that begin with an underscore `_` will be ignored.
 * `out` - the output path, can be only a directory path (for now)
 * `site` (otpional) - global data that will be available to all templates in the markup directory. Like site title, description, social media links, etc. You can then use this data in your templates `{{ site.title }}` for instance.
 * `data` (optional) - is an array of JSON or YAML data files, that once loaded will be available to all templates in the markup directory. If you provide a path to a file for instance `links.json` with a `facebook` property, you can then use this data in your templates `{{ links.facebook }}`. The base name of the file will be used as the variable name, with spaces, dashes and dots replaced with underscores. So `the awesome-links.json` will be available as `{{ the_awesome_links.facebook }}` in your templates. The root directory of the data files is `in` directory. So if you have a `data` directory in your `in` directory, you can specify the data files like this `data: ["data/links.json"]`. The same goes for the YAML files.
-* `includePaths` (optional and WIP 🚧) - an array of paths to directories that will be added to the nunjucks include paths. Useful if you want to include templates from other directories. For instance, if you have a `includes` directory with some templates that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the template. All paths that begin with an underscore `_` are ignored by default are currently all interpreted as `includePaths` automatically. This will change in the future, to procide ignore patterns for the markup directories.
+* `includePaths` (WIP 🚧) - an array of paths to directories that will be added to the nunjucks include paths. Useful if you want to separate template partials and layouts. For instance, if you have a `_includes` directory with a `header.njk` partial that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the partial. This will change in the future, to provide better ignore and include patterns for the markup directories.
 
 **💡 NOTE:** If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the golobal variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
+
+
+Here is a sample markup configuration:
+
+```JSON
+{
+  "markups": {
+    "in": "src/markup",
+    "out": "dist",
+    "site": {
+      "title": "My Awesome Site",
+      "description": "This is my awesome site"
+    },
+    "data": [
+      "data/links.json",
+      "data/other.yaml"
+    ],
+    "includePaths": [
+      "_includes"
+    ]
+  }
+}
+```
 
 If your project doesn't have markups, you can remove the `markups` property from the config entirely. No code will be executed for this property.
 
