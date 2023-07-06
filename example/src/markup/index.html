@@ -7,4 +7,7 @@
   {% for link in links %}
     <a href="{{ link.url }}" id="{{ link.title | slugify }}">{{ link.title }}</a>
   {% endfor %}
+
+  <!-- Links loaded from example/markup/_data/poops.yml -->
+  {% for poop in poops.poops %}{{ poop }}{% endfor %}
 {% endblock %}

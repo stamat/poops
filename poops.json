@@ -28,7 +28,8 @@
       "description": "Straightforward, no-bullshit bundler for the web."
     },
     "data": [
-      "_data/links.json"
+      "_data/links.json",
+      "_data/poops.yaml"
     ],
     "includePaths": [
       "_layouts",

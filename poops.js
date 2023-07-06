@@ -74,7 +74,7 @@ function poops() {
       if (/(\.html|\.njk)$/i.test(file)) markups.compile()
 
       // TODO: We can actually reload the page only if the data file from data has changed.
-      if (/(\.json|\.yml)$/i.test(file)) {
+      if (/(\.json|\.ya?ml)$/i.test(file)) {
         markups.reloadDataFiles().then(() => {
           markups.compile()
         })

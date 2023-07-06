@@ -234,7 +234,7 @@ Poops can generate static pages for you. This feature is still under development
 * `in` - the input path, can be a directory or a file path, but please just use it as a directory path
 * `out` - the output path, can be only a directory path (for now)
 * `site` (otpional) - global data that will be available to all templates in the markup directory. Like site title, description, social media links, etc. You can then use this data in your templates `{{ site.title }}` for instance.
-* `data` (optional) - is an array of JSON data files, that will be transformed into JS objects and will be available to all templates in the markup directory. If you provide a path to a file for instance `links.json` with a `facebook` property, you can then use this data in your templates `{{ links.facebook }}`. The base name of the file will be used as the variable name, with spaces, dashes and dots replaced with underscores. So `the awesome-links.json` will be available as `{{ the_awesome_links.facebook }}` in your templates. The root directory of the data files is `in` directory. So if you have a `data` directory in your `in` directory, you can specify the data files like this `data: ["data/links.json"]`.
+* `data` (optional) - is an array of JSON or YAML data files, that once loaded will be available to all templates in the markup directory. If you provide a path to a file for instance `links.json` with a `facebook` property, you can then use this data in your templates `{{ links.facebook }}`. The base name of the file will be used as the variable name, with spaces, dashes and dots replaced with underscores. So `the awesome-links.json` will be available as `{{ the_awesome_links.facebook }}` in your templates. The root directory of the data files is `in` directory. So if you have a `data` directory in your `in` directory, you can specify the data files like this `data: ["data/links.json"]`. The same goes for the YAML files.
 * `includePaths` (optional and WIP 🚧) - an array of paths to directories that will be added to the nunjucks include paths. Useful if you want to include templates from other directories. For instance, if you have a `includes` directory with some templates that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the template. All paths that begin with an underscore `_` are ignored by default are currently all interpreted as `includePaths` automatically. This will change in the future, to procide ignore patterns for the markup directories.
 
 **💡 NOTE:** If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the golobal variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
@@ -252,8 +252,7 @@ Here you can specify a banner that will be added to the top of the output files.
 * `author`
 * `description`
 
-
-Here is a samle banner template.
+Here is a sample banner template.
 ```
 /* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */
 ```

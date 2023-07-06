@@ -1,7 +1,7 @@
 {
   "name": "poops",
   "description": "A super simple bundler for simple web projects.",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "license": "MIT",
   "main": "poops.js",
   "repository": "https://github.com/stamat/poops.git",
@@ -34,7 +34,8 @@
     "postcss": "^8.4.24",
     "sass": "^1.63.4",
     "serve-static": "^1.15.0",
-    "terser": "^5.18.0"
+    "terser": "^5.18.0",
+    "yaml": "^2.3.1"
   },
   "devDependencies": {
     "eslint": "^8.42.0",
