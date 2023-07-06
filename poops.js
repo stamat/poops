@@ -66,6 +66,7 @@ function poops() {
   markups.compile()
 
   if (config.watch) {
+    // TODO: ability to automatically create a watch list of directories if watch is set to true. The list will be generated from the `in` property of each task.
     chokidar.watch(config.watch).on('change', (file) => {
       if (/(\.js|\.ts)$/i.test(file)) scripts.compile()
       if (/(\.sass|\.scss|\.css)$/i.test(file)) styles.compile()
