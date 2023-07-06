@@ -5,6 +5,6 @@
 
   <!-- Links loaded from example/markup/_data/links.json -->
   {% for link in links %}
-    <a href="{{ link.url }}">{{ link.title }}</a>
+    <a href="{{ link.url }}" id="{{ link.title | slugify }}">{{ link.title }}</a>
   {% endfor %}
 {% endblock %}
