@@ -17,20 +17,12 @@ const { pathExists } = helpers
 const cwd = process.cwd() // Current Working Directory
 const pkg = require('./package.json')
 const args = process.argv.slice(2)
-
-let defaultConfigPath = 'poops.json'
-
-if (args.length) {
-  defaultConfigPath = args[0]
-}
-
-const configPath = path.join(cwd, defaultConfigPath)
-// Load poops.json
-const config = require(configPath)
-
 const pstyle = new PrintStyle()
 
-// JS/TS Compiler
+let defaultConfigPath = 'poops.json'
+if (args.length) defaultConfigPath = args[0]
+let configPath = path.join(cwd, defaultConfigPath)
+if (!args.length && !pathExists(configPath)) configPath = path.join(cwd, '💩.json')
 
 // Main function 💩
 function poops() {
@@ -93,12 +85,15 @@ console.log(`\n${pstyle.color('#8b4513')}💩 Poops — v${pkg.version}
 
 // Check if poops.json exists
 if (!pathExists(configPath)) {
-  console.log(`${pstyle.redBright + pstyle.bold}[error]${pstyle.reset} \`${pstyle.underline}${defaultConfigPath}${pstyle.reset}\` not found.
-${pstyle.dim}Configuration file \`${pstyle.underline}${defaultConfigPath}${pstyle.reset}${pstyle.dim}\` not found in your working directory: ${pstyle.underline}${cwd}${pstyle.reset}\n
-${pstyle.dim}Please specify another file path or create a \`poops.json\` file in your working directory and try again.\n
+  console.log(`${pstyle.redBright + pstyle.bold}[error]${pstyle.reset} \`${pstyle.underline}${defaultConfigPath}${pstyle.reset}\` or \`${pstyle.underline}💩.json${pstyle.reset}\` not found.
+${pstyle.dim}Configuration file \`${defaultConfigPath}\` or \`💩.json\` not found in your working directory: ${pstyle.underline}${cwd}${pstyle.reset}\n
+${pstyle.dim}Please specify another file path or create a \`poops.json\` or \`💩.json\` file in your working directory and try again.\n
 ${pstyle.dim}For information on the structure of the configuration file, please visit: \n${pstyle.underline}https://stamat.github.io/poops${pstyle.reset}\n`)
   process.exit(1)
 }
+
+// Load poops.json
+const config = require(configPath)
 
 if (config.watch) {
   config.watch = Array.isArray(config.watch) ? config.watch : [config.watch]
