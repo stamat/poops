@@ -55,24 +55,20 @@ or locally:
 npm i -D poops
 ```
 
-If you have installed Poops globally, create a `poops.json` configuration file in the project root (see [Configuration](#configuration) on how to configure) and run:
+If you have installed Poops globally, create a `poops.json` or `💩.json` configuration file in the project root (see [Configuration](#configuration) on how to configure) and run:
 
-```bash
-poops
-```
+`poops` or `💩`
 
 or pass a custom config. This is usefull when you have multiple environments:
 
-```bash
-poops yourAwesomeConfig.json
-```
+`poops yourAwesomeConfig.json` or `💩 yourAwesomeConfig.json`
 
-If you have installed Poops locally you can run it with `npx poops` or add a script to your `package.json`:
+If you have installed Poops locally you can run it with `npx poops` or `npx 💩` or add a script to your `package.json`:
 
 ```json
 {
   "scripts": {
-    "build": "npx poops"
+    "build": "npx poops" // or "npx 💩"
   }
 }
 ```
@@ -149,8 +145,8 @@ Scripts are bundled with [esbuild](https://esbuild.github.io/). You can specify 
 * `out` - the output path, can be a directory or a file path, but please just use it as a filename
 * `options` - the options for the bundler. You can apply most of the esbuild options that are not in conflict with Poops. See [esbuild's options](https://esbuild.github.io/api/#build-api) for more info.
 
-Options:
-* `sourcemap` - whether to generate sourcemaps or not, sourcemaps are generated only for non-minified files since they are useful for debugging. Default is `false`
+**Options:**
+* `sourcemap` - whether to generate sourcemaps or not, sourcemaps are generated only for non-minified files since they are useful for debugging. Default is `false`. This is a direct esbuild option
 * `minify` - whether to minify the output or not, minification is performed by Terser and is only applied to non-minified files. Default is `false`
 * `mangle` - whether to mangle the output or not, mangling is performed by Terser and this is the only Terser oprion. Default is `false`
 * `justMinified` - whether you want to have a minified file as output only. Removes the non-minified file from the output. Useful for production builds. Default is `false`
@@ -201,7 +197,7 @@ Styles are bundled with [Dart Sass](https://sass-lang.com/dart-sass). You can sp
 * `out` - the output path, can be a directory or a file path, but please just use it as a filename
 * `options` - the options for the bundler.
 
-Options:
+**Options:**
 * `sourcemap` - whether to generate sourcemaps or not, sourcemaps are generated only for non-minified files since they are useful for debugging. Default is `false`
 * `minify` - whether to minify the output or not, minification is performed by `cssnano` and is only applied to non-minified files. At the minification step, `autoprefixer` is also applied. Default is `false`
 * `justMinified` - whether you want to have a minified file as output only. Removes the non-minified file from the output. Useful for production builds. Defaults to `false`.
