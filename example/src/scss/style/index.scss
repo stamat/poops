@@ -3,7 +3,6 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'DM Sans', Helvetica, Arial, sans-serif !important;
-  font-size: 24px !important;
   line-height: 1.5;
 }
 
@@ -14,7 +13,6 @@ header {
 header h1 {
   font-family: 'Poppins', Helvetica, Arial, sans-serif !important;
   font-weight: 700 !important;
-  font-size: 94px;
   line-height: 1;
   margin: 0;
   color: #824F2D;
@@ -23,5 +21,9 @@ header h1 {
 #poop {
   font-size: 10rem;
   display: inline-block;
-  margin-bottom: 24px;
+}
+
+code.terminal::before {
+  content: '$ ';
+  opacity: 0.5;
 }

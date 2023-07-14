@@ -378,6 +378,8 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
 
 * [ ] Run esbuild for each input path individually if there are multiple input paths
 * [ ] Styles `in` should be able to support array of inputs like we have it on scripts
+* [ ] Build a cli config creation helper tool. If the user doesn't have a config file, we can ask them a few questions and create a config file for them.
+* [ ] Support for LESS styles... I guess...
 * [x] Add nunjucks static templating
   * [ ] Refactor nunjucks implementation
   * [ ] Complete documentation for nunjucks

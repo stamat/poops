@@ -1,4 +1,4 @@
-/* poops v1.0.6 | https://github.com/stamat/poops | MIT License */
+/* poops v1.0.7 | https://github.com/stamat/poops | MIT License */
 "use strict";
 (() => {
   // example/src/js/scripts/utils.ts

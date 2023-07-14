@@ -28,6 +28,7 @@
       "description": "Straightforward, no-bullshit bundler for the web."
     },
     "data": [
+      "_data/features.yaml",
       "_data/links.json",
       "_data/poops.yaml"
     ],
