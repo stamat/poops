@@ -17658,4 +17658,8 @@ code.terminal::before {
   content: "$ ";
   opacity: 0.5;
 }
+
+a {
+  color: #824F2D;
+}
 /*# sourceMappingURL=styles.css.map */
