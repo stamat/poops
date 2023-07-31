@@ -25,7 +25,7 @@ let configPath = path.join(cwd, defaultConfigPath)
 if (!args.length && !pathExists(configPath)) configPath = path.join(cwd, '💩.json')
 
 // Main function 💩
-function poops() {
+async function poops() {
   const styles = new Styles(config)
   const scripts = new Scripts(config)
   const markups = new Markups(config)
@@ -53,9 +53,9 @@ function poops() {
     lrserver.watch(cwd)
   }
 
-  styles.compile()
-  scripts.compile()
-  markups.compile()
+  await styles.compile()
+  await scripts.compile()
+  await markups.compile()
 
   if (config.watch) {
     // TODO: think about watching the updates of the config file itself, we can reload the config and recompile everything.

@@ -1,7 +1,6 @@
 import { capitalize, calculateSum, formatDate } from './scripts/utils'
 
 // Sample TypeScript code rendered by ChatGPT-3
-
 class Person {
   private name: string;
   private age: number;
