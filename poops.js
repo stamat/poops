@@ -80,8 +80,9 @@ async function poops() {
 }
 
 // CLI Header
-console.log(`\n${pstyle.color('#8b4513')}💩 Poops — v${pkg.version}
-----------------${pstyle.reset + pstyle.bell}\n`)
+const title = `💩 Poops — v${pkg.version}`
+console.log(`\n${pstyle.color('#8b4513')}${title}
+${title.replace(/./g, '-')}${pstyle.reset + pstyle.bell}\n`)
 
 // Check if poops.json exists
 if (!pathExists(configPath)) {
