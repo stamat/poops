@@ -35,7 +35,7 @@ if (version && !isValidVersion(version)) {
 }
 
 if (version && packageJson.version === version) {
-  console.log('Version is already set to ', version)
+  console.log('Version is already ', version)
   process.exit(1)
 }
 
@@ -65,24 +65,29 @@ function incrementPatchVersion(version) {
   return `${parts[0]}.${parts[1]}.${patch}`
 }
 
-function run(cmd) {
+function run(cmd, exitOnError = true) {
   console.log(cmd)
-  const out = execSync(cmd)
-  console.log(out.toString())
+  try {
+    const out = execSync(cmd)
+    console.log(out.toString())
+  } catch (e) {
+    if (exitOnError) process.exit(1)
+  }
 }
 
 function publish(version) {
+  packageJson.version = version
+  fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2))
+
+  run('git add package.json')
+  run(`git commit -m "Bump version to ${version}"`)
+
   if (fs.existsSync(path.join(process.cwd(), 'script/build'))) {
     run('script/build')
     execSync('git add .')
     execSync(`git commit -m "Build version ${version}"`)
   }
 
-  packageJson.version = version
-  fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2))
-
-  run('git add package.json')
-  run(`git commit -m "Bump version to ${version}"`)
   run(`git tag v${version}`)
   run('git push')
   run('git push --tags')
@@ -94,11 +99,13 @@ function publish(version) {
         if (notes.trim() !== '') {
           notesArg = `--notes "${notes}"`
         }
+        run(`gh release create v${version} --title "v${version}" ${notesArg} --latest`)
+        run('npm publish', true)
         rl.close()
       })
-      run(`gh release create v${version} --title "v${version}" ${notesArg} --latest`)
+    } else {
+      run('npm publish')
+      rl.close()
     }
   })
-
-  run('npm publish')
 }
