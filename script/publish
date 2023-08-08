@@ -72,6 +72,12 @@ function run(cmd) {
 }
 
 function publish(version) {
+  if (fs.existsSync(path.join(process.cwd(), 'script/build'))) {
+    run('script/build')
+    execSync('git add .')
+    execSync(`git commit -m "Build version ${version}"`)
+  }
+
   packageJson.version = version
   fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2))
 
