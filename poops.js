@@ -21,6 +21,8 @@ const pstyle = new PrintStyle()
 
 let build = false
 let defaultConfigPath = 'poops.json'
+let overridePort = null
+let overrideLivereloadPort = null
 
 for (let i = 0; i < args.length; i++) {
   const arg = args[i]
@@ -31,7 +33,29 @@ for (let i = 0; i < args.length; i++) {
       break
     case '-c':
     case '--config':
+      if (args.length === i + 1 || args[i + 1].startsWith('-')) {
+        console.log(`${pstyle.redBright + pstyle.bold}[error]${pstyle.reset} Missing config file path`)
+        process.exit(1)
+      }
       defaultConfigPath = args[i + 1]
+      i++
+      break
+    case '-p':
+    case '--port':
+      if (args.length === i + 1 || args[i + 1].startsWith('-') || isNaN(args[i + 1])) {
+        console.log(`${pstyle.redBright + pstyle.bold}[error]${pstyle.reset} Missing port number`)
+        process.exit(1)
+      }
+      overridePort = args[i + 1]
+      i++
+      break
+    case '-l':
+    case '--livereload':
+      if (args.length === i + 1 || args[i + 1].startsWith('-') || isNaN(args[i + 1])) {
+        console.log(`${pstyle.redBright + pstyle.bold}[error]${pstyle.reset} Missing livereload port number`)
+        process.exit(1)
+      }
+      overrideLivereloadPort = args[i + 1]
       i++
       break
     case '-v':
@@ -45,6 +69,8 @@ for (let i = 0; i < args.length; i++) {
       -b, --build\t\tBuild the project and exit
       -c, --config\t\tSpecify the config file
       -h, --help\t\tShow this help message
+      -l, --livereload\tSpecify the port to use for the livereload server, overrides the config file
+      -p, --port\t\tSpecify the port to use for the server, overrides the config file
       -v, --version\t\tShow version number`)
       process.exit(0)
       break
@@ -63,6 +89,12 @@ if (!args.length && !pathExists(configPath)) configPath = path.join(cwd, '💩.j
 
 // Main function 💩
 async function poops() {
+  let lport
+  if (config.livereload) {
+    lport = overrideLivereloadPort || config.livereload.port || 35729
+    config.livereload_port = lport
+  }
+
   const styles = new Styles(config)
   const scripts = new Scripts(config)
   const markups = new Markups(config)
@@ -91,7 +123,7 @@ async function poops() {
 
     const lrserver = livereload.createServer({
       exclusions: [...new Set(lrExcludes)],
-      port: config.livereload.port || 35729
+      port: lport
     })
     console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} ${pstyle.dim}🔃 LiveReload server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${lrserver.config.port}${pstyle.reset}`)
     lrserver.watch(cwd)
@@ -156,8 +188,8 @@ if (!build && config.serve) {
     app.use(serveStatic(cwd))
   }
 
-  const port = config.serve.port ? parseInt(config.serve.port, 10) : 4040
-  http.createServer(app).listen(port, () => {
+  const port = overridePort || config.serve.port || 4040
+  http.createServer(app).listen(parseInt(port), () => {
     console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} ${pstyle.dim}🌍 Local server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${port}${pstyle.reset}`)
     poops()
   })

@@ -17,10 +17,12 @@
 <body>
   {% block content %} {% endblock %}
 
+  {% if livereload_port %}
   <script>document.write('<script src="http://'
     + (location.host || 'localhost').split(':')[0]
-    + ':35729/livereload.js?snipver=1"></'
+    + ':{{livereload_port}}/livereload.js?snipver=1"></'
     + 'script>')</script>
+  {% endif %}
 
   <script type="text/javascript">
     var poop = document.getElementById('poop');
