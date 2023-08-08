@@ -19,8 +19,45 @@ const pkg = require('./package.json')
 const args = process.argv.slice(2)
 const pstyle = new PrintStyle()
 
+let build = false
 let defaultConfigPath = 'poops.json'
-if (args.length) defaultConfigPath = args[0]
+
+for (let i = 0; i < args.length; i++) {
+  const arg = args[i]
+  switch (arg) {
+    case '-b':
+    case '--build':
+      build = true
+      break
+    case '-c':
+    case '--config':
+      defaultConfigPath = args[i + 1]
+      i++
+      break
+    case '-v':
+    case '--version':
+      console.log(pkg.version)
+      process.exit(0)
+      break
+    case '-h':
+    case '--help':
+      console.log(`Usage: ${pkg.name} [config-file] [options]
+      -b, --build\t\tBuild the project and exit
+      -c, --config\t\tSpecify the config file
+      -h, --help\t\tShow this help message
+      -v, --version\t\tShow version number`)
+      process.exit(0)
+      break
+    default:
+      if (arg.startsWith('-')) {
+        console.log(`Unknown option: ${arg}`)
+        process.exit(1)
+      } else {
+        defaultConfigPath = arg
+      }
+  }
+}
+
 let configPath = path.join(cwd, defaultConfigPath)
 if (!args.length && !pathExists(configPath)) configPath = path.join(cwd, '💩.json')
 
@@ -29,6 +66,13 @@ async function poops() {
   const styles = new Styles(config)
   const scripts = new Scripts(config)
   const markups = new Markups(config)
+
+  if (build || (!config.watch && !config.livereload && !config.serve)) {
+    await styles.compile()
+    await scripts.compile()
+    await markups.compile()
+    process.exit(0)
+  }
 
   if (config.livereload) {
     const lrExcludes = ['.git', '.svn', '.hg']
@@ -73,10 +117,6 @@ async function poops() {
       }
     })
   }
-
-  if (!config.watch && !config.livereload && !config.serve) {
-    process.exit(1)
-  }
 }
 
 // CLI Header
@@ -107,7 +147,7 @@ if (config.includePaths) {
 }
 
 // Start the webserver
-if (config.serve) {
+if (!build && config.serve) {
   const app = connect()
 
   if (config.serve.base && pathExists(cwd, config.serve.base)) {
