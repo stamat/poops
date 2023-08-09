@@ -11,6 +11,7 @@ const serveStatic = require('serve-static')
 const Scripts = require('./lib/scripts.js')
 const PrintStyle = require('./lib/utils/print-style.js')
 const Styles = require('./lib/styles.js')
+const portscanner = require('portscanner')
 
 const { pathExists } = helpers
 
@@ -69,7 +70,7 @@ for (let i = 0; i < args.length; i++) {
       -b, --build\t\tBuild the project and exit
       -c, --config\t\tSpecify the config file
       -h, --help\t\tShow this help message
-      -l, --livereload\tSpecify the port to use for the livereload server, overrides the config file
+      -l, --livereload\t\tSpecify the port to use for the livereload server, overrides the config file
       -p, --port\t\tSpecify the port to use for the server, overrides the config file
       -v, --version\t\tShow version number`)
       process.exit(0)
@@ -92,6 +93,7 @@ async function poops() {
   let lport
   if (config.livereload) {
     lport = overrideLivereloadPort || config.livereload.port || 35729
+    if (!overrideLivereloadPort) lport = await getAvailablePort(lport, lport + 10)
     config.livereload_port = lport
   }
 
@@ -178,8 +180,19 @@ if (config.includePaths) {
   config.includePaths = ['node_modules']
 }
 
-// Start the webserver
-if (!build && config.serve) {
+async function getAvailablePort(port, max) {
+  while (port < max) {
+    const status = await portscanner.checkPortStatus(port, 'localhost')
+    if (status === 'closed') {
+      return port
+    } else {
+      port++
+    }
+  }
+  return port
+}
+
+async function startServer() {
   const app = connect()
 
   if (config.serve.base && pathExists(cwd, config.serve.base)) {
@@ -188,11 +201,18 @@ if (!build && config.serve) {
     app.use(serveStatic(cwd))
   }
 
-  const port = overridePort || config.serve.port || 4040
+  let port = overridePort || config.serve.port || 4040
+  if (!overridePort) port = await getAvailablePort(port, port + 10)
+
   http.createServer(app).listen(parseInt(port), () => {
     console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} ${pstyle.dim}🌍 Local server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${port}${pstyle.reset}`)
     poops()
   })
+}
+
+// Start the webserver
+if (!build && config.serve) {
+  startServer()
 } else {
   poops()
 }
