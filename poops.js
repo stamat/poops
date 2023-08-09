@@ -86,7 +86,7 @@ for (let i = 0; i < args.length; i++) {
 }
 
 let configPath = path.join(cwd, defaultConfigPath)
-if (!pathExists(configPath)) configPath = path.join(cwd, '💩.json')
+if (!pathExists(configPath)) configPath = path.join(cwd, '💩.json') //TODO: Ok dude, I know it's late, but you can do better than this.
 
 // Main function 💩
 async function poops() {
