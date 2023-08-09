@@ -41,11 +41,25 @@ function incrementPatchVersion(version) {
   return `${parts[0]}.${parts[1]}.${patch}`
 }
 
+function runPromise(child) {
+  child.stdout.on('data', (data) => {
+    console.log(data.toString())
+  })
+
+  child.stderr.on('data', (data) => {
+    console.log(data.toString())
+  })
+
+  return new Promise(function(resolve, reject) {
+    child.addListener('error', reject)
+    child.addListener('exit', resolve)
+  })
+}
+
 async function run(cmd, exitOnError = true) {
   console.log(cmd)
   try {
-    const out = await exec(cmd)
-    console.log(out.toString())
+    await runPromise(exec(cmd))
   } catch (e) {
     if (exitOnError) process.exit(1)
   }
@@ -55,30 +69,30 @@ async function publish(version) {
   packageJson.version = version
   fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2))
 
-  run('git add package.json')
-  run(`git commit -m "Bump version to ${version}"`)
+  await run('git add package.json')
+  await run(`git commit -m "Bump version to ${version}"`)
 
   if (fs.existsSync(path.join(process.cwd(), 'script/build'))) {
-    run('script/build')
-    run('git add .')
-    run(`git commit -m "Build version ${version}"`)
+    await run('script/build')
+    await run('git add .')
+    await run(`git commit -m "Build version ${version}"`)
   }
 
-  run(`git tag v${version}`)
-  run('git push')
-  run('git push --tags')
+  await run(`git tag v${version}`)
+  await run('git push')
+  await run('git push --tags')
 
-  const publish = await question('Do you want to publish the package? (y/n) ')
+  const publish = await question('Do you want to publish the package? (y/n): ')
   if (publish === 'y') {
     let notesArg = ''
     const notes = await question('Enter notes for the release (optional): ')
     if (notes.trim() !== '') {
       notesArg = ` --notes "${notes}"`
     }
-    run(`gh release create v${version} --title "v${version}"${notesArg} --generate-notes --latest`)
-    run('npm publish')
+    await run(`gh release create v${version} --title "v${version}"${notesArg} --generate-notes --latest`)
+    await run('npm publish')
   } else {
-    run('npm publish')
+    await run('npm publish')
   }
 }
 
