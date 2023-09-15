@@ -120,8 +120,7 @@ async function init() {
     if (answer === 'y') {
       publish(version)
     } else {
-      console.log('Aborted')
-      process.exit(0)
+      publish(packageJson.version)
     }
   } else {
     publish(version)
