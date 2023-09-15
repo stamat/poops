@@ -26,17 +26,14 @@
     "lint": "eslint ./poops.js"
   },
   "dependencies": {
-    "autoprefixer": "^10.4.14",
     "chokidar": "^3.5.3",
     "connect": "^3.7.0",
-    "cssnano": "^6.0.1",
     "deepmerge": "^4.3.1",
     "esbuild": "^0.18.4",
     "glob": "^10.3.1",
     "livereload": "^0.9.3",
     "nunjucks": "^3.2.4",
     "portscanner": "^2.2.0",
-    "postcss": "^8.4.24",
     "sass": "^1.63.4",
     "serve-static": "^1.15.0",
     "terser": "^5.18.0",
