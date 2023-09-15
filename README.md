@@ -87,8 +87,7 @@ Just create a `poops.json` file in the root of your project and add the followin
       "minify": true,
       "justMinified": false,
       "format": "iife",
-      "target": "es2019",
-      "mangle": true
+      "target": "es2019"
     }
   }],
   "styles": [{
@@ -164,8 +163,7 @@ Scripts are bundled with [esbuild](https://esbuild.github.io/). You can specify 
         "minify": true,
         "justMinified": false,
         "format": "iife",
-        "target": "es2019",
-        "mangle": true
+        "target": "es2019"
       }
     },
     {
@@ -176,8 +174,7 @@ Scripts are bundled with [esbuild](https://esbuild.github.io/). You can specify 
         "minify": true,
         "justMinified": false,
         "format": "iife",
-        "target": "es2019",
-        "mangle": true
+        "target": "es2019"
       }
     }
   ]
