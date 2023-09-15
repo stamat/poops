@@ -27,15 +27,14 @@ It uses a simple config file where you define your input and output paths and it
 
 * Bundles SCSS/SASS to CSS
 * Uses [dart-sass](https://sass-lang.com/dart-sass)for SCSS/SASS bundling
+* Bundles JS/TS to IIFE/ESM/CJS
 * Uses [esbuild](https://esbuild.github.io/) for bundling and trinspiling JS/TS to IIFE/ESM/CJS
-* CSS minification via [esbuild](https://esbuild.github.io/)
-* Uses [terser](https://terser.org/) for JS minification and mangling
-* Can produce minified code simultaneously with non-minified code!
+* Optional JS and CSS minification using [esbuild](https://esbuild.github.io/)
+* Can produce minified code simultaneously with non-minified code! (cause I always forget to minify my code for production)
+* Supports source maps only for non minified - non production code (optional)
 * Supports multiple input and output paths
 * Resolves node modules
 * Can add a templatable banner to output files (optional)
-* Supports source maps (optional)
-* Supports minification (optional)
 * Static site generation with [nunjucks](https://mozilla.github.io/nunjucks/) templating (optional)
 * Has a configurable local server (optional)
 * Rebuilds on file changes (optional)
@@ -146,8 +145,7 @@ Scripts are bundled with [esbuild](https://esbuild.github.io/). You can specify 
 
 **Options:**
 * `sourcemap` - whether to generate sourcemaps or not, sourcemaps are generated only for non-minified files since they are useful for debugging. Default is `false`. This is a direct esbuild option
-* `minify` - whether to minify the output or not, minification is performed by Terser and is only applied to non-minified files. Default is `false`
-* `mangle` - whether to mangle the output or not, mangling is performed by Terser and this is the only Terser option. Default is `false`
+* `minify` - whether to minify the output or not, minification is performed by `esbuild` and is only applied to non-minified files. Default is `false`
 * `justMinified` - whether you want to have a minified file as output only. Removes the non-minified file from the output. Useful for production builds. Default is `false`
 * `format` - the output format, can be `iife` or `esm` or `cjs` - this is a direct esbuild option
 * `target` - the target for the output, can be `es2018` or `es2019` or `es2020` or `esnext` for instance - this is a direct esbuild option
