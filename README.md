@@ -26,10 +26,9 @@ It uses a simple config file where you define your input and output paths and it
 ## Features
 
 * Bundles SCSS/SASS to CSS
-* Uses [dart-sass](https://sass-lang.com/dart-sass) for SCSS/SASS bundling
-* CSS minification with Nanocss and Autoprefixer via [postcss](https://postcss.org/)
-* Bundles JS/TS to IIFE/ESM/CJS
-* Uses [esbuild](https://esbuild.github.io/) for ES bundling
+* Uses [dart-sass](https://sass-lang.com/dart-sass)for SCSS/SASS bundling
+* Uses [esbuild](https://esbuild.github.io/) for bundling and trinspiling JS/TS to IIFE/ESM/CJS
+* CSS minification via [esbuild](https://esbuild.github.io/)
 * Uses [terser](https://terser.org/) for JS minification and mangling
 * Can produce minified code simultaneously with non-minified code!
 * Supports multiple input and output paths
@@ -199,7 +198,7 @@ Styles are bundled with [Dart Sass](https://sass-lang.com/dart-sass). You can sp
 
 **Options:**
 * `sourcemap` - whether to generate sourcemaps or not, sourcemaps are generated only for non-minified files since they are useful for debugging. Default is `false`
-* `minify` - whether to minify the output or not, minification is performed by `cssnano` and is only applied to non-minified files. At the minification step, `autoprefixer` is also applied. Default is `false`
+* `minify` - whether to minify the output or not, minification is performed by `esbuild`. Default is `false`
 * `justMinified` - whether you want to have a minified file as output only. Removes the non-minified file from the output. Useful for production builds. Defaults to `false`.
 
 `styles` property can accept an array of style configurations or just a single style configuration. If you want to bundle multiple styles, just add them to the `styles` array:

@@ -86,7 +86,7 @@ for (let i = 0; i < args.length; i++) {
 }
 
 let configPath = path.join(cwd, defaultConfigPath)
-if (!pathExists(configPath)) configPath = path.join(cwd, '💩.json') //TODO: Ok dude, I know it's late, but you can do better than this.
+if (!pathExists(configPath)) configPath = path.join(cwd, '💩.json') // TODO: Ok dude, I know it's late, but you can do better than this.
 
 // Main function 💩
 async function poops() {
@@ -127,7 +127,7 @@ async function poops() {
       exclusions: [...new Set(lrExcludes)],
       port: lport
     })
-    console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} ${pstyle.dim}🔃 LiveReload server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${lrserver.config.port}${pstyle.reset}`)
+    console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} ${pstyle.dim}🔃 LiveReload server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${lrserver.config.port}${pstyle.reset}\n`)
     lrserver.watch(cwd)
   }
 
