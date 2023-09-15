@@ -26,7 +26,7 @@ It uses a simple config file where you define your input and output paths and it
 ## Features
 
 * Bundles SCSS/SASS to CSS
-* Uses [dart-sass](https://sass-lang.com/dart-sass)for SCSS/SASS bundling
+* Uses [dart-sass](https://sass-lang.com/dart-sass) for SCSS/SASS bundling
 * Bundles JS/TS to IIFE/ESM/CJS
 * Uses [esbuild](https://esbuild.github.io/) for bundling and trinspiling JS/TS to IIFE/ESM/CJS
 * Optional JS and CSS minification using [esbuild](https://esbuild.github.io/)
