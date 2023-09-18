@@ -120,7 +120,12 @@ async function init() {
     if (answer === 'y') {
       publish(version)
     } else {
-      publish(packageJson.version)
+      const desiredVersion = await question(`Enter the desired version: (or press enter to use ${packageJson.version})`)
+      if (desiredVersion.trim() === '') {
+        publish(packageJson.version)
+      } else {
+        publish(desiredVersion)
+      }
     }
   } else {
     publish(version)
