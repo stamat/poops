@@ -14,7 +14,7 @@ const readline = require('readline')
 const { exec } = require('child_process')
 const fs = require('fs')
 const path = require('path')
-let version = process.argv[2]
+const argVersion = process.argv[2]
 const packageJson = require(path.join(process.cwd(), './package.json'))
 
 function question(prompt) {
@@ -102,20 +102,20 @@ async function init() {
     process.exit(1)
   }
 
-  if (version && !isValidVersion(version)) {
-    console.log('Invalid version: ', version)
+  if (argVersion && !isValidVersion(argVersion)) {
+    console.log('Invalid version: ', argVersion)
     console.log('Current version: ', packageJson.version)
     process.exit(1)
   }
 
-  if (version && packageJson.version === version) {
-    console.log('Version is already ', version)
+  if (argVersion && packageJson.version === argVersion) {
+    console.log('Version is already ', argVersion)
     process.exit(1)
   }
 
-  if (!version) {
+  if (!argVersion) {
     console.log('Current version: ', packageJson.version)
-    version = incrementPatchVersion(packageJson.version)
+    const version = incrementPatchVersion(packageJson.version)
     const answer = await question(`Do you want to increment the version to ${version}? (y/n) `)
     if (answer === 'y') {
       publish(version)
@@ -124,11 +124,15 @@ async function init() {
       if (desiredVersion.trim() === '') {
         publish(packageJson.version)
       } else {
+        if (!isValidVersion(desiredVersion)) {
+          console.log('Invalid version: ', desiredVersion)
+          process.exit(1)
+        }
         publish(desiredVersion)
       }
     }
   } else {
-    publish(version)
+    publish(argVersion)
   }
 }
 init()
