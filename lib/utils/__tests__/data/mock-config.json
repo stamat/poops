@@ -1,0 +1,28 @@
+[{
+  "in": "example/src/js/main.ts",
+  "out": "example/dist/js/scripts.js",
+  "options": {
+    "preserved": "1"
+  }
+},
+{
+  "in": "example/src/js/main.ts",
+  "out": "example/dist/js/",
+  "options": {
+    "preserved": "2"
+  }
+},
+{
+  "in": "example/src/js/",
+  "out": "example/dist/js/",
+  "options": {
+    "preserved": "3"
+  }
+},
+{
+  "in": "example/src/js/*.ts",
+  "out": "example/dist/js/",
+  "options": {
+    "preserved": "4"
+  }
+}]
