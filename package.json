@@ -4,10 +4,13 @@
   "version": "1.0.15",
   "license": "MIT",
   "main": "poops.js",
-  "repository": "https://github.com/stamat/poops.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stamat/poops.git"
+  },
   "bin": {
-    "poops": "./poops.js",
-    "💩": "./poops.js"
+    "poops": "poops.js",
+    "💩": "poops.js"
   },
   "author": "Stamat <@stamat> (http://stamat.info)",
   "homepage": "https://github.com/stamat/poops",
