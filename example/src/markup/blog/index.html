@@ -10,3 +10,13 @@ paginate: 1
     {{ post.description }}
   </div>
 {% endfor %}
+
+{% if blog.nextPageUrl %}
+  <a href="/{{ blog.nextPageUrl }}">Next</a>
+{% endif %}
+
+{{ blog.pageNumber }} of {{ blog.totalPages }}
+
+{% if blog.prevPageUrl %}
+  <a href="/{{ blog.prevPageUrl }}">Previous</a>
+{% endif %}
