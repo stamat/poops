@@ -382,7 +382,7 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
   * [ ] Refactor nunjucks implementation
   * [ ] Complete documentation for nunjucks
   * [ ] Add markdown support
-  * [ ] Front Matter support
+  * [x] Front Matter support
   * [ ] Future implementation: alternative templating engine liquidjs
   * [ ] Future implementation: posts and custom collections, so we can have a real static site generator
 * [ ] Refactor!!!!
