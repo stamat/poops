@@ -151,6 +151,18 @@ async function poops() {
       }
     }).on('unlink', (file) => {
       if (/(\.html|\.njk|\.md)$/i.test(file)) markups.compile()
+
+      if (/(\.json|\.ya?ml)$/i.test(file)) {
+        markups.reloadDataFiles().then(() => {
+          markups.compile()
+        })
+      }
+    }).on('add', (file) => {
+      if (/(\.json|\.ya?ml)$/i.test(file)) {
+        markups.reloadDataFiles().then(() => {
+          markups.compile()
+        })
+      }
     })
   }
 }
