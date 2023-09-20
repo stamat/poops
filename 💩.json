@@ -35,6 +35,15 @@
       "includePaths": [
         "_layouts",
         "_partials"
+      ],
+      "collections": [
+        {
+          "name": "blog",
+          "sort": {
+            "by": "date",
+            "order": "asc"
+          }
+        }
       ]
     }
   },
