@@ -1,8 +1,9 @@
 ---
 layout: blog
+paginate: 1
 ---
 
-{% for post in blog.items %}
+{% for post in blog.pageItems %}
   <div class="post">
     <h1><a href="{{ post.url }}">{{ post.title }}</a></h1>
     <div class="date">{{ post.date }}</div>
