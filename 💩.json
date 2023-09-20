@@ -41,7 +41,7 @@
           "name": "blog",
           "sort": {
             "by": "date",
-            "order": "asc"
+            "order": "desc"
           }
         }
       ]
