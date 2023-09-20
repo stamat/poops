@@ -141,7 +141,7 @@ async function poops() {
     chokidar.watch(config.watch).on('change', (file) => {
       if (/(\.m?js|\.ts)$/i.test(file)) scripts.compile()
       if (/(\.sass|\.scss|\.css)$/i.test(file)) styles.compile()
-      if (/(\.html|\.njk)$/i.test(file)) markups.compile()
+      if (/(\.html|\.njk|\.md)$/i.test(file)) markups.compile()
 
       // TODO: We can actually reload the page only if the data file from data has changed.
       if (/(\.json|\.ya?ml)$/i.test(file)) {

@@ -1,35 +1,32 @@
 ---
+layout: default
 subtitle: ✨ <strong>Now supports Front Matter!</strong> ✨
 ---
-{% extends "layout.html" %}
+{% include "header.html" %}
 
-{% block content %}
-  {% include "header.html" %}
-
-  <div class="container my-32" style="max-width: 1440px">
-    <div class="grid grid-gutter">
-      <!-- Links loaded from example/markup/_data/features.json -->
-      {% for feature in features %}
-        <div class="col-12 col-md-4 my-32">
-          <div class="w-48 h-48 round d-flex flex-column align-center justify-center" style="background: #824F2D; color: #DCC8AC">
-            {{ feature.icon | safe }}
-          </div>
-          <h2 class="h4 mb-8 mt-16" style="color: #824F2D;">{{ feature.title }}</h2>
-          <p class="p2 m-0">{{ feature.text }}</p>
+<div class="container my-32" style="max-width: 1440px">
+  <div class="grid grid-gutter">
+    <!-- Links loaded from example/markup/_data/features.json -->
+    {% for feature in features %}
+      <div class="col-12 col-md-4 my-32">
+        <div class="w-48 h-48 round d-flex flex-column align-center justify-center" style="background: #824F2D; color: #DCC8AC">
+          {{ feature.icon | safe }}
         </div>
-      {% endfor %}
-    </div>
+        <h2 class="h4 mb-8 mt-16" style="color: #824F2D;">{{ feature.title }}</h2>
+        <p class="p2 m-0">{{ feature.text }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="container text-center">
+  <!-- Links loaded from example/markup/_data/links.json -->
+  <div class="mb-24 mt-32">
+    {% for link in links %}
+      <a href="{{ link.url }}" id="{{ link.title | slugify }}">{{ link.title }}</a>
+    {% endfor %}
   </div>
 
-  <div class="container text-center">
-    <!-- Links loaded from example/markup/_data/links.json -->
-    <div class="mb-24 mt-32">
-      {% for link in links %}
-        <a href="{{ link.url }}" id="{{ link.title | slugify }}">{{ link.title }}</a>
-      {% endfor %}
-    </div>
-
-    <!-- Links loaded from example/markup/_data/poops.yml -->
-    <div>{% for poop in poops.poops %}{{ poop }}{% endfor %}</div>
-  </div>
-{% endblock %}
+  <!-- Links loaded from example/markup/_data/poops.yml -->
+  <div>{% for poop in poops.poops %}{{ poop }}{% endfor %}</div>
+</div>

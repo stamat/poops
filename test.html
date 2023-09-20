@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>💩 Poops</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Straightforward, no-bullshit bundler for the web.">
+  <link rel="preconnect" href="https://fonts.googleapis.com"> 
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="example/dist/css/styles.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans&family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+</head>
+<body>
+  
+<h1>MarkDown Test</h1>
+<p>This is just a MarkDown test</p>
+
+
+
+  
+  <script>document.write('<script src="http://'
+    + (location.host || 'localhost').split(':')[0]
+    + ':35729/livereload.js?snipver=1"></'
+    + 'script>')</script>
+  
+
+  <script type="text/javascript">
+    var poop = document.getElementById('poop');
+
+    function getPosition(element) {
+      var clientRect = element.getBoundingClientRect();
+      return {
+        left: clientRect.left + document.body.scrollLeft,
+        top: clientRect.top + document.body.scrollTop
+      };
+    }
+
+    var poopPosition = getPosition(poop);
+
+    var count = 200;
+    var defaults = {
+      origin: { 
+        y: ((poopPosition.top + poop.offsetHeight/2) * 100 / window.innerHeight) / 100,
+        x: ((poopPosition.left + poop.offsetWidth/2) * 100 / window.innerWidth) / 100
+      }
+    };
+
+    function fire(particleRatio, opts) {
+      confetti(Object.assign({}, defaults, opts, {
+        shapes: ['square'],
+        particleCount: Math.floor(count * particleRatio)
+      }));
+    }
+
+    function explode() {
+      fire(0.25, {
+        spread: 26,
+        startVelocity: 55,
+      });
+      fire(0.2, {
+        spread: 60,
+      });
+      fire(0.35, {
+        spread: 100,
+        decay: 0.91,
+        scalar: 0.8
+      });
+      fire(0.1, {
+        spread: 120,
+        startVelocity: 25,
+        decay: 0.92,
+        scalar: 1.2
+      });
+      fire(0.1, {
+        spread: 120,
+        startVelocity: 45,
+      });
+    }
+
+    poop.addEventListener('mouseenter', function() {
+      explode();
+    });
+
+    poop.addEventListener('click', function() {
+      explode();
+    });
+
+    explode();
+  </script>
+  <script>hljs.highlightAll();</script>
+  <script async type="text/javascript" src="example/dist/js/scripts.min.js"></script>
+</body>
+</html>
