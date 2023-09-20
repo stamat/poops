@@ -386,6 +386,7 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
   * [ ] Future implementation: alternative templating engine liquidjs
   * [x] Future implementation: posts and custom collections, so we can have a real static site generator
   * [x] Collection pagination system
+  * [ ] RSS and ATOM generation for collections
 * [ ] Refactor!!!!
 
 ## Why?
