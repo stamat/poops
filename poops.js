@@ -138,7 +138,7 @@ async function poops() {
   if (config.watch) {
     // TODO: think about watching the updates of the config file itself, we can reload the config and recompile everything.
     // TODO: ability to automatically create a watch list of directories if watch is set to true. The list will be generated from the `in` property of each task.
-    chokidar.watch(config.watch).on('change', (file) => {
+    chokidar.watch(config.watch, { ignoreInitial: true }).on('change', (file) => {
       if (/(\.m?js|\.ts)$/i.test(file)) scripts.compile()
       if (/(\.sass|\.scss|\.css)$/i.test(file)) styles.compile()
       if (/(\.html|\.njk|\.md)$/i.test(file)) markups.compile()
@@ -149,6 +149,8 @@ async function poops() {
           markups.compile()
         })
       }
+    }).on('unlink', (file) => {
+      if (/(\.html|\.njk|\.md)$/i.test(file)) markups.compile()
     })
   }
 }
