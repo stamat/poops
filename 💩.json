@@ -22,19 +22,21 @@
   "markup": {
     "in": "example/src/markup",
     "out": "/",
-    "site": {
-      "title": "💩 Poops",
-      "description": "Straightforward, no-bullshit bundler for the web."
-    },
-    "data": [
-      "_data/features.yaml",
-      "_data/links.json",
-      "_data/poops.yaml"
-    ],
-    "includePaths": [
-      "_layouts",
-      "_partials"
-    ]
+    "options": {
+      "site": {
+        "title": "💩 Poops",
+        "description": "Straightforward, no-bullshit bundler for the web."
+      },
+      "data": [
+        "_data/features.yaml",
+        "_data/links.json",
+        "_data/poops.yaml"
+      ],
+      "includePaths": [
+        "_layouts",
+        "_partials"
+      ]
+    }
   },
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
   "serve" : {

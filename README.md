@@ -102,18 +102,20 @@ Just create a `poops.json` file in the root of your project and add the followin
   "markup": {
     "in": "example/src/markup",
     "out": "/",
-    "site": {
-      "title": "Poops",
-      "description": "A super simple bundler for simple web projects."
-    },
-     "data": [
-      "_data/links.json",
-      "_data/poops.yaml"
-    ],
-    "includePaths": [
-      "_layouts",
-      "_partials"
-    ]
+    "options": {
+      "site": {
+        "title": "Poops",
+        "description": "A super simple bundler for simple web projects."
+      },
+      "data": [
+        "example/src/markup/data/links.json",
+        "example/src/markup/data/poops.yaml"
+      ],
+      "includePaths": [
+        "example/src/markup/_layouts",
+        "example/src/markup/_partials"
+      ]
+    }
   },
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
   "serve" : {
@@ -245,17 +247,19 @@ Here is a sample markup configuration:
   "markups": {
     "in": "src/markup",
     "out": "dist",
-    "site": {
-      "title": "My Awesome Site",
-      "description": "This is my awesome site"
-    },
-    "data": [
-      "data/links.json",
-      "data/other.yaml"
-    ],
-    "includePaths": [
-      "_includes"
-    ]
+    "options": {
+      "site": {
+        "title": "My Awesome Site",
+        "description": "This is my awesome site"
+      },
+      "data": [
+        "data/links.json",
+        "data/other.yaml"
+      ],
+      "includePaths": [
+        "_includes"
+      ]
+    }
   }
 }
 ```
