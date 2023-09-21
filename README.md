@@ -387,7 +387,7 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
   * [x] Future implementation: posts and custom collections, so we can have a real static site generator
   * [x] Collection pagination system
   * [x] Post published toggle
-  * [ ] RSS and ATOM generation for collections
+  * [x] RSS and ATOM generation for collections
 * [ ] Refactor!!!!
 
 ## Why?
