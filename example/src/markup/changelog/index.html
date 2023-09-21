@@ -8,7 +8,7 @@ paginate: 1
 {% for post in changelog.pageItems %}
   <div class="post">
     <h2><a href="{{ relativePathPrefix }}{{ post.url }}">{{ post.title }}</a></h2>
-    <div class="date">{{ post.date | format }}</div>
+    <div class="date">{{ post.date | date }}</div>
     {{ post.description }}
   </div>
 {% endfor %}

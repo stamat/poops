@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+  <title>{{ site.title }}/</title>
+  <description>{{ site.description }}/</description>
+  <link>{{ site.url }}</link>
+  <lastBuildDate>{{ '' | date('ddd, DD MMM YYYY HH:mm:ss ZZ') }}</lastBuildDate>
+  {% set lastPost = changelog.items[0] %}
+  <pubDate>{{ lastPost.date | date('ddd, DD MMM YYYY HH:mm:ss ZZ') }}</pubDate>
+  <ttl>1800</ttl>
+{% set posts = changelog.items.slice(0, 10) %}
+{% for post in posts %}
+    <item>
+      <title>{{ post.title }}</title>
+      <link>{{ site.url }}/{{ post.url }}</link>
+      <description>{{ post.description }}</description>
+      <pubDate>{{ post.date | date('ddd, DD MMM YYYY HH:mm:ss ZZ') }}</pubDate>
+    </item>
+{% endfor %}
+  </channel>
+</rss>

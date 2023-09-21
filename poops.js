@@ -141,7 +141,7 @@ async function poops() {
     chokidar.watch(config.watch, { ignoreInitial: true }).on('change', (file) => {
       if (/(\.m?js|\.ts)$/i.test(file)) scripts.compile()
       if (/(\.sass|\.scss|\.css)$/i.test(file)) styles.compile()
-      if (/(\.html|\.njk|\.md)$/i.test(file)) markups.compile()
+      if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) markups.compile()
 
       // TODO: We can actually reload the page only if the data file from data has changed.
       if (/(\.json|\.ya?ml)$/i.test(file)) {
@@ -150,13 +150,7 @@ async function poops() {
         })
       }
     }).on('unlink', (file) => {
-      if (/(\.html|\.njk|\.md)$/i.test(file)) markups.compile()
-
-      if (/(\.json|\.ya?ml)$/i.test(file)) {
-        markups.reloadDataFiles().then(() => {
-          markups.compile()
-        })
-      }
+      if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) markups.compile()
     }).on('add', (file) => {
       if (/(\.json|\.ya?ml)$/i.test(file)) {
         markups.reloadDataFiles().then(() => {

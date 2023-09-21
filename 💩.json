@@ -25,7 +25,8 @@
     "options": {
       "site": {
         "title": "💩 Poops",
-        "description": "Straightforward, no-bullshit bundler for the web."
+        "description": "Straightforward, no-bullshit bundler for the web.",
+        "url": "https://stamat.github.io/poops"
       },
       "data": [
         "_data/features.yaml",
