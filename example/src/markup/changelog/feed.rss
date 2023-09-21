@@ -12,6 +12,7 @@
 {% for post in posts %}
     <item>
       <title>{{ post.title }}</title>
+      <guid isPermaLink="true">{{ site.url }}/{{ post.url }}</guid>
       <link>{{ site.url }}/{{ post.url }}</link>
       <description>{{ post.description }}</description>
       <pubDate>{{ post.date | date('ddd, DD MMM YYYY HH:mm:ss ZZ') }}</pubDate>
