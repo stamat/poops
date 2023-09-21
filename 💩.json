@@ -38,7 +38,8 @@
       ],
       "collections": [
         "changelog"
-      ]
+      ],
+      "timeDateFormat": "MMM D, YYYY"
     }
   },
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
