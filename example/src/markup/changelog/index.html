@@ -2,7 +2,7 @@
 layout: blog
 title: Changelog
 description: Follow the latest changes of Poops.
-paginate: 1
+paginate: 10
 ---
 <div class="text-center">
   <h1>Changelog</h1>
@@ -15,12 +15,14 @@ paginate: 1
   </div>
 {% endfor %}
 
-{% if changelog.nextPageUrl %}
-  <a href="{{ relativePathPrefix }}{{ changelog.nextPageUrl }}">Next</a>
-{% endif %}
+{% if changelog.totalPages > 1 %}
+  {% if changelog.nextPageUrl %}
+    <a href="{{ relativePathPrefix }}{{ changelog.nextPageUrl }}">Next</a>
+  {% endif %}
 
-{{ changelog.pageNumber }} of {{ changelog.totalPages }}
+  {{ changelog.pageNumber }} of {{ changelog.totalPages }}
 
-{% if changelog.prevPageUrl %}
-  <a href="{{ relativePathPrefix }}{{ changelog.prevPageUrl }}">Previous</a>
+  {% if changelog.prevPageUrl %}
+    <a href="{{ relativePathPrefix }}{{ changelog.prevPageUrl }}">Previous</a>
+  {% endif %}
 {% endif %}
