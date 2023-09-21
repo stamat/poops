@@ -127,7 +127,7 @@ async function poops() {
       exclusions: [...new Set(lrExcludes)],
       port: lport
     })
-    console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} ${pstyle.dim}🔃 LiveReload server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${lrserver.config.port}${pstyle.reset}\n`)
+    console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} 🔃${pstyle.dim} LiveReload server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${lrserver.config.port}${pstyle.reset}\n`)
     lrserver.watch(cwd)
   }
 
@@ -219,7 +219,7 @@ async function startServer() {
   if (!overridePort) port = await getAvailablePort(port, port + 10)
 
   http.createServer(app).listen(parseInt(port), () => {
-    console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} ${pstyle.dim}🌍 Local server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${port}${pstyle.reset}`)
+    console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} 🌍${pstyle.dim} Local server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${port}${pstyle.reset}`)
     poops()
   })
 }
