@@ -1,0 +1,22 @@
+ /*
+  * BREAKPOINTS - 'size label': (min, max)
+  */
+$breakpoints: (
+  '':   (false, 956px),
+  'lg':  (960px, false)
+);
+
+$container-max-width: 1440px;
+
+/*
+ * COLORS
+ */
+$colors: (
+ black: #000000,
+ white: #ffffff,
+ primary: #824F2D,
+ brownish: #DCC8AC
+);
+
+$heading-font: Poppins,Helvetica,Arial,sans-serif;
+$paragraph-font: 'DM Sans', Helvetica, Arial, sans-serif;

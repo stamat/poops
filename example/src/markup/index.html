@@ -2,17 +2,18 @@
 layout: default
 subtitle: ✨ <strong>Now supports Front Matter!</strong> ✨
 ---
-{% include "header.html" %}
+{% include "site-header.html" %}
+{% include "heading.html" %}
 
-<div class="container my-32" style="max-width: 1440px">
+<div class="container my-32">
   <div class="grid grid-gutter">
     <!-- Links loaded from example/markup/_data/features.json -->
     {% for feature in features %}
-      <div class="col-12 col-md-4 my-32">
+      <div class="col-12 col-lg-4 my-32">
         <div class="w-48 h-48 round d-flex flex-column align-center justify-center" style="background: #824F2D; color: #DCC8AC">
           {{ feature.icon | safe }}
         </div>
-        <h2 class="h4 mb-8 mt-16" style="color: #824F2D;">{{ feature.title }}</h2>
+        <h2 class="h4 mb-8 mt-16 text-primary">{{ feature.title }}</h2>
         <p class="p2 m-0">{{ feature.text }}</p>
       </div>
     {% endfor %}
