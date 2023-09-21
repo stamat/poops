@@ -35,7 +35,7 @@ It uses a simple config file where you define your input and output paths and it
 * Supports multiple input and output paths
 * Resolves node modules
 * Can add a templatable banner to output files (optional)
-* Static site generation with [nunjucks](https://mozilla.github.io/nunjucks/) templating (optional)
+* Static site generation with [nunjucks](https://mozilla.github.io/nunjucks/) templating, with blogging option (optional)
 * Has a configurable local server (optional)
 * Rebuilds on file changes (optional)
 * Live reloads on file changes (optional)
@@ -383,12 +383,11 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
   * [ ] Complete documentation for nunjucks
   * [x] Add markdown support
   * [x] Front Matter support
-  * [ ] Future implementation: alternative templating engine liquidjs
+  * [ ] Future implementation: alternative templating engine liquidjs?
   * [x] Future implementation: posts and custom collections, so we can have a real static site generator
   * [x] Collection pagination system
-  * [ ] Post published toggle
+  * [x] Post published toggle
   * [ ] RSS and ATOM generation for collections
-  * [ ] Post permalink structure?
 * [ ] Refactor!!!!
 
 ## Why?
