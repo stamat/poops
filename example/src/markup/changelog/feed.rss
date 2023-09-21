@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-  <title>{{ site.title }}/</title>
-  <description>{{ site.description }}/</description>
+  <title>Changelog | {{ site.title }}</title>
+  <description>{{ site.description }}</description>
   <link>{{ site.url }}</link>
   <lastBuildDate>{{ '' | date('ddd, DD MMM YYYY HH:mm:ss ZZ') }}</lastBuildDate>
   {% set lastPost = changelog.items[0] %}

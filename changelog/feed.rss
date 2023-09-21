@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-  <title>💩 Poops/</title>
-  <description>Straightforward, no-bullshit bundler for the web./</description>
+  <title>Changelog | 💩 Poops</title>
+  <description>Straightforward, no-bullshit bundler for the web.</description>
   <link>https://stamat.github.io/poops</link>
-  <lastBuildDate>Thu, 21 Sep 2023 20:57:25 +0200</lastBuildDate>
+  <lastBuildDate>Thu, 21 Sep 2023 21:04:06 +0200</lastBuildDate>
   
   <pubDate>Thu, 21 Sep 2023 15:42:00 +0200</pubDate>
   <ttl>1800</ttl>
