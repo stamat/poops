@@ -2,7 +2,9 @@
 layout: blog
 paginate: 1
 ---
-
+<div class="text-center">
+  <h1>Changelog</h1>
+</div>
 {% for post in changelog.pageItems %}
   <div class="post">
     <h1><a href="{{ relativePathPrefix }}{{ post.url }}">{{ post.title }}</a></h1>
