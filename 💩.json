@@ -37,9 +37,6 @@
         "_layouts",
         "_partials"
       ],
-      "collections": [
-        "changelog"
-      ],
       "timeDateFormat": "MMM D, YYYY"
     }
   },
