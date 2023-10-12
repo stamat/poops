@@ -5,9 +5,9 @@
   <description>Straightforward, no-bullshit bundler for the web.</description>
   <link>https://stamat.github.io/poops</link>
   <atom:link href="https://stamat.github.io/poops/changelog/feed.rss" rel="self" type="application/rss+xml" />
-  <lastBuildDate>Fri, 22 Sep 2023 17:30:13 +0200</lastBuildDate>
+  <lastBuildDate>Thu, 12 Oct 2023 18:19:14 +0200</lastBuildDate>
   
-  <pubDate>Thu, 21 Sep 2023 15:42:00 +0200</pubDate>
+  <pubDate>Thu, 12 Oct 2023 16:10:00 +0200</pubDate>
   <ttl>1800</ttl>
 
 
@@ -16,7 +16,7 @@
       <guid isPermaLink="true">https://stamat.github.io/poops/changelog/blog-functionality.html</guid>
       <link>https://stamat.github.io/poops/changelog/blog-functionality.html</link>
       <description>Hey folks, this is my second blog post.</description>
-      <pubDate>Thu, 21 Sep 2023 15:42:00 +0200</pubDate>
+      <pubDate>Thu, 12 Oct 2023 16:10:00 +0200</pubDate>
     </item>
 
     <item>
