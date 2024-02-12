@@ -42,7 +42,7 @@ It uses a simple config file where you define your input and output paths and it
 
 ## Quick Start
 
-*For a superfast start, you can use the Poops template repository: [💩🌪️Shitstorm](https://github.com/stamat/shitstorm)*
+> For a superfast start, you can use the Poops template repository: [💩🌪️Shitstorm](https://github.com/stamat/shitstorm)
 
 You can install Poops globally:
 
