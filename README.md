@@ -41,6 +41,9 @@ It uses a simple config file where you define your input and output paths and it
 * Live reloads on file changes (optional)
 
 ## Quick Start
+
+*For a superfast start, you can use the Poops template repository: [💩🌪️Shitstorm](https://github.com/stamat/shitstorm)*
+
 You can install Poops globally:
 
 ```bash
