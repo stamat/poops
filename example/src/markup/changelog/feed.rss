@@ -5,9 +5,9 @@
   <description>{{ site.description }}</description>
   <link>{{ site.url }}</link>
   <atom:link href="{{ site.url }}/changelog/feed.rss" rel="self" type="application/rss+xml" />
-  <lastBuildDate>{{ '' | date('ddd, DD MMM YYYY HH:mm:ss ZZ') }}</lastBuildDate>
+  <lastBuildDate>{{ '' | date('ddd, DD MMM YYYY') }}</lastBuildDate>
   {% set lastPost = changelog.items[0] %}
-  <pubDate>{{ lastPost.date | date('ddd, DD MMM YYYY HH:mm:ss ZZ') }}</pubDate>
+  <pubDate>{{ lastPost.date | date('ddd, DD MMM YYYY') }}</pubDate>
   <ttl>1800</ttl>
 {% set posts = changelog.items.slice(0, 10) %}
 {% for post in posts %}
@@ -16,7 +16,7 @@
       <guid isPermaLink="true">{{ site.url }}/{{ post.url }}</guid>
       <link>{{ site.url }}/{{ post.url }}</link>
       <description>{{ post.description }}</description>
-      <pubDate>{{ post.date | date('ddd, DD MMM YYYY HH:mm:ss ZZ') }}</pubDate>
+      <pubDate>{{ post.date | date('ddd, DD MMM YYYY') }}</pubDate>
     </item>
 {% endfor %}
   </channel>

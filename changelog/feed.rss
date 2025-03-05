@@ -5,9 +5,9 @@
   <description>Straightforward, no-bullshit bundler for the web.</description>
   <link>https://stamat.github.io/poops</link>
   <atom:link href="https://stamat.github.io/poops/changelog/feed.rss" rel="self" type="application/rss+xml" />
-  <lastBuildDate>Thu, 12 Oct 2023 18:19:14 +0200</lastBuildDate>
+  <lastBuildDate>Wed, 05 Mar 2025</lastBuildDate>
   
-  <pubDate>Thu, 12 Oct 2023 16:10:00 +0200</pubDate>
+  <pubDate>Thu, 12 Oct 2023</pubDate>
   <ttl>1800</ttl>
 
 
@@ -16,7 +16,7 @@
       <guid isPermaLink="true">https://stamat.github.io/poops/changelog/blog-functionality.html</guid>
       <link>https://stamat.github.io/poops/changelog/blog-functionality.html</link>
       <description>Hey folks, this is my second blog post.</description>
-      <pubDate>Thu, 12 Oct 2023 16:10:00 +0200</pubDate>
+      <pubDate>Thu, 12 Oct 2023</pubDate>
     </item>
 
     <item>
@@ -24,7 +24,7 @@
       <guid isPermaLink="true">https://stamat.github.io/poops/changelog/front-matter.html</guid>
       <link>https://stamat.github.io/poops/changelog/front-matter.html</link>
       <description>Front matter is an awesome idea! Since the static site generator functionality of Poops is inspired by Jekyll and the genius of peeps that came up with the idea of front matter, I decided to add it to Poops as well. Made things super simple! And that's what Poops is all about. Making things simple.</description>
-      <pubDate>Tue, 19 Sep 2023 02:00:00 +0200</pubDate>
+      <pubDate>Tue, 19 Sep 2023</pubDate>
     </item>
 
   </channel>
