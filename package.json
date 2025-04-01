@@ -35,7 +35,7 @@
     "esbuild": "^0.25.0",
     "glob": "^10.3.1",
     "livereload": "^0.9.3",
-    "marked": "^9.0.3",
+    "marked": "^15.0.7",
     "moment": "^2.29.4",
     "nunjucks": "^3.2.4",
     "portscanner": "^2.2.0",
