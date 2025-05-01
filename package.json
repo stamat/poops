@@ -33,7 +33,7 @@
     "connect": "^3.7.0",
     "deepmerge": "^4.3.1",
     "esbuild": "^0.25.0",
-    "glob": "^10.3.1",
+    "glob": "^11.0.2",
     "livereload": "^0.9.3",
     "marked": "^9.0.3",
     "moment": "^2.29.4",
