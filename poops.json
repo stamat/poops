@@ -40,6 +40,12 @@
       "timeDateFormat": "MMM D, YYYY"
     }
   },
+  "copy": [
+    {
+      "in": "example/src/static",
+      "out": "example/dist"
+    }
+  ],
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
   "serve" : {
     "port": 4040,

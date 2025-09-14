@@ -2,6 +2,7 @@
 
 const chokidar = require('chokidar')
 const connect = require('connect')
+const Copy = require('./lib/copy.js')
 const helpers = require('./lib/utils/helpers.js')
 const http = require('node:http')
 const livereload = require('livereload')
@@ -100,11 +101,13 @@ async function poops() {
   const styles = new Styles(config)
   const scripts = new Scripts(config)
   const markups = new Markups(config)
+  const copy = new Copy(config)
 
   if (build || (!config.watch && !config.livereload && !config.serve)) {
     await styles.compile()
     await scripts.compile()
     await markups.compile()
+    await copy.execute()
     process.exit(0)
   }
 
@@ -134,6 +137,7 @@ async function poops() {
   await styles.compile()
   await scripts.compile()
   await markups.compile()
+  await copy.execute()
 
   if (config.watch) {
     // TODO: think about watching the updates of the config file itself, we can reload the config and recompile everything.
@@ -149,14 +153,18 @@ async function poops() {
           markups.compile()
         })
       }
+
+      copy.execute()
     }).on('unlink', (file) => {
       if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) markups.compile()
+      copy.execute()
     }).on('add', (file) => {
       if (/(\.json|\.ya?ml)$/i.test(file)) {
         markups.reloadDataFiles().then(() => {
           markups.compile()
         })
       }
+      copy.execute()
     })
   }
 }
