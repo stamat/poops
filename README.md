@@ -273,6 +273,34 @@ If your project doesn't have markups, you can remove the `markups` property from
 
 * `slugify` - slugifies a string. Usage: `{{ "My Awesome Title" | slugify }}` will output `my-awesome-title`
 
+### Copy
+
+Configuration entry to copy files or directories - copy your static files like images and fonts, for instance, from `src` to `dist` directory.
+
+Here is a sample markup configuration:
+
+```JSON
+{
+  "copy": {
+    "in": "src/static",
+    "out": "dist"
+  }
+}
+```
+
+You can specify a list of input paths and pass them to an output directory, for instance:
+
+```JSON
+{
+  "copy": {
+    "in": ["src/static/ogimage.jpg", "src/static/favicon.ico", "src/fonts"],
+    "out": "dist"
+  }
+}
+```
+
+**💡 NOTE:** Copy property can also accept the list of objects containing `in` and `out` properties.
+
 ### Banner (optional)
 
 Here you can specify a banner that will be added to the top of the output files. It is templatable via mustache. The following variables are available from your project's `package.json`:
