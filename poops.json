@@ -21,7 +21,7 @@
   }],
   "markup": {
     "in": "example/src/markup",
-    "out": "/",
+    "out": "example/dist",
     "options": {
       "site": {
         "title": "💩 Poops",
@@ -49,7 +49,7 @@
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
   "serve" : {
     "port": 4040,
-    "base": "/"
+    "base": "/example/dist"
   },
   "livereload": true,
   "watch": [
