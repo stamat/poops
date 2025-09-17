@@ -14,7 +14,7 @@ const PrintStyle = require('./lib/utils/print-style.js')
 const Styles = require('./lib/styles.js')
 const portscanner = require('portscanner')
 
-const { pathExists } = helpers
+const { pathExists, doesFileBelongToPath } = helpers
 
 const cwd = process.cwd() // Current Working Directory
 const pkg = require('./package.json')
@@ -154,17 +154,17 @@ async function poops() {
         })
       }
 
-      copy.execute()
+      doesFileBelongToPath(file, config.copy) && copy.execute()
     }).on('unlink', (file) => {
       if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) markups.compile()
-      copy.execute()
+      doesFileBelongToPath(file, config.copy) && copy.execute()
     }).on('add', (file) => {
       if (/(\.json|\.ya?ml)$/i.test(file)) {
         markups.reloadDataFiles().then(() => {
           markups.compile()
         })
       }
-      copy.execute()
+      doesFileBelongToPath(file, config.copy) && copy.execute()
     })
   }
 }
