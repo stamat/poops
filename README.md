@@ -120,6 +120,12 @@ Just create a `poops.json` file in the root of your project and add the followin
       ]
     }
   },
+    "copy": [
+    {
+      "in": "example/src/static",
+      "out": "example/dist"
+    }
+  ],
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
   "serve" : {
     "port": 4040,
@@ -238,9 +244,9 @@ Poops can generate static pages for you. This feature is still under development
 * `out` - the output path, can be only a directory path (for now)
 * `site` (optional) - global data that will be available to all templates in the markup directory. Like site title, description, social media links, etc. You can then use this data in your templates `{{ site.title }}` for instance.
 * `data` (optional) - is an array of JSON or YAML data files, that once loaded will be available to all templates in the markup directory. If you provide a path to a file for instance `links.json` with a `facebook` property, you can then use this data in your templates `{{ links.facebook }}`. The base name of the file will be used as the variable name, with spaces, dashes and dots replaced with underscores. So `the awesome-links.json` will be available as `{{ the_awesome_links.facebook }}` in your templates. The root directory of the data files is `in` directory. So if you have a `data` directory in your `in` directory, you can specify the data files like this `data: ["data/links.json"]`. The same goes for the YAML files.
-* `includePaths` (WIP 🚧) - an array of paths to directories that will be added to the nunjucks include paths. Useful if you want to separate template partials and layouts. For instance, if you have a `_includes` directory with a `header.njk` partial that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the partial. This will change in the future, to provide better ignore and include patterns for the markup directories.
+* `includePaths` - an array of paths to directories that will be added to the nunjucks include paths. Useful if you want to separate template partials and layouts. For instance, if you have a `_includes` directory with a `header.njk` partial that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the partial. This will change in the future, to provide better ignore and include patterns for the markup directories.
 
-**💡 NOTE:** If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the golobal variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
+**💡 NOTE:** If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the global variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
 
 
 Here is a sample markup configuration:
@@ -275,9 +281,9 @@ If your project doesn't have markups, you can remove the `markups` property from
 
 ### Copy
 
-Configuration entry to copy files or directories - copy your static files like images and fonts, for instance, from `src` to `dist` directory.
+Configuration entry to copy files or directories - copy your static files like images and fonts, for instance, from `src` to `dist` directory. This feature was added to enable moving static files if you deploy GitHub pages via a GitHub action. If you don't want to use this feature, simply exclude the `copy` property from your config file.
 
-Here is a sample markup configuration:
+Here is a sample copy configuration which will copy the `static` directory and it's contents to the  `dist` directory:
 
 ```JSON
 {
@@ -299,7 +305,38 @@ You can specify a list of input paths and pass them to an output directory, for 
 }
 ```
 
-**💡 NOTE:** Copy property can also accept the list of objects containing `in` and `out` properties.
+**💡 NOTE:** Copy property can also accept the list of objects containing `in` and `out` properties. For instance:
+
+```JSON
+{
+  "copy": [
+    {
+      "in": ["src/static/ogimage.jpg", "src/static/favicon.ico", "src/fonts"],
+      "out": "dist"
+    },
+    {
+      "in": "images",
+      "out": "dist/static"
+    }
+  ]
+}
+```
+
+**💡 NOTE:** Copy can also accept some basic **GLOB** as input paths. Don't expect too much of it, but for instance these paths will work:
+
+```JSON
+{
+  "copy": {
+    "in": [
+      "images/**/awesome.{jpeg,jpg,png}",
+      "notes/info[0-9].txt",
+      "notes/doc?.txt",
+      "notes/memo*.txt",
+      "notes/log[!123a].txt",
+    ],
+    "out": "dist"
+  }
+}
 
 ### Banner (optional)
 
