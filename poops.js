@@ -157,7 +157,10 @@ async function poops() {
       doesFileBelongToPath(file, config.copy) && copy.execute()
     }).on('unlink', (file) => {
       if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) markups.compile()
-      doesFileBelongToPath(file, config.copy) && copy.execute()
+      copy.unlink(file, doesFileBelongToPath(file, config.copy))
+    }).on('unlinkDir', (path) => {
+      doesFileBelongToPath(path, config.markup) && markups.compile()
+      copy.unlink(path, doesFileBelongToPath(path, config.copy))
     }).on('add', (file) => {
       if (/(\.json|\.ya?ml)$/i.test(file)) {
         markups.reloadDataFiles().then(() => {
