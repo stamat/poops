@@ -337,6 +337,7 @@ You can specify a list of input paths and pass them to an output directory, for 
     "out": "dist"
   }
 }
+```
 
 ### Banner (optional)
 
