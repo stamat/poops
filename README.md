@@ -322,7 +322,7 @@ You can specify a list of input paths and pass them to an output directory, for 
 }
 ```
 
-**💡 NOTE:** Copy can also accept some basic **GLOB** as input paths. Don't expect too much of it, but for instance these paths will work:
+**💡 NOTE:** Copy can also accept some basic **GLOB** as input paths. Does NOT support **EXTGLOB** yet. Don't expect too much of it, but for instance these paths will work:
 
 ```JSON
 {
