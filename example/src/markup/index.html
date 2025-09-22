@@ -20,14 +20,4 @@ subtitle: ✨ <strong>Now supports Front Matter!</strong> ✨
   </div>
 </div>
 
-<div class="container text-center">
-  <!-- Links loaded from example/markup/_data/links.json -->
-  <div class="mb-24 mt-32">
-    {% for link in links %}
-      <a href="{{ link.url }}" id="{{ link.title | slugify }}">{{ link.title }}</a>
-    {% endfor %}
-  </div>
-
-  <!-- Links loaded from example/markup/_data/poops.yml -->
-  <div>{% for poop in poops.poops %}{{ poop }}{% endfor %}</div>
-</div>
+{% include "site-footer.html" %}
