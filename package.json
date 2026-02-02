@@ -12,6 +12,10 @@
     "poops": "poops.js",
     "💩": "poops.js"
   },
+  "files": [
+    "poops.js",
+    "lib/"
+  ],
   "author": "Stamat <@stamat> (http://stamat.info)",
   "homepage": "https://github.com/stamat/poops",
   "private": false,
@@ -50,6 +54,6 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^16.0.0",
     "eslint-plugin-promise": "^6.1.1",
-    "sulphuris": "^1.0.5"
+    "sulphuris": "^2.0.0"
   }
 }

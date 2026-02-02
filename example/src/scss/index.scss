@@ -1,4 +1,13 @@
-@import 'config.scss';
-@import 'sulphuris';
+@use "_config" as c;
+
+@forward 'sulphuris/src/core/_config' with (
+  $colors: c.$colors,
+  $container-max-width: c.$container-max-width,
+  $breakpoints: c.$breakpoints,
+  $heading-font: c.$heading-font,
+  $paragraph-font: c.$paragraph-font,
+);
+@use 'sulphuris';
+
 @import 'style/index.scss';
 @import 'style/test';
