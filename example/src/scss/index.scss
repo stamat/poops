@@ -1,6 +1,6 @@
 @use "_config" as c;
 
-@forward 'sulphuris/src/core/_config' with (
+@forward 'sulphuris/core/_config' with (
   $colors: c.$colors,
   $container-max-width: c.$container-max-width,
   $breakpoints: c.$breakpoints,
