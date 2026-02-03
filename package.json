@@ -1,7 +1,7 @@
 {
   "name": "poops",
   "description": "Straightforward, no-bullshit bundler for the web.",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "license": "MIT",
   "main": "poops.js",
   "repository": {
