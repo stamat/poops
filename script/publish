@@ -10,12 +10,13 @@
  *
  * With love, @stamat
  */
-const readline = require('readline')
-const { exec } = require('child_process')
-const fs = require('fs')
-const path = require('path')
+import readline from 'node:readline'
+import { exec } from 'node:child_process'
+import fs from 'node:fs'
+import path from 'node:path'
+
 const argVersion = process.argv[2]
-const packageJson = require(path.join(process.cwd(), './package.json'))
+const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8'))
 
 function question(prompt) {
   const rl = readline.createInterface({
