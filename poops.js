@@ -88,14 +88,74 @@ for (let i = 0; i < args.length; i++) {
 let configPath = path.join(cwd, defaultConfigPath)
 if (!pathExists(configPath)) configPath = path.join(cwd, '💩.json') // TODO: Ok dude, I know it's late, but you can do better than this.
 
+async function resolveLiveReloadPort(config) {
+  if (!config.livereload) return null
+  let liveReloadPort = overrideLivereloadPort || config.livereload.port || 35729
+  if (!overrideLivereloadPort) liveReloadPort = await getAvailablePort(liveReloadPort, liveReloadPort + 10)
+  config.livereload_port = liveReloadPort
+}
+
+function setupLiveReloadServer(config) {
+  if (!config.livereload) return null
+  const liveReloadExcludes = ['.git', '.svn', '.hg']
+
+  if (config.watch) {
+    liveReloadExcludes.push(...config.watch)
+  }
+
+  if (config.includePaths) {
+    liveReloadExcludes.push(...config.includePaths)
+  }
+
+  if (config.livereload.exclude) {
+    liveReloadExcludes.push(...config.livereload.exclude)
+  }
+
+  const liveReloadServer = livereload.createServer({
+    exclusions: [...new Set(liveReloadExcludes)],
+    port: config.livereload_port
+  })
+  console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} 🔃${pstyle.dim} LiveReload server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${liveReloadServer.config.port}${pstyle.reset}\n`)
+  liveReloadServer.watch(cwd)
+}
+
+function setupWatchers(config, modules) {
+  if (!config.watch) return
+
+  // TODO: think about watching the updates of the config file itself, we can reload the config and recompile everything.
+  // TODO: ability to automatically create a watch list of directories if watch is set to true. The list will be generated from the `in` property of each task.
+  chokidar.watch(config.watch, { ignoreInitial: true }).on('change', (file) => {
+    if (/(\.m?js|\.ts)$/i.test(file)) modules.scripts.compile()
+    if (/(\.sass|\.scss|\.css)$/i.test(file)) modules.styles.compile()
+    if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) modules.markups.compile()
+
+    // TODO: We can actually reload the page only if the data file from data has changed.
+    if (/(\.json|\.ya?ml)$/i.test(file)) {
+      modules.markups.reloadDataFiles().then(() => {
+        modules.markups.compile()
+      })
+    }
+
+    doesFileBelongToPath(file, config.copy) && modules.copy.execute()
+  }).on('unlink', (file) => {
+    if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) modules.markups.compile()
+    modules.copy.unlink(file, doesFileBelongToPath(file, config.copy))
+  }).on('unlinkDir', (path) => {
+    doesFileBelongToPath(path, config.markup) && modules.markups.compile()
+    modules.copy.unlink(path, doesFileBelongToPath(path, config.copy))
+  }).on('add', (file) => {
+    if (/(\.json|\.ya?ml)$/i.test(file)) {
+      modules.markups.reloadDataFiles().then(() => {
+        modules.markups.compile()
+      })
+    }
+    doesFileBelongToPath(file, config.copy) && modules.copy.execute()
+  })
+}
+  
 // Main function 💩
 async function poops() {
-  let lport
-  if (config.livereload) {
-    lport = overrideLivereloadPort || config.livereload.port || 35729
-    if (!overrideLivereloadPort) lport = await getAvailablePort(lport, lport + 10)
-    config.livereload_port = lport
-  }
+  await resolveLiveReloadPort(config)
 
   const styles = new Styles(config)
   const scripts = new Scripts(config)
@@ -110,65 +170,14 @@ async function poops() {
     process.exit(0)
   }
 
-  if (config.livereload) {
-    const lrExcludes = ['.git', '.svn', '.hg']
-
-    if (config.watch) {
-      lrExcludes.push(...config.watch)
-    }
-
-    if (config.includePaths) {
-      lrExcludes.push(...config.includePaths)
-    }
-
-    if (config.livereload.exclude) {
-      lrExcludes.push(...config.livereload.exclude)
-    }
-
-    const lrserver = livereload.createServer({
-      exclusions: [...new Set(lrExcludes)],
-      port: lport
-    })
-    console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} 🔃${pstyle.dim} LiveReload server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${lrserver.config.port}${pstyle.reset}\n`)
-    lrserver.watch(cwd)
-  }
+  setupLiveReloadServer(config)
 
   await styles.compile()
   await scripts.compile()
   await markups.compile()
   await copy.execute()
 
-  if (config.watch) {
-    // TODO: think about watching the updates of the config file itself, we can reload the config and recompile everything.
-    // TODO: ability to automatically create a watch list of directories if watch is set to true. The list will be generated from the `in` property of each task.
-    chokidar.watch(config.watch, { ignoreInitial: true }).on('change', (file) => {
-      if (/(\.m?js|\.ts)$/i.test(file)) scripts.compile()
-      if (/(\.sass|\.scss|\.css)$/i.test(file)) styles.compile()
-      if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) markups.compile()
-
-      // TODO: We can actually reload the page only if the data file from data has changed.
-      if (/(\.json|\.ya?ml)$/i.test(file)) {
-        markups.reloadDataFiles().then(() => {
-          markups.compile()
-        })
-      }
-
-      doesFileBelongToPath(file, config.copy) && copy.execute()
-    }).on('unlink', (file) => {
-      if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) markups.compile()
-      copy.unlink(file, doesFileBelongToPath(file, config.copy))
-    }).on('unlinkDir', (path) => {
-      doesFileBelongToPath(path, config.markup) && markups.compile()
-      copy.unlink(path, doesFileBelongToPath(path, config.copy))
-    }).on('add', (file) => {
-      if (/(\.json|\.ya?ml)$/i.test(file)) {
-        markups.reloadDataFiles().then(() => {
-          markups.compile()
-        })
-      }
-      doesFileBelongToPath(file, config.copy) && copy.execute()
-    })
-  }
+  setupWatchers(config, { styles, scripts, markups, copy })
 }
 
 // CLI Header
