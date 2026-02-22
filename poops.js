@@ -1,23 +1,22 @@
 #!/usr/bin/env node
 
-const chokidar = require('chokidar')
-const connect = require('connect')
-const Copy = require('./lib/copy.js')
-const helpers = require('./lib/utils/helpers.js')
-const http = require('node:http')
-const livereload = require('livereload')
-const Markups = require('./lib/markups.js')
-const path = require('node:path')
-const serveStatic = require('serve-static')
-const Scripts = require('./lib/scripts.js')
-const PrintStyle = require('./lib/utils/print-style.js')
-const Styles = require('./lib/styles.js')
-const portscanner = require('portscanner')
-
-const { pathExists, doesFileBelongToPath } = helpers
+import chokidar from 'chokidar'
+import connect from 'connect'
+import Copy from './lib/copy.js'
+import { pathExists, doesFileBelongToPath } from './lib/utils/helpers.js'
+import http from 'node:http'
+import fs from 'node:fs'
+import livereload from 'livereload'
+import Markups from './lib/markups.js'
+import path from 'node:path'
+import serveStatic from 'serve-static'
+import Scripts from './lib/scripts.js'
+import PrintStyle from './lib/utils/print-style.js'
+import Styles from './lib/styles.js'
+import portscanner from 'portscanner'
 
 const cwd = process.cwd() // Current Working Directory
-const pkg = require('./package.json')
+const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), 'utf-8'))
 const args = process.argv.slice(2)
 const pstyle = new PrintStyle()
 
@@ -187,7 +186,7 @@ ${pstyle.dim}For information on the structure of the configuration file, please 
 }
 
 // Load poops.json
-const config = require(configPath)
+const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
 
 if (config.watch) {
   config.watch = Array.isArray(config.watch) ? config.watch : [config.watch]
