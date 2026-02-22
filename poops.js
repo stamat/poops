@@ -160,10 +160,10 @@ async function poops() {
   const markups = new Markups(config)
   const copy = new Copy(config)
 
-  await styles.compile()
-  await scripts.compile()
-  await markups.compile()
-  await copy.execute()
+  try { await styles.compile() } catch (err) { console.log(err) }
+  try { await scripts.compile() } catch (err) { console.log(err) }
+  try { await markups.compile() } catch (err) { console.log(err) }
+  try { await copy.execute() } catch (err) { console.log(err) }
 
   if (build || (!config.watch && !config.livereload && !config.serve)) {
     process.exit(0)
