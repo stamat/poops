@@ -1,0 +1,8 @@
+{
+  "name": "test-pkg",
+  "version": "1.2.3",
+  "homepage": "https://example.com",
+  "description": "A test package",
+  "license": "MIT",
+  "author": "Test Author"
+}
