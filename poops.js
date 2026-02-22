@@ -155,27 +155,19 @@ function setupWatchers(config, modules) {
   
 // Main function 💩
 async function poops() {
-  await resolveLiveReloadPort(config)
-
   const styles = new Styles(config)
   const scripts = new Scripts(config)
   const markups = new Markups(config)
   const copy = new Copy(config)
 
-  if (build || (!config.watch && !config.livereload && !config.serve)) {
-    await styles.compile()
-    await scripts.compile()
-    await markups.compile()
-    await copy.execute()
-    process.exit(0)
-  }
-
-  setupLiveReloadServer(config)
-
   await styles.compile()
   await scripts.compile()
   await markups.compile()
   await copy.execute()
+
+  if (build || (!config.watch && !config.livereload && !config.serve)) {
+    process.exit(0)
+  }
 
   setupWatchers(config, { styles, scripts, markups, copy })
 }
@@ -231,9 +223,11 @@ async function startServer() {
   let port = overridePort || config.serve.port || 4040
   if (!overridePort) port = await getAvailablePort(port, port + 10)
 
-  http.createServer(app).listen(parseInt(port), () => {
-    console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} 🌍${pstyle.dim} Local server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${port}${pstyle.reset}`)
-    poops()
+  http.createServer(app).listen(parseInt(port), async () => {
+    await resolveLiveReloadPort(config)
+    await poops() // Initial compilation before starting the server
+    console.log(`\n${pstyle.blue + pstyle.bold}[info]${pstyle.reset} 🌍${pstyle.dim} Local server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${port}${pstyle.reset}`)
+    setupLiveReloadServer(config)
   })
 }
 
