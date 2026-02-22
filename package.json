@@ -15,7 +15,8 @@
   },
   "files": [
     "poops.js",
-    "lib/"
+    "lib/",
+    "!lib/**/__tests__/"
   ],
   "author": "Stamat <@stamat> (http://stamat.info)",
   "homepage": "https://github.com/stamat/poops",
