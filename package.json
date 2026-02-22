@@ -39,7 +39,7 @@
     "chokidar": "^3.5.3",
     "connect": "^3.7.0",
     "esbuild": "^0.25.0",
-    "glob": "^10.3.1",
+    "glob": "^13.0.6",
     "livereload": "^0.9.3",
     "marked": "^9.0.3",
     "moment": "^2.29.4",
@@ -50,11 +50,11 @@
     "yaml": "^2.3.1"
   },
   "devDependencies": {
-    "eslint": "^8.42.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-n": "^16.0.0",
-    "eslint-plugin-promise": "^6.1.1",
+    "eslint": "^9.39.3",
+    "neostandard": "^0.12.2",
     "sulphuris": "^2.0.0"
+  },
+  "overrides": {
+    "minimatch": ">=10.2.1"
   }
 }
