@@ -48,6 +48,7 @@
     "nunjucks": "^3.2.4",
     "portscanner": "^2.2.0",
     "sass": "^1.63.4",
+    "sass-resolver": "^1.0.0",
     "serve-static": "^1.15.0",
     "yaml": "^2.3.1"
   },
