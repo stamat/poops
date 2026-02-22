@@ -1,4 +1,5 @@
 # 💩 Poops [![npm version](https://img.shields.io/npm/v/poops)](https://www.npmjs.com/package/poops)
+
 Straightforward, no-bullshit bundler for the web.
 
 > When your day is long
@@ -17,7 +18,7 @@ Straightforward, no-bullshit bundler for the web.
 
 [R.E.M. - Everybody Poops :poop:](https://www.youtube.com/watch?v=5rOiW_xY-kc)
 
-----
+---
 
 Intuitive with a minimal learning curve and minimal docs, utilizing the most efficient transpilers and compilers available (like [dart-sass](https://sass-lang.com/dart-sass) and [esbuild](https://esbuild.github.io/)) Poops aims to be the simplest bundler option there is. If it's not, please do contribute so we can make it so! 🙏 All ideas and contributions are welcome.
 
@@ -25,20 +26,20 @@ It uses a simple config file where you define your input and output paths and it
 
 ## Features
 
-* Bundles SCSS/SASS to CSS
-* Uses [dart-sass](https://sass-lang.com/dart-sass) for SCSS/SASS bundling
-* Bundles JS/TS to IIFE/ESM/CJS
-* Uses [esbuild](https://esbuild.github.io/) for bundling and trinspiling JS/TS to IIFE/ESM/CJS
-* Optional JS and CSS minification using [esbuild](https://esbuild.github.io/)
-* Can produce minified code simultaneously with non-minified code! (cause I always forget to minify my code for production)
-* Supports source maps only for non minified - non production code (optional)
-* Supports multiple input and output paths
-* Resolves node modules
-* Can add a templatable banner to output files (optional)
-* Static site generation with [nunjucks](https://mozilla.github.io/nunjucks/) templating, with blogging option (optional)
-* Has a configurable local server (optional)
-* Rebuilds on file changes (optional)
-* Live reloads on file changes (optional)
+- Bundles SCSS/SASS to CSS
+- Uses [dart-sass](https://sass-lang.com/dart-sass) for SCSS/SASS bundling
+- Bundles JS/TS to IIFE/ESM/CJS
+- Uses [esbuild](https://esbuild.github.io/) for bundling and trinspiling JS/TS to IIFE/ESM/CJS
+- Optional JS and CSS minification using [esbuild](https://esbuild.github.io/)
+- Can produce minified code simultaneously with non-minified code! (cause I always forget to minify my code for production)
+- Supports source maps only for non minified - non production code (optional)
+- Supports multiple input and output paths
+- Resolves node modules
+- Can add a templatable banner to output files (optional)
+- Static site generation with [nunjucks](https://mozilla.github.io/nunjucks/) templating, with blogging option (optional)
+- Has a configurable local server (optional)
+- Rebuilds on file changes (optional)
+- Live reloads on file changes (optional)
 
 ## Quick Start
 
@@ -82,26 +83,30 @@ Just create a `poops.json` file in the root of your project and add the followin
 
 ```json
 {
-  "scripts": [{
-    "in": "example/src/js/main.ts",
-    "out": "example/dist/js/scripts.js",
-    "options": {
-      "sourcemap": true,
-      "minify": true,
-      "justMinified": false,
-      "format": "iife",
-      "target": "es2019"
+  "scripts": [
+    {
+      "in": "example/src/js/main.ts",
+      "out": "example/dist/js/scripts.js",
+      "options": {
+        "sourcemap": true,
+        "minify": true,
+        "justMinified": false,
+        "format": "iife",
+        "target": "es2019"
+      }
     }
-  }],
-  "styles": [{
-    "in": "example/src/scss/index.scss",
-    "out": "example/dist/css/styles.css",
-    "options": {
-      "sourcemap": true,
-      "minify": true,
-      "justMinified": false
+  ],
+  "styles": [
+    {
+      "in": "example/src/scss/index.scss",
+      "out": "example/dist/css/styles.css",
+      "options": {
+        "sourcemap": true,
+        "minify": true,
+        "justMinified": false
+      }
     }
-  }],
+  ],
   "markup": {
     "in": "example/src/markup",
     "out": "/",
@@ -120,24 +125,20 @@ Just create a `poops.json` file in the root of your project and add the followin
       ]
     }
   },
-    "copy": [
+  "copy": [
     {
       "in": "example/src/static",
       "out": "example/dist"
     }
   ],
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
-  "serve" : {
+  "serve": {
     "port": 4040,
     "base": "/"
   },
   "livereload": true,
-  "watch": [
-    "src"
-  ],
-  "includePaths": [
-    "node_modules"
-  ]
+  "watch": ["src"],
+  "includePaths": ["node_modules"]
 }
 ```
 
@@ -149,17 +150,17 @@ You can freely remove the properties that you don't need. For example, if you do
 
 Scripts are bundled with [esbuild](https://esbuild.github.io/). You can specify multiple scripts to bundle. Each script has the following properties:
 
-* `in` - the input path, can be an array of file paths, but please just use one file path per script
-* `out` - the output path, can be a directory or a file path, but please just use it as a filename
-* `options` - the options for the bundler. You can apply most of the esbuild options that are not in conflict with Poops. See [esbuild's options](https://esbuild.github.io/api/#build-api) for more info.
+- `in` - the input path, can be an array of file paths, but please just use one file path per script
+- `out` - the output path, can be a directory or a file path, but please just use it as a filename
+- `options` - the options for the bundler. You can apply most of the esbuild options that are not in conflict with Poops. See [esbuild's options](https://esbuild.github.io/api/#build-api) for more info.
 
 **Options:**
-* `sourcemap` - whether to generate sourcemaps or not, sourcemaps are generated only for non-minified files since they are useful for debugging. Default is `false`. This is a direct esbuild option
-* `minify` - whether to minify the output or not, minification is performed by `esbuild` and is only applied to non-minified files. Default is `false`
-* `justMinified` - whether you want to have a minified file as output only. Removes the non-minified file from the output. Useful for production builds. Default is `false`
-* `format` - the output format, can be `iife` or `esm` or `cjs` - this is a direct esbuild option
-* `target` - the target for the output, can be `es2018` or `es2019` or `es2020` or `esnext` for instance - this is a direct esbuild option
 
+- `sourcemap` - whether to generate sourcemaps or not, sourcemaps are generated only for non-minified files since they are useful for debugging. Default is `false`. This is a direct esbuild option
+- `minify` - whether to minify the output or not, minification is performed by `esbuild` and is only applied to non-minified files. Default is `false`
+- `justMinified` - whether you want to have a minified file as output only. Removes the non-minified file from the output. Useful for production builds. Default is `false`
+- `format` - the output format, can be `iife` or `esm` or `cjs` - this is a direct esbuild option
+- `target` - the target for the output, can be `es2018` or `es2019` or `es2020` or `esnext` for instance - this is a direct esbuild option
 
 `scripts` property can accept an array of script configurations or just a single script configuration. If you want to bundle multiple scripts, just add them to the `scripts` array:
 
@@ -198,14 +199,15 @@ As noted earlier, if you don't want to bundle scripts, just remove the `scripts`
 
 Styles are bundled with [Dart Sass](https://sass-lang.com/dart-sass). You can specify multiple styles to bundle. Each style has the following properties:
 
-* `in` - the input path, accepts only a path to a file
-* `out` - the output path, can be a directory or a file path, but please just use it as a filename
-* `options` - the options for the bundler.
+- `in` - the input path, accepts only a path to a file
+- `out` - the output path, can be a directory or a file path, but please just use it as a filename
+- `options` - the options for the bundler.
 
 **Options:**
-* `sourcemap` - whether to generate sourcemaps or not, sourcemaps are generated only for non-minified files since they are useful for debugging. Default is `false`
-* `minify` - whether to minify the output or not, minification is performed by `esbuild`. Default is `false`
-* `justMinified` - whether you want to have a minified file as output only. Removes the non-minified file from the output. Useful for production builds. Defaults to `false`.
+
+- `sourcemap` - whether to generate sourcemaps or not, sourcemaps are generated only for non-minified files since they are useful for debugging. Default is `false`
+- `minify` - whether to minify the output or not, minification is performed by `esbuild`. Default is `false`
+- `justMinified` - whether you want to have a minified file as output only. Removes the non-minified file from the output. Useful for production builds. Defaults to `false`.
 
 `styles` property can accept an array of style configurations or just a single style configuration. If you want to bundle multiple styles, just add them to the `styles` array:
 
@@ -238,16 +240,15 @@ As noted earlier, if you don't want to bundle styles, just remove the `styles` p
 
 ### Markups 🚧
 
-Poops can generate static pages for you. This feature is still under development, but available for testing from the  v1.0.2. Your markup is templated with [nunjucks](https://mozilla.github.io/nunjucks/). You can specify multiple markup directories to template. **It's currently recommended to specify only one markup directory since this feature is still WIP 🚧.** Each markup directory has the following properties:
+Poops can generate static pages for you. This feature is still under development, but available for testing from the v1.0.2. Your markup is templated with [nunjucks](https://mozilla.github.io/nunjucks/). You can specify multiple markup directories to template. **It's currently recommended to specify only one markup directory since this feature is still WIP 🚧.** Each markup directory has the following properties:
 
-* `in` - the input path, can be a directory or a file path, but please just use it as a directory path for now. All files in this directory will be processed and the structure of the directory will be preserved in the output directory with exception to directories that begin with an underscore `_` will be ignored.
-* `out` - the output path, can be only a directory path (for now)
-* `site` (optional) - global data that will be available to all templates in the markup directory. Like site title, description, social media links, etc. You can then use this data in your templates `{{ site.title }}` for instance.
-* `data` (optional) - is an array of JSON or YAML data files, that once loaded will be available to all templates in the markup directory. If you provide a path to a file for instance `links.json` with a `facebook` property, you can then use this data in your templates `{{ links.facebook }}`. The base name of the file will be used as the variable name, with spaces, dashes and dots replaced with underscores. So `the awesome-links.json` will be available as `{{ the_awesome_links.facebook }}` in your templates. The root directory of the data files is `in` directory. So if you have a `data` directory in your `in` directory, you can specify the data files like this `data: ["data/links.json"]`. The same goes for the YAML files.
-* `includePaths` - an array of paths to directories that will be added to the nunjucks include paths. Useful if you want to separate template partials and layouts. For instance, if you have a `_includes` directory with a `header.njk` partial that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the partial. This will change in the future, to provide better ignore and include patterns for the markup directories.
+- `in` - the input path, can be a directory or a file path, but please just use it as a directory path for now. All files in this directory will be processed and the structure of the directory will be preserved in the output directory with exception to directories that begin with an underscore `_` will be ignored.
+- `out` - the output path, can be only a directory path (for now)
+- `site` (optional) - global data that will be available to all templates in the markup directory. Like site title, description, social media links, etc. You can then use this data in your templates `{{ site.title }}` for instance.
+- `data` (optional) - is an array of JSON or YAML data files, that once loaded will be available to all templates in the markup directory. If you provide a path to a file for instance `links.json` with a `facebook` property, you can then use this data in your templates `{{ links.facebook }}`. The base name of the file will be used as the variable name, with spaces, dashes and dots replaced with underscores. So `the awesome-links.json` will be available as `{{ the_awesome_links.facebook }}` in your templates. The root directory of the data files is `in` directory. So if you have a `data` directory in your `in` directory, you can specify the data files like this `data: ["data/links.json"]`. The same goes for the YAML files.
+- `includePaths` - an array of paths to directories that will be added to the nunjucks include paths. Useful if you want to separate template partials and layouts. For instance, if you have a `_includes` directory with a `header.njk` partial that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the partial. This will change in the future, to provide better ignore and include patterns for the markup directories.
 
 **💡 NOTE:** If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the global variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
-
 
 Here is a sample markup configuration:
 
@@ -277,13 +278,13 @@ If your project doesn't have markups, you can remove the `markups` property from
 
 #### Custom Filters
 
-* `slugify` - slugifies a string. Usage: `{{ "My Awesome Title" | slugify }}` will output `my-awesome-title`
+- `slugify` - slugifies a string. Usage: `{{ "My Awesome Title" | slugify }}` will output `my-awesome-title`
 
 ### Copy
 
 Configuration entry to copy files or directories - copy your static files like images and fonts, for instance, from `src` to `dist` directory. This feature was added to enable moving static files if you deploy GitHub pages via a GitHub action. If you don't want to use this feature, simply exclude the `copy` property from your config file.
 
-Here is a sample copy configuration which will copy the `static` directory and it's contents to the  `dist` directory:
+Here is a sample copy configuration which will copy the `static` directory and it's contents to the `dist` directory:
 
 ```JSON
 {
@@ -322,7 +323,7 @@ You can specify a list of input paths and pass them to an output directory, for 
 }
 ```
 
-**💡 NOTE:** Copy can also accept some basic **GLOB** as input paths. Does NOT support **EXTGLOB** yet. Don't expect too much of it, but for instance these paths will work:
+**💡 NOTE:** Copy can also accept **GLOB** and **EXTGLOB** patterns as input paths, except POSIX character classes (e.g. `[[:alpha:]]`):
 
 ```JSON
 {
@@ -333,6 +334,9 @@ You can specify a list of input paths and pass them to an output directory, for 
       "notes/doc?.txt",
       "notes/memo*.txt",
       "notes/log[!123a].txt",
+      "assets/!(vendor)/*.js",
+      "fonts/@(woff|woff2)/*.+(woff|woff2)",
+      "docs/?(intro|overview).md"
     ],
     "out": "dist"
   }
@@ -343,14 +347,15 @@ You can specify a list of input paths and pass them to an output directory, for 
 
 Here you can specify a banner that will be added to the top of the output files. It is templatable via mustache. The following variables are available from your project's `package.json`:
 
-* `name`
-* `version`
-* `homepage`
-* `license`
-* `author`
-* `description`
+- `name`
+- `version`
+- `homepage`
+- `license`
+- `author`
+- `description`
 
 Here is a sample banner template.
+
 ```
 /* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */
 ```
@@ -360,20 +365,24 @@ You can always pass just a string, you don't have to template it.
 If you don't want to add a banner, just remove the `banner` property from the config.
 
 ### Local Server (optional)
+
 Sets up a local server for your project.
 
 Server options:
-* `port` - the port on which the server will run
-* `base` - the base path of the server, where your HTML files are located
+
+- `port` - the port on which the server will run
+- `base` - the base path of the server, where your HTML files are located
 
 If you don't want to run a local server, just remove the `serve` property from the config.
 
 ### Live Reload (optional)
+
 Sets up a livereload server for your project.
 
 Live reload options:
-* `port` - the port on which the livereload server will run
-* `exclude` - an array of files and directories to exclude from livereload
+
+- `port` - the port on which the livereload server will run
+- `exclude` - an array of files and directories to exclude from livereload
 
 `livereload` can only be `true`, which means that it will run on the default port (`35729`) or you can specify a port:
 
@@ -390,10 +399,7 @@ You can also exclude files and directories from livereload:
 ```json
 {
   "livereload": {
-    "exclude": [
-      "some_directory/**/*",
-      "some_other_directory/**/*"
-    ]
+    "exclude": ["some_directory/**/*", "some_other_directory/**/*"]
   }
 }
 ```
@@ -401,10 +407,14 @@ You can also exclude files and directories from livereload:
 In order for Livereload to work, you need to add the following script snippet to your HTML files in your development environment:
 
 ```html
-<script>document.write('<script src="http://'
-    + (location.host || 'localhost').split(':')[0]
-    + ':35729/livereload.js?snipver=1"></'
-    + 'script>')</script>
+<script>
+  document.write(
+    '<script src="http://' +
+      (location.host || "localhost").split(":")[0] +
+      ':35729/livereload.js?snipver=1"></' +
+      "script>",
+  );
+</script>
 ```
 
 Be mindful of the port, if you have specified a custom port, you need to change the port in the snippet as well.
@@ -414,56 +424,52 @@ You can also use a browser extension for livereload, for instance here is one fo
 If you don't want to run livereload, just remove the `livereload` property from the config, or set it to false.
 
 ### Watch (optional)
+
 Sets up a watcher for your project which will rebuild your files on change.
 
 `watch` property accepts an array of paths to watch for changes. If you want to watch for changes in the `src` directory, just add it to the `watch` array:
 
 ```json
 {
-  "watch": [
-    "src"
-  ]
+  "watch": ["src"]
 }
 ```
 
 If you don't want to watch for file changes, just remove the `watch` property from the config.
 
 ### Include Paths (optional)
+
 This property is used to specify paths that you want to resolve your imports from. Like `node_modules`. You don't need to specify the `includePaths`, `node_modules` are included by default. But if you do specify `includePaths`, you need to include `node_modules` as well, since this change will override the default behavior.
 
 Same as `watch` property, `includePaths` accepts an array of paths to include. If you want to include `lib` directory for instance, just add it to the `includePaths` array:
 
 ```json
 {
-  "includePaths": [
-    "node_modules", "lib"
-  ]
+  "includePaths": ["node_modules", "lib"]
 }
 ```
 
 ## Todo
 
-* [ ] Run esbuild for each input path individually if there are multiple input paths
-* [ ] Styles `in` should be able to support array of inputs like we have it on scripts
-* [ ] Build a cli config creation helper tool. If the user doesn't have a config file, we can ask them a few questions and create a config file for them. Create Yeoman generator for poops projects.
-* [ ] Support for LESS styles... I guess... And Stylus... I guess...
-* [x] Add nunjucks static templating
-  * [ ] Refactor nunjucks implementation
-  * [ ] Complete documentation for nunjucks
-  * [x] Add markdown support
-  * [x] Front Matter support
-  * [ ] Future implementation: alternative templating engine liquidjs?
-  * [x] Future implementation: posts and custom collections, so we can have a real static site generator
-  * [x] Collection pagination system
-  * [x] Post published toggle
-  * [x] RSS and ATOM generation for collections
-* [ ] Refactor!!!!
+- [ ] Run esbuild for each input path individually if there are multiple input paths
+- [ ] Styles `in` should be able to support array of inputs like we have it on scripts
+- [ ] Build a cli config creation helper tool. If the user doesn't have a config file, we can ask them a few questions and create a config file for them. Create Yeoman generator for poops projects.
+- [x] Add nunjucks static templating
+  - [ ] Refactor nunjucks implementation
+  - [ ] Complete documentation for nunjucks
+  - [x] Add markdown support
+  - [x] Front Matter support
+  - [x] Future implementation: posts and custom collections, so we can have a real static site generator
+  - [x] Collection pagination system
+  - [x] Post published toggle
+  - [x] RSS and ATOM generation for collections
+  - [ ] Support for images and creating srcsets
 
 ## Why?
 
 Why doesn't anyone maintain GULP anymore? Why does Parcel hate config files? Why are Rollup and Webpack so complex to setup for simple tasks? Vite???? What's going on?
 
-I'm tired... Tired of bullshit... I just want to bundle my scss/sass and/or my js/ts to css and iife/esm js, by providing input and output paths for both/one. And to be able to have minimal easily maintainable dependencies. I don't need plugins, I'll add the features manually for the practice I use. That's it. The f**king end.
+I'm tired... Tired of bullshit... I just want to bundle my scss/sass and/or my js/ts to css and iife/esm js, by providing input and output paths for both/one. And to be able to have minimal easily maintainable dependencies. I don't need plugins, I'll add the features manually for the practice I use. That's it. The f\*\*king end.
 
 To better illustrate it, here is a sample diff of Poops replacing Rollup:
 
