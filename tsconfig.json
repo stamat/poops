@@ -4,7 +4,7 @@
     "target": "es2019",
     "module": "es2020",
     "lib": ["es2019", "dom", "dom.iterable"],
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "checkJs": false,

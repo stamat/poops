@@ -6,6 +6,6 @@ description: Next to compiling scripts, styles and markup, copy capability is ad
 published: true
 ---
 
-### What?
+<h1>{{page.title}}</h1>
 
-It's markdown!
+Copy feature copies one directories or files from one place to the other. Useful for deployments.
