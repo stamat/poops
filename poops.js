@@ -125,7 +125,7 @@ function setupWatchers(config, modules) {
   // TODO: think about watching the updates of the config file itself, we can reload the config and recompile everything.
   // TODO: ability to automatically create a watch list of directories if watch is set to true. The list will be generated from the `in` property of each task.
   chokidar.watch(config.watch, { ignoreInitial: true }).on('change', (file) => {
-    if (/(\.m?js|\.ts)$/i.test(file)) modules.scripts.compile()
+    if (/(\.m?jsx?|\.tsx?)$/i.test(file)) modules.scripts.compile()
     if (/(\.sass|\.scss|\.css)$/i.test(file)) modules.styles.compile()
     if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) modules.markups.compile()
 
