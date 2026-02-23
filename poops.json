@@ -9,6 +9,15 @@
       "format": "iife",
       "target": "es2019"
     }
+  }, {
+    "in": "example/src/js/react-app.jsx",
+    "out": "example/dist/js/react-app.js",
+    "options": {
+      "sourcemap": true,
+      "minify": true,
+      "format": "iife",
+      "target": "es2019"
+    }
   }],
   "styles": [{
     "in": "example/src/scss/index.scss",

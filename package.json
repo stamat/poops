@@ -57,6 +57,8 @@
     "eslint": "^9.39.3",
     "jest": "^30.2.0",
     "neostandard": "^0.12.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "sulphuris": "^2.0.0"
   },
   "overrides": {

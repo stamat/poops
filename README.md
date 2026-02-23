@@ -28,8 +28,8 @@ It uses a simple config file where you define your input and output paths and it
 
 - Bundles SCSS/SASS to CSS
 - Uses [dart-sass](https://sass-lang.com/dart-sass) for SCSS/SASS bundling
-- Bundles JS/TS to IIFE/ESM/CJS
-- Uses [esbuild](https://esbuild.github.io/) for bundling and trinspiling JS/TS to IIFE/ESM/CJS
+- Bundles JS/TS/JSX/TSX to IIFE/ESM/CJS
+- Uses [esbuild](https://esbuild.github.io/) for bundling and transpiling JS/TS/JSX/TSX to IIFE/ESM/CJS
 - Optional JS and CSS minification using [esbuild](https://esbuild.github.io/)
 - Can produce minified code simultaneously with non-minified code! (cause I always forget to minify my code for production)
 - Supports source maps only for non minified - non production code (optional)
@@ -148,7 +148,7 @@ You can freely remove the properties that you don't need. For example, if you do
 
 ### Scripts
 
-Scripts are bundled with [esbuild](https://esbuild.github.io/). You can specify multiple scripts to bundle. Each script has the following properties:
+Scripts are bundled with [esbuild](https://esbuild.github.io/). Supports `.js`, `.ts`, `.jsx`, and `.tsx` files out of the box — including React and other JSX frameworks. You can specify multiple scripts to bundle. Each script has the following properties:
 
 - `in` - the input path, can be an array of file paths, but please just use one file path per script
 - `out` - the output path, can be a directory or a file path, but please just use it as a filename
@@ -161,6 +161,7 @@ Scripts are bundled with [esbuild](https://esbuild.github.io/). You can specify 
 - `justMinified` - whether you want to have a minified file as output only. Removes the non-minified file from the output. Useful for production builds. Default is `false`
 - `format` - the output format, can be `iife` or `esm` or `cjs` - this is a direct esbuild option
 - `target` - the target for the output, can be `es2018` or `es2019` or `es2020` or `esnext` for instance - this is a direct esbuild option
+- `jsx` - the JSX transform mode, can be `transform` (default) or `automatic`. Use `automatic` for React 17+ JSX runtime which doesn't require importing React in every file - this is a direct esbuild option
 
 `scripts` property can accept an array of script configurations or just a single script configuration. If you want to bundle multiple scripts, just add them to the `scripts` array:
 
@@ -192,6 +193,28 @@ Scripts are bundled with [esbuild](https://esbuild.github.io/). You can specify 
   ]
 }
 ```
+
+#### JSX/TSX (React) Example
+
+To bundle a React app, just point `in` to your `.jsx` or `.tsx` entry file:
+
+```json
+{
+  "scripts": [
+    {
+      "in": "src/js/app.jsx",
+      "out": "dist/js/app.js",
+      "options": {
+        "minify": true,
+        "format": "iife",
+        "jsx": "automatic"
+      }
+    }
+  ]
+}
+```
+
+Setting `jsx` to `automatic` uses React's JSX runtime (React 17+), so you don't need `import React from 'react'` in every file. If you omit `jsx` or set it to `transform`, the classic `React.createElement` transform is used.
 
 As noted earlier, if you don't want to bundle scripts, just remove the `scripts` property from the config.
 
