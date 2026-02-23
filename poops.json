@@ -19,6 +19,16 @@
       "target": "es2019"
     }
   }],
+  "ssg": [{
+    "component": "example/src/js/App.jsx",
+    "in": "example/src/js/app-hydrate.jsx",
+    "out": "example/dist/js/app-hydrate.js",
+    "inject": "app_html",
+    "options": {
+      "minify": true,
+      "target": "es2019"
+    }
+  }],
   "styles": [{
     "in": "example/src/scss/index.scss",
     "out": "example/dist/css/styles.css",

@@ -6,7 +6,7 @@ subtitle: <strong>React? No problem!</strong>
 
 <h1>React JSX Example</h1>
 
-<div id="root"></div>
-<script async type="text/javascript" src="{{ relativePathPrefix }}js/react-app.min.js"></script>
+<div id="root">{{ app_html | safe }}</div>
+<script async type="text/javascript" src="{{ relativePathPrefix }}js/app-hydrate.min.js"></script>
 
 {% include "site-footer.html" %}

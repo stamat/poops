@@ -218,6 +218,53 @@ Setting `jsx` to `automatic` uses React's JSX runtime (React 17+), so you don't 
 
 As noted earlier, if you don't want to bundle scripts, just remove the `scripts` property from the config.
 
+### React SSG (Static Site Generation)
+
+SSG renders React components to HTML at build time, then hydrates them on the client. This means pages load with pre-rendered content instead of an empty `<div>`.
+
+Each SSG entry has the following properties:
+
+- `component` — the file that default-exports a React component (rendered server-side)
+- `in` — the client entry file for hydration (bundled for browser)
+- `out` — output path for the client bundle
+- `inject` — Nunjucks variable name for the rendered HTML
+- `options` — esbuild options (applied to the client bundle, same as `scripts` options)
+
+```json
+{
+  "ssg": [
+    {
+      "component": "src/js/App.jsx",
+      "in": "src/js/app-hydrate.jsx",
+      "out": "dist/js/app-hydrate.js",
+      "inject": "app_html",
+      "options": {
+        "minify": true,
+        "target": "es2019"
+      }
+    }
+  ]
+}
+```
+
+In your Nunjucks templates, use the `inject` name to insert the rendered HTML:
+
+```html
+<div id="root">{{ app_html | safe }}</div>
+<script src="js/app-hydrate.min.js"></script>
+```
+
+**How it works:**
+
+1. Poops bundles the component with `react-dom/server` for Node.js and calls `renderToString`
+2. The rendered HTML is stored and made available as a Nunjucks global variable
+3. The client entry is bundled for the browser (same as a regular `scripts` entry)
+4. At runtime, React hydrates the pre-rendered HTML, making it interactive
+
+SSG runs after Styles but before Scripts and Markups in the build pipeline. Poops does not need `react` or `react-dom` as its own dependency — they are resolved from your project's `node_modules`.
+
+In watch mode, changes to JSX/TSX files trigger SSG re-rendering followed by a markup recompile.
+
 ### Styles
 
 Styles are bundled with [Dart Sass](https://sass-lang.com/dart-sass). You can specify multiple styles to bundle. Each style has the following properties:

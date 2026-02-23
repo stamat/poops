@@ -11,6 +11,7 @@ import Markups from './lib/markups.js'
 import path from 'node:path'
 import serveStatic from 'serve-static'
 import Scripts from './lib/scripts.js'
+import SSG from './lib/ssg.js'
 import PrintStyle from './lib/utils/print-style.js'
 import Styles from './lib/styles.js'
 import portscanner from 'portscanner'
@@ -125,7 +126,15 @@ function setupWatchers(config, modules) {
   // TODO: think about watching the updates of the config file itself, we can reload the config and recompile everything.
   // TODO: ability to automatically create a watch list of directories if watch is set to true. The list will be generated from the `in` property of each task.
   chokidar.watch(config.watch, { ignoreInitial: true }).on('change', (file) => {
-    if (/(\.m?jsx?|\.tsx?)$/i.test(file)) modules.scripts.compile()
+    if (/(\.m?jsx?|\.tsx?)$/i.test(file)) {
+      modules.scripts.compile()
+      if (config.ssg) {
+        modules.ssg.compile().then(() => {
+          config.ssgData = modules.ssg.getRendered()
+          modules.markups.compile()
+        })
+      }
+    }
     if (/(\.sass|\.scss|\.css)$/i.test(file)) modules.styles.compile()
     if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) modules.markups.compile()
 
@@ -152,15 +161,18 @@ function setupWatchers(config, modules) {
     doesFileBelongToPath(file, config.copy) && modules.copy.execute()
   })
 }
-  
+
 // Main function 💩
 async function poops() {
   const styles = new Styles(config)
+  const ssg = new SSG(config)
   const scripts = new Scripts(config)
   const markups = new Markups(config)
   const copy = new Copy(config)
 
   try { await styles.compile() } catch (err) { console.log(err) }
+  try { await ssg.compile() } catch (err) { console.log(err) }
+  config.ssgData = ssg.getRendered()
   try { await scripts.compile() } catch (err) { console.log(err) }
   try { await markups.compile() } catch (err) { console.log(err) }
   try { await copy.execute() } catch (err) { console.log(err) }
@@ -169,7 +181,7 @@ async function poops() {
     process.exit(0)
   }
 
-  setupWatchers(config, { styles, scripts, markups, copy })
+  setupWatchers(config, { styles, ssg, scripts, markups, copy })
 }
 
 // CLI Header
@@ -223,6 +235,7 @@ async function startServer() {
   let port = overridePort || config.serve.port || 4040
   if (!overridePort) port = await getAvailablePort(port, port + 10)
 
+  // eslint-disable-next-line @stylistic/space-before-function-paren
   http.createServer(app).listen(parseInt(port), async () => {
     await resolveLiveReloadPort(config)
     await poops() // Initial compilation before starting the server
