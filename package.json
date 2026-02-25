@@ -1,7 +1,7 @@
 {
   "name": "poops",
   "description": "Straightforward, no-bullshit bundler for the web.",
-  "version": "1.1.0",
+  "version": "1.0.20",
   "license": "MIT",
   "type": "module",
   "main": "poops.js",
@@ -48,7 +48,7 @@
     "nunjucks": "^3.2.4",
     "portscanner": "^2.2.0",
     "sass": "^1.63.4",
-    "sass-path-resolver": "^1.0.1",
+    "sass-path-resolver": "^1.0.2",
     "serve-static": "^1.15.0",
     "yaml": "^2.3.1"
   },
