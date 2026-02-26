@@ -127,38 +127,38 @@ function setupWatchers(config, modules) {
   // TODO: ability to automatically create a watch list of directories if watch is set to true. The list will be generated from the `in` property of each task.
   chokidar.watch(config.watch, { ignoreInitial: true }).on('change', (file) => {
     if (/(\.m?jsx?|\.tsx?)$/i.test(file)) {
-      modules.scripts.compile()
+      modules.scripts.compile().catch(err => console.error(err))
       if (config.ssg) {
         modules.ssg.compile().then(() => {
           config.ssgData = modules.ssg.getRendered()
-          modules.markups.compile()
-        })
+          return modules.markups.compile()
+        }).catch(err => console.error(err))
       }
     }
-    if (/(\.sass|\.scss|\.css)$/i.test(file)) modules.styles.compile()
-    if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) modules.markups.compile()
+    if (/(\.sass|\.scss|\.css)$/i.test(file)) modules.styles.compile().catch(err => console.error(err))
+    if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) modules.markups.compile().catch(err => console.error(err))
 
     // TODO: We can actually reload the page only if the data file from data has changed.
     if (/(\.json|\.ya?ml)$/i.test(file)) {
       modules.markups.reloadDataFiles().then(() => {
-        modules.markups.compile()
-      })
+        return modules.markups.compile()
+      }).catch(err => console.error(err))
     }
 
-    doesFileBelongToPath(file, config.copy) && modules.copy.execute()
+    doesFileBelongToPath(file, config.copy) && modules.copy.execute().catch(err => console.error(err))
   }).on('unlink', (file) => {
-    if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) modules.markups.compile()
+    if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) modules.markups.compile().catch(err => console.error(err))
     modules.copy.unlink(file, doesFileBelongToPath(file, config.copy))
   }).on('unlinkDir', (path) => {
-    doesFileBelongToPath(path, config.markup) && modules.markups.compile()
+    doesFileBelongToPath(path, config.markup) && modules.markups.compile().catch(err => console.error(err))
     modules.copy.unlink(path, doesFileBelongToPath(path, config.copy))
   }).on('add', (file) => {
     if (/(\.json|\.ya?ml)$/i.test(file)) {
       modules.markups.reloadDataFiles().then(() => {
-        modules.markups.compile()
-      })
+        return modules.markups.compile()
+      }).catch(err => console.error(err))
     }
-    doesFileBelongToPath(file, config.copy) && modules.copy.execute()
+    doesFileBelongToPath(file, config.copy) && modules.copy.execute().catch(err => console.error(err))
   })
 }
 
@@ -170,12 +170,12 @@ async function poops() {
   const markups = new Markups(config)
   const copy = new Copy(config)
 
-  try { await styles.compile() } catch (err) { console.log(err) }
-  try { await ssg.compile() } catch (err) { console.log(err) }
+  try { await styles.compile() } catch (err) { console.error(err) }
+  try { await ssg.compile() } catch (err) { console.error(err) }
   config.ssgData = ssg.getRendered()
-  try { await scripts.compile() } catch (err) { console.log(err) }
-  try { await markups.compile() } catch (err) { console.log(err) }
-  try { await copy.execute() } catch (err) { console.log(err) }
+  try { await scripts.compile() } catch (err) { console.error(err) }
+  try { await markups.compile() } catch (err) { console.error(err) }
+  try { await copy.execute() } catch (err) { console.error(err) }
 
   if (build || (!config.watch && !config.livereload && !config.serve)) {
     process.exit(0)
