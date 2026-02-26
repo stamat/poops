@@ -12,6 +12,7 @@ import path from 'node:path'
 import serveStatic from 'serve-static'
 import Scripts from './lib/scripts.js'
 import SSG from './lib/ssg.js'
+import log from './lib/utils/log.js'
 import PrintStyle from './lib/utils/print-style.js'
 import Styles from './lib/styles.js'
 import portscanner from 'portscanner'
@@ -36,7 +37,7 @@ for (let i = 0; i < args.length; i++) {
     case '-c':
     case '--config':
       if (args.length === i + 1 || args[i + 1].startsWith('-')) {
-        console.log(`${pstyle.redBright + pstyle.bold}[error]${pstyle.reset} Missing config file path`)
+        log({ tag: 'error', text: 'Missing config file path' })
         process.exit(1)
       }
       defaultConfigPath = args[i + 1]
@@ -45,7 +46,7 @@ for (let i = 0; i < args.length; i++) {
     case '-p':
     case '--port':
       if (args.length === i + 1 || args[i + 1].startsWith('-') || isNaN(args[i + 1])) {
-        console.log(`${pstyle.redBright + pstyle.bold}[error]${pstyle.reset} Missing port number`)
+        log({ tag: 'error', text: 'Missing port number' })
         process.exit(1)
       }
       overridePort = args[i + 1]
@@ -54,7 +55,7 @@ for (let i = 0; i < args.length; i++) {
     case '-l':
     case '--livereload':
       if (args.length === i + 1 || args[i + 1].startsWith('-') || isNaN(args[i + 1])) {
-        console.log(`${pstyle.redBright + pstyle.bold}[error]${pstyle.reset} Missing livereload port number`)
+        log({ tag: 'error', text: 'Missing livereload port number' })
         process.exit(1)
       }
       overrideLivereloadPort = args[i + 1]
@@ -116,7 +117,8 @@ function setupLiveReloadServer(config) {
     exclusions: [...new Set(liveReloadExcludes)],
     port: config.livereload_port
   })
-  console.log(`${pstyle.blue + pstyle.bold}[info]${pstyle.reset} 🔃${pstyle.dim} LiveReload server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${liveReloadServer.config.port}${pstyle.reset}\n`)
+  log({ tag: 'info', text: '🔃 LiveReload server:', link: `http://localhost:${liveReloadServer.config.port}` })
+  console.log()
   liveReloadServer.watch(cwd)
 }
 
@@ -239,7 +241,8 @@ async function startServer() {
   http.createServer(app).listen(parseInt(port), async () => {
     await resolveLiveReloadPort(config)
     await poops() // Initial compilation before starting the server
-    console.log(`\n${pstyle.blue + pstyle.bold}[info]${pstyle.reset} 🌍${pstyle.dim} Local server:${pstyle.reset} ${pstyle.italic + pstyle.underline}http://localhost:${port}${pstyle.reset}`)
+    console.log()
+    log({ tag: 'info', text: '🌍 Local server:', link: `http://localhost:${port}` })
     setupLiveReloadServer(config)
   })
 }
