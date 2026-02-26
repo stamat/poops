@@ -437,6 +437,12 @@ Options:
 {# items = ["a", "b", "c"] #}
 ```
 
+- `svg` — reads an SVG file and injects it inline. The path is resolved relative to the project root. Returns empty string if the file doesn't exist or isn't an SVG:
+
+```nunjucks
+{{ 'src/icons/logo.svg' | svg }}
+```
+
 - `srcset` — returns just the srcset attribute value:
 
 ```html
