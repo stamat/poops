@@ -383,9 +383,59 @@ Output:
 - Defaults: `sizes="100vw"`, `loading="lazy"`
 - Falls back to a plain `<img src="...">` if no variants are found
 
+##### googleFonts
+
+Generates Google Fonts `<link>` tags with preconnect hints. Accepts an array of font names (strings) or font objects with weight/italic options.
+
+```nunjucks
+{% googleFonts ["Open Sans", "Roboto"] %}
+```
+
+Output:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto&display=swap" rel="stylesheet">
+```
+
+With specific weights and italics:
+
+```nunjucks
+{% googleFonts ["DM Sans", {name: "Poppins", weights: [400, 700], ital: true}] %}
+```
+
+Options:
+- `name` — font family name
+- `weights` — array of weight values (e.g. `[400, 700]`)
+- `ital` — set to `true` to include italic variants
+- `display` — font-display strategy, defaults to `swap`
+
 #### Custom Filters
 
-- `slugify` - slugifies a string. Usage: `{{ "My Awesome Title" | slugify }}` will output `my-awesome-title`
+- `slugify` — slugifies a string. Usage: `{{ "My Awesome Title" | slugify }}` will output `my-awesome-title`
+
+- `jsonify` — serializes a value to JSON. Usage: `{{ myObject | jsonify }}`
+
+- `markdown` — renders a markdown string to HTML. Usage: `{{ "**bold**" | markdown }}`
+
+- `date` — formats a date string. Uses [dayjs](https://day.js.org/) format tokens. Usage: `{{ "2024-01-15" | date("MMMM D, YYYY") }}` will output `January 15, 2024`. A default format can be set via the `timeDateFormat` config option.
+
+- `concat` — returns a new array with the value appended (does not mutate the original):
+
+```nunjucks
+{% set items = ["a", "b"] %}
+{% set more = items | concat("c") %}
+{# more = ["a", "b", "c"], items unchanged #}
+```
+
+- `push` — appends a value to an array in place (mutates the original):
+
+```nunjucks
+{% set items = ["a", "b"] %}
+{{ items | push("c") }}
+{# items = ["a", "b", "c"] #}
+```
 
 - `srcset` — returns just the srcset attribute value:
 
