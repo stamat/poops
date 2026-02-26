@@ -575,7 +575,7 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
 - [ ] Styles `in` should be able to support array of inputs like we have it on scripts
 - [ ] Build a cli config creation helper tool. If the user doesn't have a config file, we can ask them a few questions and create a config file for them. Create Yeoman generator for poops projects.
 - [x] Add nunjucks static templating
-  - [ ] Refactor nunjucks implementation
+  - [x] Refactor nunjucks implementation
   - [x] Complete documentation for nunjucks
   - [x] Add markdown support
   - [x] Front Matter support
