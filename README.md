@@ -308,9 +308,7 @@ Styles are bundled with [Dart Sass](https://sass-lang.com/dart-sass). You can sp
 
 As noted earlier, if you don't want to bundle styles, just remove the `styles` property from the config.
 
-### Markups 🚧
-
-Poops can generate static pages for you. This feature is still under development, but available for testing from the v1.0.2. Your markup is templated with [nunjucks](https://mozilla.github.io/nunjucks/). You can specify multiple markup directories to template. **It's currently recommended to specify only one markup directory since this feature is still WIP 🚧.** Each markup directory has the following properties:
+### Markups
 
 - `in` - the input path, can be a directory or a file path, but please just use it as a directory path for now. All files in this directory will be processed and the structure of the directory will be preserved in the output directory with exception to directories that begin with an underscore `_` will be ignored.
 - `out` - the output path, can be only a directory path (for now)
@@ -346,9 +344,61 @@ Here is a sample markup configuration:
 
 If your project doesn't have markups, you can remove the `markups` property from the config entirely. No code will be executed for this property.
 
+#### Custom Extensions
+
+##### image
+
+Poops can generate responsive `<img>` elements with `srcset` attributes. Image processing (resize, format conversion) is handled externally — Poops discovers the generated variants on disk and produces the correct HTML markup.
+
+**Naming convention:** Your image tool should output variants as `{name}-{width}w.{ext}`. For example, given `photo.jpg`, the expected variants are: `photo-320w.jpg`, `photo-640w.jpg`, `photo-320w.webp`, `photo-640w.webp`, etc.
+
+**`{% image %}` tag** — generates a full `<img>` element:
+
+```html
+{% image 'static/photo.jpg', alt='Hero', class='hero-img', sizes='(max-width:
+640px) 100vw, 50vw' %}
+```
+
+Output:
+
+```html
+<img
+  src="static/photo-640w.jpg"
+  srcset="
+    static/photo-320w.webp 320w,
+    static/photo-640w.webp 640w,
+    static/photo-960w.webp 960w
+  "
+  sizes="(max-width: 640px) 100vw, 50vw"
+  alt="Hero"
+  class="hero-img"
+  loading="lazy"
+/>
+```
+
+- Scans the output directory for files matching `{name}-{width}w.{ext}`
+- Groups by format, prefers `avif` > `webp` > original format for srcset
+- Uses the middle-sized variant as `src` fallback
+- Prepends `relativePathPrefix` automatically
+- Defaults: `sizes="100vw"`, `loading="lazy"`
+- Falls back to a plain `<img src="...">` if no variants are found
+
 #### Custom Filters
 
 - `slugify` - slugifies a string. Usage: `{{ "My Awesome Title" | slugify }}` will output `my-awesome-title`
+
+- `srcset` — returns just the srcset attribute value:
+
+```html
+<img
+  src="static/photo-640w.jpg"
+  srcset="{{ 'static/photo.jpg' | srcset }}"
+  sizes="100vw"
+  alt="Hero"
+/>
+```
+
+Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo-960w.webp 960w`
 
 ### Copy
 
@@ -526,14 +576,14 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
 - [ ] Build a cli config creation helper tool. If the user doesn't have a config file, we can ask them a few questions and create a config file for them. Create Yeoman generator for poops projects.
 - [x] Add nunjucks static templating
   - [ ] Refactor nunjucks implementation
-  - [ ] Complete documentation for nunjucks
+  - [x] Complete documentation for nunjucks
   - [x] Add markdown support
   - [x] Front Matter support
   - [x] Future implementation: posts and custom collections, so we can have a real static site generator
   - [x] Collection pagination system
   - [x] Post published toggle
   - [x] RSS and ATOM generation for collections
-  - [ ] Support for images and creating srcsets
+  - [x] Support for images and creating srcsets
 
 ## Why?
 
