@@ -55,7 +55,9 @@
         "_layouts",
         "_partials"
       ],
-      "timeDateFormat": "MMM D, YYYY"
+      "timeDateFormat": "MMM D, YYYY",
+      "searchIndex": "search-index.json",
+      "sitemap": "sitemap.xml"
     }
   },
   "copy": [

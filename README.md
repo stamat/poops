@@ -513,6 +513,76 @@ If the language is omitted, highlight.js will auto-detect it. Returns a `<pre><c
 
 Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo-960w.webp 960w`
 
+#### Search Index & Sitemap
+
+Poops can automatically generate a JSON search index and/or an XML sitemap from your compiled pages. Both are generated in a single pass during the markup compilation phase.
+
+To enable, add `searchIndex` and/or `sitemap` to your markup config:
+
+```json
+{
+  "markup": {
+    "in": "src/markup",
+    "out": "dist",
+    "options": {
+      "searchIndex": "search-index.json",
+      "sitemap": "sitemap.xml"
+    }
+  }
+}
+```
+
+The string shorthand sets the output filename with default options. For more control, use the object form:
+
+```json
+{
+  "searchIndex": {
+    "output": "search-index.json",
+    "minWordLength": 3,
+    "maxKeywords": 20,
+    "globalFrequencyCeiling": 0.8,
+    "stopWords": "path/to/custom-stop-words.json"
+  },
+  "sitemap": {
+    "output": "sitemap.xml"
+  }
+}
+```
+
+**Search Index options:**
+
+- `output` — output filename, written to the markup output directory
+- `minWordLength` — minimum word length to consider as a keyword (default: `3`)
+- `maxKeywords` — maximum keywords per page (default: `20`)
+- `globalFrequencyCeiling` — drop words appearing in more than this fraction of all pages (default: `0.8`, meaning words found in 80%+ of pages are dropped as non-discriminating)
+- `stopWords` — customise stop word filtering:
+  - omit or `undefined` — uses the bundled English stop words
+  - `false` — disables stop word filtering entirely
+  - `["word1", "word2"]` — inline array of stop words
+  - `"path/to/file.json"` — path to a JSON array file (relative to project root)
+
+**Search Index output format:**
+
+All front matter fields are passed through to the index automatically. Internal fields (`content`, `isIndex`, `layout`, `published`) are stripped. If a page defines `keywords` in its front matter, those are used as-is instead of auto-extracted ones.
+
+```json
+[
+  {
+    "title": "My Post",
+    "date": "2024-01-15",
+    "description": "A great post about things.",
+    "collection": "blog",
+    "tags": ["javascript", "bundler"],
+    "url": "blog/my-post.html",
+    "keywords": ["javascript", "bundler", "webpack", "esbuild"]
+  }
+]
+```
+
+**Sitemap** generates a standard `sitemap.xml` with `<loc>` and `<lastmod>` (from front matter `date`). If `site.url` is set in your markup config, it is prepended to all URLs. Collection index/pagination pages are included in the sitemap but excluded from the search index.
+
+Pages with `published: false` in their front matter are excluded from both outputs.
+
 ### Copy
 
 Configuration entry to copy files or directories - copy your static files like images and fonts, for instance, from `src` to `dist` directory. This feature was added to enable moving static files if you deploy GitHub pages via a GitHub action. If you don't want to use this feature, simply exclude the `copy` property from your config file.
