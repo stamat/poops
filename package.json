@@ -37,6 +37,7 @@
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
   },
   "dependencies": {
+    "argoyle": "^1.0.0",
     "book-of-spells": "^1.0.32",
     "chokidar": "^3.5.3",
     "connect": "^3.7.0",

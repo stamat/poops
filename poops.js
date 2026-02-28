@@ -15,77 +15,32 @@ import SSG from './lib/ssg.js'
 import log from './lib/utils/log.js'
 import PrintStyle from './lib/utils/print-style.js'
 import Styles from './lib/styles.js'
+import Argoyle from 'argoyle'
 import portscanner from 'portscanner'
 
 const cwd = process.cwd() // Current Working Directory
 const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), 'utf-8'))
-const args = process.argv.slice(2)
 const pstyle = new PrintStyle()
 
-let build = false
-let defaultConfigPath = 'poops.json'
-let overridePort = null
-let overrideLivereloadPort = null
+const cli = new Argoyle(pkg.version)
+  .line(`Usage: ${pkg.name} [config-file] [options]\n`)
+  .option('build', { short: 'b', description: 'Build the project and exit' })
+  .option('config', { short: 'c', value: '<path>', description: 'Specify the config file' })
+  .option('port', { short: 'p', value: '<number>', description: 'Specify the port for the server, overrides the config file' })
+  .option('livereload-port', { short: 'l', value: '<number>', description: 'Specify the port for the livereload server, overrides the config file' })
 
-for (let i = 0; i < args.length; i++) {
-  const arg = args[i]
-  switch (arg) {
-    case '-b':
-    case '--build':
-      build = true
-      break
-    case '-c':
-    case '--config':
-      if (args.length === i + 1 || args[i + 1].startsWith('-')) {
-        log({ tag: 'error', text: 'Missing config file path' })
-        process.exit(1)
-      }
-      defaultConfigPath = args[i + 1]
-      i++
-      break
-    case '-p':
-    case '--port':
-      if (args.length === i + 1 || args[i + 1].startsWith('-') || isNaN(args[i + 1])) {
-        log({ tag: 'error', text: 'Missing port number' })
-        process.exit(1)
-      }
-      overridePort = args[i + 1]
-      i++
-      break
-    case '-l':
-    case '--livereload':
-      if (args.length === i + 1 || args[i + 1].startsWith('-') || isNaN(args[i + 1])) {
-        log({ tag: 'error', text: 'Missing livereload port number' })
-        process.exit(1)
-      }
-      overrideLivereloadPort = args[i + 1]
-      i++
-      break
-    case '-v':
-    case '--version':
-      console.log(pkg.version)
-      process.exit(0)
-      break
-    case '-h':
-    case '--help':
-      console.log(`Usage: ${pkg.name} [config-file] [options]
-      -b, --build\t\tBuild the project and exit
-      -c, --config\t\tSpecify the config file
-      -h, --help\t\tShow this help message
-      -l, --livereload\t\tSpecify the port to use for the livereload server, overrides the config file
-      -p, --port\t\tSpecify the port to use for the server, overrides the config file
-      -v, --version\t\tShow version number`)
-      process.exit(0)
-      break
-    default:
-      if (arg.startsWith('-')) {
-        console.log(`Unknown option: ${arg}`)
-        process.exit(1)
-      } else {
-        defaultConfigPath = arg
-      }
-  }
+let flags, positionals
+try {
+  ({ flags, positionals } = cli.parse())
+} catch (err) {
+  log({ tag: 'error', text: err.message })
+  process.exit(1)
 }
+
+const build = flags.build
+const defaultConfigPath = flags.config || positionals[0] || 'poops.json'
+const overridePort = flags.port
+const overrideLivereloadPort = flags['livereload-port']
 
 let configPath = path.join(cwd, defaultConfigPath)
 if (!pathExists(configPath)) configPath = path.join(cwd, '💩.json') // TODO: Ok dude, I know it's late, but you can do better than this.
