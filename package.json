@@ -43,6 +43,7 @@
     "dayjs": "^1.11.19",
     "esbuild": "^0.25.0",
     "glob": "^13.0.6",
+    "highlight.js": "^11.11.1",
     "livereload": "^0.9.3",
     "marked": "^9.0.3",
     "nunjucks": "^3.2.4",

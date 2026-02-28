@@ -411,6 +411,38 @@ Options:
 - `ital` — set to `true` to include italic variants
 - `display` — font-display strategy, defaults to `swap`
 
+##### highlight
+
+Syntax-highlights code blocks at build time using [highlight.js](https://highlightjs.org/), eliminating layout shift caused by client-side highlighting. Code is pre-highlighted in the HTML output — you only need the highlight.js CSS theme on the client, not the JS.
+
+**`{% highlight %}` tag** — wraps a code block with syntax highlighting:
+
+```nunjucks
+{% highlight 'javascript' %}
+const greet = (name) => {
+  return `Hello, ${name}!`;
+};
+{% endhighlight %}
+```
+
+Output:
+
+```html
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> greet = <span class="hljs-function">...</span></code></pre>
+```
+
+The language argument is optional. If omitted, highlight.js will attempt to auto-detect the language.
+
+**Markdown code fences** are also highlighted automatically at build time:
+
+````md
+```json
+{ "name": "poops" }
+```
+````
+
+Registered languages: `javascript`/`js`, `typescript`/`ts`, `css`, `scss`, `html`, `xml`, `json`, `bash`/`sh`, `shell`, `python`/`py`, `ruby`/`rb`, `php`, `java`, `c`, `cpp`, `csharp`/`cs`, `go`, `rust`/`rs`, `yaml`/`yml`, `markdown`/`md`, `sql`, `diff`.
+
 #### Custom Filters
 
 - `slugify` — slugifies a string. Usage: `{{ "My Awesome Title" | slugify }}` will output `my-awesome-title`
@@ -442,6 +474,14 @@ Options:
 ```nunjucks
 {{ 'src/icons/logo.svg' | svg }}
 ```
+
+- `highlight` — syntax-highlights a code string at build time using highlight.js. Takes an optional language argument:
+
+```nunjucks
+{{ someCodeVariable | highlight('javascript') }}
+```
+
+If the language is omitted, highlight.js will auto-detect it. Returns a `<pre><code class="hljs">` block with highlighted markup.
 
 - `srcset` — returns just the srcset attribute value:
 
