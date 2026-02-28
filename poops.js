@@ -11,7 +11,6 @@ import Markups from './lib/markups.js'
 import path from 'node:path'
 import serveStatic from 'serve-static'
 import Scripts from './lib/scripts.js'
-import SSG from './lib/ssg.js'
 import log from './lib/utils/log.js'
 import PrintStyle from 'printstyle'
 import Styles from './lib/styles.js'
@@ -84,13 +83,12 @@ function setupWatchers(config, modules) {
   // TODO: ability to automatically create a watch list of directories if watch is set to true. The list will be generated from the `in` property of each task.
   chokidar.watch(config.watch, { ignoreInitial: true }).on('change', (file) => {
     if (/(\.m?jsx?|\.tsx?)$/i.test(file)) {
-      modules.scripts.compile().catch(err => console.error(err))
-      if (config.ssg) {
-        modules.ssg.compile().then(() => {
-          config.ssgData = modules.ssg.getRendered()
+      modules.scripts.compile().then(() => {
+        if (modules.scripts.renderedChanged) {
+          config.reactorData = modules.scripts.getRendered()
           return modules.markups.compile()
-        }).catch(err => console.error(err))
-      }
+        }
+      }).catch(err => console.error(err))
     }
     if (/(\.sass|\.scss|\.css)$/i.test(file)) modules.styles.compile().catch(err => console.error(err))
     if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) modules.markups.compile().catch(err => console.error(err))
@@ -122,15 +120,13 @@ function setupWatchers(config, modules) {
 // Main function 💩
 async function poops() {
   const styles = new Styles(config)
-  const ssg = new SSG(config)
   const scripts = new Scripts(config)
   const markups = new Markups(config)
   const copy = new Copy(config)
 
   try { await styles.compile() } catch (err) { console.error(err) }
-  try { await ssg.compile() } catch (err) { console.error(err) }
-  config.ssgData = ssg.getRendered()
   try { await scripts.compile() } catch (err) { console.error(err) }
+  config.reactorData = scripts.getRendered()
   try { await markups.compile() } catch (err) { console.error(err) }
   try { await copy.execute() } catch (err) { console.error(err) }
 
@@ -138,7 +134,7 @@ async function poops() {
     process.exit(0)
   }
 
-  setupWatchers(config, { styles, ssg, scripts, markups, copy })
+  setupWatchers(config, { styles, scripts, markups, copy })
 }
 
 // CLI Header
@@ -165,6 +161,15 @@ if (config.includePaths) {
   config.includePaths = Array.isArray(config.includePaths) ? config.includePaths : [config.includePaths]
 } else {
   config.includePaths = ['node_modules']
+}
+
+// Backwards compatibility: merge "reactor" or "ssg" entries into scripts
+const reactorEntries = config.reactor || config.ssg
+if (reactorEntries) {
+  const entries = Array.isArray(reactorEntries) ? reactorEntries : [reactorEntries]
+  config.scripts = config.scripts || []
+  if (!Array.isArray(config.scripts)) config.scripts = [config.scripts]
+  config.scripts.push(...entries)
 }
 
 async function getAvailablePort(port, max) {
