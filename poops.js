@@ -13,7 +13,7 @@ import serveStatic from 'serve-static'
 import Scripts from './lib/scripts.js'
 import SSG from './lib/ssg.js'
 import log from './lib/utils/log.js'
-import PrintStyle from './lib/utils/print-style.js'
+import PrintStyle from 'printstyle'
 import Styles from './lib/styles.js'
 import Argoyle from 'argoyle'
 import portscanner from 'portscanner'
@@ -143,15 +143,14 @@ async function poops() {
 
 // CLI Header
 const title = `💩 Poops — v${pkg.version}`
-console.log(`\n${pstyle.color('#8b4513')}${title}
-${title.replace(/./g, '-')}${pstyle.reset + pstyle.bell}\n`)
+console.log(pstyle.paint(`\n{#8b4513}${title}\n${title.replace(/./g, '-')}{/}${pstyle.bell}\n`))
 
 // Check if poops.json exists
 if (!pathExists(configPath)) {
-  console.log(`${pstyle.redBright + pstyle.bold}[error]${pstyle.reset} \`${pstyle.underline}${defaultConfigPath}${pstyle.reset}\` or \`${pstyle.underline}💩.json${pstyle.reset}\` not found.
-${pstyle.dim}Configuration file \`${defaultConfigPath}\` or \`💩.json\` not found in your working directory: ${pstyle.underline}${cwd}${pstyle.reset}\n
-${pstyle.dim}Please specify another file path or create a \`poops.json\` or \`💩.json\` file in your working directory and try again.\n
-${pstyle.dim}For information on the structure of the configuration file, please visit: \n${pstyle.underline}https://stamat.github.io/poops${pstyle.reset}\n`)
+  console.log(pstyle.paint(`{bold.redBright|[error]} \`{underline|${defaultConfigPath}}\` or \`{underline|💩.json}\` not found.
+{dim}Configuration file \`${defaultConfigPath}\` or \`💩.json\` not found in your working directory: {underline}${cwd}{/}{dim}\n
+{/}{dim}Please specify another file path or create a \`poops.json\` or \`💩.json\` file in your working directory and try again.\n
+{/}{dim}For information on the structure of the configuration file, please visit: \n{underline}https://stamat.github.io/poops{/}\n`))
   process.exit(1)
 }
 
