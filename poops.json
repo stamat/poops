@@ -39,8 +39,7 @@
     }
   }],
   "markup": {
-    "engine": "liquid",
-    "in": "example/src/liquid",
+    "in": "example/src/markup",
     "out": "example/dist",
     "site": {
       "title": "💩 Poops",
@@ -50,8 +49,7 @@
     "data": [
       "_data/features.yaml",
       "_data/links.json",
-      "_data/poops.yaml",
-      "_data/fonts.json"
+      "_data/poops.yaml"
     ],
     "includePaths": [
       "_layouts",
