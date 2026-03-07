@@ -5,6 +5,7 @@ import connect from 'connect'
 import Copy from './lib/copy.js'
 import { pathExists, doesFileBelongToPath } from './lib/utils/helpers.js'
 import http from 'node:http'
+import os from 'node:os'
 import fs from 'node:fs'
 import livereload from 'livereload'
 import Markups from './lib/markups.js'
@@ -184,6 +185,16 @@ async function getAvailablePort(port, max) {
   return port
 }
 
+function getLocalIP() {
+  const interfaces = os.networkInterfaces()
+  for (const iface of Object.values(interfaces)) {
+    for (const info of iface) {
+      if (info.family === 'IPv4' && !info.internal) return info.address
+    }
+  }
+  return 'localhost'
+}
+
 async function startServer() {
   const app = connect()
 
@@ -197,11 +208,12 @@ async function startServer() {
   if (!overridePort) port = await getAvailablePort(port, port + 10)
 
   // eslint-disable-next-line @stylistic/space-before-function-paren
-  http.createServer(app).listen(parseInt(port), async () => {
+  http.createServer(app).listen(parseInt(port), '0.0.0.0', async () => {
     await resolveLiveReloadPort(config)
     await poops() // Initial compilation before starting the server
     console.log()
-    log({ tag: 'info', text: '🌍 Local server:', link: `http://localhost:${port}` })
+    log({ tag: 'info', text: '🏠 Local server:', link: `http://localhost:${port}` })
+    log({ tag: 'info', text: '🛜 Network:', link: `http://${getLocalIP()}:${port}` })
     setupLiveReloadServer(config)
   })
 }
