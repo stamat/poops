@@ -194,6 +194,8 @@ function getLocalIP() {
 }
 
 async function startServer() {
+  await resolveLiveReloadPort(config)
+  await poops() // Initial compilation before starting the server
   const app = connect()
 
   if (config.serve.base && pathExists(cwd, config.serve.base)) {
@@ -207,8 +209,6 @@ async function startServer() {
 
   // eslint-disable-next-line @stylistic/space-before-function-paren
   http.createServer(app).listen(parseInt(port), '0.0.0.0', async () => {
-    await resolveLiveReloadPort(config)
-    await poops() // Initial compilation before starting the server
     console.log()
     styledLog(`🏠 {dim}Local server:{/} {underline|http://localhost:${port}}`)
     styledLog(`🛜 {dim} Network     :{/} {underline|http://${getLocalIP()}:${port}}`)
