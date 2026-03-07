@@ -95,12 +95,14 @@ Just create a `poops.json` file in the root of your project and add the followin
         "format": "iife",
         "target": "es2019"
       }
-    },
+    }
+  ],
+  "reactor": [
     {
       "component": "example/src/js/App.jsx",
+      "inject": "app_html",
       "in": "example/src/js/app-hydrate.jsx",
       "out": "example/dist/js/app-hydrate.js",
-      "inject": "app_html",
       "options": {
         "minify": true,
         "target": "es2019"
@@ -229,28 +231,26 @@ Setting `jsx` to `automatic` uses React's JSX runtime (React 17+), so you don't 
 
 As noted earlier, if you don't want to bundle scripts, just remove the `scripts` property from the config.
 
-#### React Pre-rendering (Reactor)
+### Reactor (React Pre-rendering)
 
-When a script entry includes `component` and `inject` properties, Poops renders the React component to HTML at build time and makes it available as a Nunjucks global variable. The client entry is then bundled for hydration in the browser.
+The `reactor` config key defines React components that are pre-rendered to HTML at build time (SSG) and optionally hydrated on the client. This is a separate pipeline from `scripts` — reactor entries have their own build step, watcher path, and logging tag.
 
-- `component` — the file that default-exports a React component (rendered at build time)
-- `inject` — Nunjucks variable name for the rendered HTML
-- `in` — the client entry file for hydration (bundled for browser)
-- `out` — output path for the client bundle
-- `options` — esbuild options (same as regular script entries)
+Each reactor entry has the following properties:
+
+- `component` — the file that default-exports a React component (rendered at build time with `renderToString`)
+- `inject` — Nunjucks global variable name for the rendered HTML
+- `in` (optional) — client entry file for hydration (bundled for the browser)
+- `out` (optional) — output path for the client bundle
+- `options` (optional) — esbuild options for the client bundle (same as script entries: `minify`, `format`, `target`, `sourcemap`, etc.)
 
 ```json
 {
-  "scripts": [
-    {
-      "in": "src/js/main.ts",
-      "out": "dist/js/scripts.js"
-    },
+  "reactor": [
     {
       "component": "src/js/App.jsx",
+      "inject": "app_html",
       "in": "src/js/app-hydrate.jsx",
       "out": "dist/js/app-hydrate.js",
-      "inject": "app_html",
       "options": {
         "minify": true,
         "target": "es2019"
@@ -260,7 +260,7 @@ When a script entry includes `component` and `inject` properties, Poops renders 
 }
 ```
 
-For backwards compatibility,`"ssg"` are also accepted as separate config keys — their entries are merged into `scripts` automatically.
+For backwards compatibility, `"ssg"` is also accepted as a config key — it is treated as an alias for `"reactor"`.
 
 In your Nunjucks templates, use the `inject` name to insert the rendered HTML:
 
@@ -269,14 +269,29 @@ In your Nunjucks templates, use the `inject` name to insert the rendered HTML:
 <script src="js/app-hydrate.min.js"></script>
 ```
 
+If you only need server-side rendering without client hydration, omit `in` and `out`:
+
+```json
+{
+  "reactor": [
+    {
+      "component": "src/js/App.jsx",
+      "inject": "app_html"
+    }
+  ]
+}
+```
+
 **How it works:**
 
 1. Poops bundles the component with `react-dom/server` for Node.js and calls `renderToString`
 2. The rendered HTML is stored and made available as a Nunjucks global variable
-3. The client entry is bundled for the browser (same as a regular script entry)
+3. If `in`/`out` are specified, the client entry is bundled for the browser
 4. At runtime, React hydrates the pre-rendered HTML, making it interactive
 
-Poops does not need `react` or `react-dom` as its own dependency — they are resolved from your project's `node_modules`. In watch mode, changes to JSX/TSX files trigger re-rendering, and markup is recompiled only when the rendered output actually changes — so editing a regular script won't cause unnecessary markup rebuilds.
+Poops does not need `react` or `react-dom` as its own dependency — they are resolved from your project's `node_modules`. In watch mode, changes to files in the reactor component's directory trigger re-rendering and client re-bundling. Markup is recompiled only when the rendered output actually changes. Changes to other JS/TS files only trigger the scripts pipeline — the two are independent.
+
+**Note:** If you don't need server-side pre-rendering, you can bundle a React app entirely through the regular `scripts` pipeline — just point `in` to your `.jsx`/`.tsx` entry file and use `createRoot` on the client. The `reactor` config is only needed when you want build-time HTML rendering with optional hydration.
 
 ### Styles
 

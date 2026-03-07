@@ -18,11 +18,12 @@
       "format": "iife",
       "target": "es2019"
     }
-  }, {
+  }],
+  "reactor": [{
     "component": "example/src/js/App.jsx",
+    "inject": "app_html",
     "in": "example/src/js/app-hydrate.jsx",
     "out": "example/dist/js/app-hydrate.js",
-    "inject": "app_html",
     "options": {
       "minify": true,
       "target": "es2019"

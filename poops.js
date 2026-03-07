@@ -11,8 +11,9 @@ import livereload from 'livereload'
 import Markups from './lib/markups.js'
 import path from 'node:path'
 import serveStatic from 'serve-static'
+import Reactor from './lib/reactor.js'
 import Scripts from './lib/scripts.js'
-import log, { styledLog, bell } from './lib/utils/log.js'
+import log, { styledLog } from './lib/utils/log.js'
 import Styles from './lib/styles.js'
 import Argoyle from 'argoyle'
 import portscanner from 'portscanner'
@@ -82,12 +83,16 @@ function setupWatchers(config, modules) {
   // TODO: ability to automatically create a watch list of directories if watch is set to true. The list will be generated from the `in` property of each task.
   chokidar.watch(config.watch, { ignoreInitial: true }).on('change', (file) => {
     if (/(\.m?jsx?|\.tsx?)$/i.test(file)) {
-      modules.scripts.compile().then(() => {
-        if (modules.scripts.renderedChanged) {
-          config.reactorData = modules.scripts.getRendered()
-          return modules.markups.compile()
-        }
-      }).catch(err => console.error(err))
+      modules.scripts.compile().catch(err => console.error(err))
+
+      if (modules.reactor.belongsToReactor(file)) {
+        modules.reactor.compile().then(() => {
+          if (modules.reactor.renderedChanged) {
+            config.reactorData = modules.reactor.getRendered()
+            return modules.markups.compile()
+          }
+        }).catch(err => console.error(err))
+      }
     }
     if (/(\.sass|\.scss|\.css)$/i.test(file)) modules.styles.compile().catch(err => console.error(err))
     if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) modules.markups.compile().catch(err => console.error(err))
@@ -119,13 +124,15 @@ function setupWatchers(config, modules) {
 // Main function 💩
 async function poops() {
   const styles = new Styles(config)
+  const reactor = new Reactor(config)
   const scripts = new Scripts(config)
   const markups = new Markups(config)
   const copy = new Copy(config)
 
   try { await styles.compile() } catch (err) { console.error(err) }
+  try { await reactor.compile() } catch (err) { console.error(err) }
+  config.reactorData = reactor.getRendered()
   try { await scripts.compile() } catch (err) { console.error(err) }
-  config.reactorData = scripts.getRendered()
   try { await markups.compile() } catch (err) { console.error(err) }
   try { await copy.execute() } catch (err) { console.error(err) }
 
@@ -133,12 +140,12 @@ async function poops() {
     process.exit(0)
   }
 
-  setupWatchers(config, { styles, scripts, markups, copy })
+  setupWatchers(config, { styles, reactor, scripts, markups, copy })
 }
 
 // CLI Header
 const title = `💩 Poops — v${pkg.version}`
-styledLog(`\n{#8b4513}${title}\n${title.replace(/./g, '-')}{/}${bell}\n`)
+styledLog(`\n{#8b4513}${title}\n${title.replace(/./g, '-')}{/}{bell}\n`)
 
 // Check if poops.json exists
 if (!pathExists(configPath)) {
@@ -162,13 +169,9 @@ if (config.includePaths) {
   config.includePaths = ['node_modules']
 }
 
-// Backwards compatibility: merge "reactor" or "ssg" entries into scripts
-const reactorEntries = config.reactor || config.ssg
-if (reactorEntries) {
-  const entries = Array.isArray(reactorEntries) ? reactorEntries : [reactorEntries]
-  config.scripts = config.scripts || []
-  if (!Array.isArray(config.scripts)) config.scripts = [config.scripts]
-  config.scripts.push(...entries)
+// Backwards compatibility: support "ssg" as alias for "reactor"
+if (!config.reactor && config.ssg) {
+  config.reactor = config.ssg
 }
 
 async function getAvailablePort(port, max) {

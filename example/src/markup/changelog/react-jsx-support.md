@@ -47,5 +47,5 @@ You can pass any esbuild JSX option through the `options` object. For example, t
 
 ### React APP example 👇
 
-<div id="root">{{ app_html | safe }}</div>
-<script async type="text/javascript" src="{{ relativePathPrefix }}js/app-hydrate.min.js"></script>
+<div id="clock-root"></div>
+<script async type="text/javascript" src="{{ relativePathPrefix }}js/react-app.min.js"></script>
