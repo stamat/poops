@@ -12,15 +12,13 @@ import Markups from './lib/markups.js'
 import path from 'node:path'
 import serveStatic from 'serve-static'
 import Scripts from './lib/scripts.js'
-import log from './lib/utils/log.js'
-import PrintStyle from 'printstyle'
+import log, { styledLog, bell } from './lib/utils/log.js'
 import Styles from './lib/styles.js'
 import Argoyle from 'argoyle'
 import portscanner from 'portscanner'
 
 const cwd = process.cwd() // Current Working Directory
 const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), 'utf-8'))
-const pstyle = new PrintStyle()
 
 const cli = new Argoyle(pkg.version)
   .line(`Usage: ${pkg.name} [config-file] [options]\n`)
@@ -72,7 +70,7 @@ function setupLiveReloadServer(config) {
     exclusions: [...new Set(liveReloadExcludes)],
     port: config.livereload_port
   })
-  log({ tag: 'info', text: '🔃 LiveReload server:', link: `http://localhost:${liveReloadServer.config.port}` })
+  styledLog(`🔃 {dim}LiveReload  :{/} ${liveReloadServer.config.port}`)
   console.log()
   liveReloadServer.watch(cwd)
 }
@@ -140,14 +138,14 @@ async function poops() {
 
 // CLI Header
 const title = `💩 Poops — v${pkg.version}`
-console.log(pstyle.paint(`\n{#8b4513}${title}\n${title.replace(/./g, '-')}{/}${pstyle.bell}\n`))
+styledLog(`\n{#8b4513}${title}\n${title.replace(/./g, '-')}{/}${bell}\n`)
 
 // Check if poops.json exists
 if (!pathExists(configPath)) {
-  console.log(pstyle.paint(`{bold.redBright|[error]} \`{underline|${defaultConfigPath}}\` or \`{underline|💩.json}\` not found.
+  styledLog(`{bold.redBright|[error]} \`{underline|${defaultConfigPath}}\` or \`{underline|💩.json}\` not found.
 {dim}Configuration file \`${defaultConfigPath}\` or \`💩.json\` not found in your working directory: {underline}${cwd}{/}{dim}\n
 {/}{dim}Please specify another file path or create a \`poops.json\` or \`💩.json\` file in your working directory and try again.\n
-{/}{dim}For information on the structure of the configuration file, please visit: \n{underline}https://stamat.github.io/poops{/}\n`))
+{/}{dim}For information on the structure of the configuration file, please visit: \n{underline}https://stamat.github.io/poops{/}\n`)
   process.exit(1)
 }
 
@@ -212,8 +210,8 @@ async function startServer() {
     await resolveLiveReloadPort(config)
     await poops() // Initial compilation before starting the server
     console.log()
-    log({ tag: 'info', text: '🏠 Local server:', link: `http://localhost:${port}` })
-    log({ tag: 'info', text: '🛜 Network:', link: `http://${getLocalIP()}:${port}` })
+    styledLog(`🏠 {dim}Local server:{/} {underline|http://localhost:${port}}`)
+    styledLog(`🛜 {dim} Network     :{/} {underline|http://${getLocalIP()}:${port}}`)
     setupLiveReloadServer(config)
   })
 }
