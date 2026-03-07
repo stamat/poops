@@ -37,7 +37,7 @@ It uses a simple config file where you define your input and output paths and it
 - Supports multiple input and output paths
 - Resolves node modules
 - Can add a templatable banner to output files (optional)
-- Static site generation with [nunjucks](https://mozilla.github.io/nunjucks/) templating, with blogging option (optional)
+- Static site generation with swappable template engines: [Nunjucks](https://mozilla.github.io/nunjucks/) (default) or [Liquid](https://liquidjs.com/) — with blogging option (optional)
 - Has a configurable local server (optional)
 - Rebuilds on file changes (optional)
 - Live reloads on file changes (optional)
@@ -78,7 +78,7 @@ If you have installed Poops locally you can run it with `npx poops` or `npx 💩
 
 ## Configuration
 
-Configuring Poops is simple 😌. Let's presume that we have a `example/src/scss` and `example/src/js` directories and we want to bundle the files into `example/dist/css` and `example/dist/js`. If you also have markup files, you can use [nunjucks](https://mozilla.github.io/nunjucks/) templating engine to generate HTML files from your templates. Let's presume that we have a `example/src/markup` directory and we want to generate HTML files in the root of the your directory.
+Configuring Poops is simple 😌. Let's presume that we have a `example/src/scss` and `example/src/js` directories and we want to bundle the files into `example/dist/css` and `example/dist/js`. If you also have markup files, you can use [Nunjucks](https://mozilla.github.io/nunjucks/) (default) or [Liquid](https://liquidjs.com/) templating engine to generate HTML files from your templates. Let's presume that we have a `example/src/markup` directory and we want to generate HTML files in the root of the your directory.
 
 Just create a `poops.json` file in the root of your project and add the following (you can see this sample config in this repo's root):
 
@@ -121,22 +121,21 @@ Just create a `poops.json` file in the root of your project and add the followin
     }
   ],
   "markup": {
+    "engine": "nunjucks",
     "in": "example/src/markup",
     "out": "/",
-    "options": {
-      "site": {
-        "title": "Poops",
-        "description": "A super simple bundler for simple web projects."
-      },
-      "data": [
-        "example/src/markup/data/links.json",
-        "example/src/markup/data/poops.yaml"
-      ],
-      "includePaths": [
-        "example/src/markup/_layouts",
-        "example/src/markup/_partials"
-      ]
-    }
+    "site": {
+      "title": "Poops",
+      "description": "A super simple bundler for simple web projects."
+    },
+    "data": [
+      "data/links.json",
+      "data/poops.yaml"
+    ],
+    "includePaths": [
+      "_layouts",
+      "_partials"
+    ]
   },
   "copy": [
     {
@@ -238,7 +237,7 @@ The `reactor` config key defines React components that are pre-rendered to HTML 
 Each reactor entry has the following properties:
 
 - `component` — the file that default-exports a React component (rendered at build time with `renderToString`)
-- `inject` — Nunjucks global variable name for the rendered HTML
+- `inject` — template global variable name for the rendered HTML (available in both Nunjucks and Liquid)
 - `in` (optional) — client entry file for hydration (bundled for the browser)
 - `out` (optional) — output path for the client bundle
 - `options` (optional) — esbuild options for the client bundle (same as script entries: `minify`, `format`, `target`, `sourcemap`, etc.)
@@ -262,7 +261,7 @@ Each reactor entry has the following properties:
 
 For backwards compatibility, `"ssg"` is also accepted as a config key — it is treated as an alias for `"reactor"`.
 
-In your Nunjucks templates, use the `inject` name to insert the rendered HTML:
+In your templates, use the `inject` name to insert the rendered HTML:
 
 ```html
 <div id="root">{{ app_html | safe }}</div>
@@ -285,7 +284,7 @@ If you only need server-side rendering without client hydration, omit `in` and `
 **How it works:**
 
 1. Poops bundles the component with `react-dom/server` for Node.js and calls `renderToString`
-2. The rendered HTML is stored and made available as a Nunjucks global variable
+2. The rendered HTML is stored and made available as a template global variable
 3. If `in`/`out` are specified, the client entry is bundled for the browser
 4. At runtime, React hydrates the pre-rendered HTML, making it interactive
 
@@ -338,41 +337,79 @@ As noted earlier, if you don't want to bundle styles, just remove the `styles` p
 
 ### Markups
 
+- `engine` (optional) - the template engine to use. Can be `"nunjucks"` (default) or `"liquid"`. [Nunjucks](https://mozilla.github.io/nunjucks/) is a Mozilla template engine inspired by Jinja2. [Liquid](https://liquidjs.com/) is a Shopify-compatible template engine. Both engines support the same tags, filters, collections, search index, and sitemap features documented below.
 - `in` - the input path, can be a directory or a file path, but please just use it as a directory path for now. All files in this directory will be processed and the structure of the directory will be preserved in the output directory with exception to directories that begin with an underscore `_` will be ignored.
 - `out` - the output path, can be only a directory path (for now)
 - `site` (optional) - global data that will be available to all templates in the markup directory. Like site title, description, social media links, etc. You can then use this data in your templates `{{ site.title }}` for instance.
 - `data` (optional) - is an array of JSON or YAML data files, that once loaded will be available to all templates in the markup directory. If you provide a path to a file for instance `links.json` with a `facebook` property, you can then use this data in your templates `{{ links.facebook }}`. The base name of the file will be used as the variable name, with spaces, dashes and dots replaced with underscores. So `the awesome-links.json` will be available as `{{ the_awesome_links.facebook }}` in your templates. The root directory of the data files is `in` directory. So if you have a `data` directory in your `in` directory, you can specify the data files like this `data: ["data/links.json"]`. The same goes for the YAML files.
-- `includePaths` - an array of paths to directories that will be added to the nunjucks include paths. Useful if you want to separate template partials and layouts. For instance, if you have a `_includes` directory with a `header.njk` partial that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the partial. This will change in the future, to provide better ignore and include patterns for the markup directories.
+- `includePaths` - an array of paths to directories that will be added to the template engine's include paths. Useful if you want to separate template partials and layouts. For instance, if you have a `_includes` directory with a `header.njk` (or `header.liquid`) partial that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the partial.
 
 **💡 NOTE:** If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the global variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
 
-Here is a sample markup configuration:
+Here is a sample markup configuration using the default Nunjucks engine:
 
-```JSON
+```json
 {
-  "markups": {
+  "markup": {
     "in": "src/markup",
     "out": "dist",
-    "options": {
-      "site": {
-        "title": "My Awesome Site",
-        "description": "This is my awesome site"
-      },
-      "data": [
-        "data/links.json",
-        "data/other.yaml"
-      ],
-      "includePaths": [
-        "_includes"
-      ]
-    }
+    "site": {
+      "title": "My Awesome Site",
+      "description": "This is my awesome site"
+    },
+    "data": [
+      "data/links.json",
+      "data/other.yaml"
+    ],
+    "includePaths": [
+      "_includes"
+    ]
   }
 }
 ```
 
-If your project doesn't have markups, you can remove the `markups` property from the config entirely. No code will be executed for this property.
+To use Liquid instead, set the `engine` property:
 
-#### Custom Extensions
+```json
+{
+  "markup": {
+    "engine": "liquid",
+    "in": "src/liquid",
+    "out": "dist",
+    "site": {
+      "title": "My Awesome Site",
+      "description": "This is my awesome site"
+    },
+    "data": [
+      "_data/links.json",
+      "_data/other.yaml"
+    ],
+    "includePaths": [
+      "_layouts",
+      "_partials"
+    ]
+  }
+}
+```
+
+If your project doesn't have markups, you can remove the `markup` property from the config entirely. No code will be executed for this property.
+
+#### Nunjucks vs Liquid
+
+Both engines support the same feature set (collections, pagination, search index, sitemap, custom tags, and filters). The main differences are in template syntax:
+
+| Feature | Nunjucks | Liquid |
+|---------|----------|--------|
+| File extension | `.njk` | `.liquid` |
+| Inheritance | `{% extends "base.html" %}` | `{% layout "base.liquid" %}` |
+| Default values | `{{ x or "fallback" }}` | `{{ x \| default: "fallback" }}` |
+| Contains check | `{% if "x" in items %}` | `{% if items contains "x" %}` |
+| Safe output | `{{ html \| safe }}` | `{{ html }}` (no escaping by default) |
+| Includes | `{% include "partial.njk" %}` | `{% render "partial.liquid" %}` |
+
+Both engines process `.html` and `.md` files in addition to their native extension.
+
+#### Custom Tags
 
 ##### image
 
@@ -382,9 +419,14 @@ Poops can generate responsive `<img>` elements with `srcset` attributes. Image p
 
 **`{% image %}` tag** — generates a full `<img>` element:
 
-```html
-{% image 'static/photo.jpg', alt='Hero', class='hero-img', sizes='(max-width:
-640px) 100vw, 50vw' %}
+Nunjucks:
+```nunjucks
+{% image 'static/photo.jpg', alt='Hero', class='hero-img', sizes='(max-width: 640px) 100vw, 50vw' %}
+```
+
+Liquid:
+```liquid
+{% image 'static/photo.jpg', alt: 'Hero', class: 'hero-img', sizes: '(max-width: 640px) 100vw, 50vw' %}
 ```
 
 Output:
@@ -415,8 +457,19 @@ Output:
 
 Generates Google Fonts `<link>` tags with preconnect hints. Accepts an array of font names (strings) or font objects with weight/italic options.
 
+Nunjucks (supports inline arrays):
 ```nunjucks
 {% googleFonts ["Open Sans", "Roboto"] %}
+```
+
+Liquid (pass a variable — inline arrays are not supported in Liquid syntax):
+```liquid
+{% googleFonts fonts %}
+```
+
+Where `fonts` is defined in a data file (e.g. `fonts.json`):
+```json
+["Open Sans", "Roboto"]
 ```
 
 Output:
@@ -430,26 +483,32 @@ Output:
 />
 ```
 
-With specific weights and italics:
+With specific weights and italics (Nunjucks):
 
 ```nunjucks
 {% googleFonts ["DM Sans", {name: "Poppins", weights: [400, 700], ital: true}] %}
 ```
 
-Options:
+With specific weights and italics (Liquid — via data file):
+
+```json
+["DM Sans", {"name": "Poppins", "weights": [400, 700], "ital": true}]
+```
+
+Font object options:
 
 - `name` — font family name
 - `weights` — array of weight values (e.g. `[400, 700]`)
 - `ital` — set to `true` to include italic variants
-- `display` — font-display strategy, defaults to `swap`
+- `display` — font-display strategy, defaults to `swap` (Nunjucks only, as a keyword argument)
 
 ##### highlight
 
 Syntax-highlights code blocks at build time using [highlight.js](https://highlightjs.org/), eliminating layout shift caused by client-side highlighting. Code is pre-highlighted in the HTML output — you only need the highlight.js CSS theme on the client, not the JS.
 
-**`{% highlight %}` tag** — wraps a code block with syntax highlighting:
+**`{% highlight %}` tag** — wraps a code block with syntax highlighting (same syntax in both engines):
 
-```nunjucks
+```
 {% highlight 'javascript' %}
 const greet = (name) => {
   return `Hello, ${name}!`;
@@ -477,43 +536,31 @@ Registered languages: `javascript`/`js`, `typescript`/`ts`, `css`, `scss`, `html
 
 #### Custom Filters
 
+All filters are available in both engines. The only syntax difference is how arguments are passed: Nunjucks uses parentheses `| filter("arg")`, Liquid uses a colon `| filter: "arg"`.
+
 - `slugify` — slugifies a string. Usage: `{{ "My Awesome Title" | slugify }}` will output `my-awesome-title`
 
 - `jsonify` — serializes a value to JSON. Usage: `{{ myObject | jsonify }}`
 
 - `markdown` — renders a markdown string to HTML. Usage: `{{ "**bold**" | markdown }}`
 
-- `date` — formats a date string. Uses [dayjs](https://day.js.org/) format tokens. Usage: `{{ "2024-01-15" | date("MMMM D, YYYY") }}` will output `January 15, 2024`. A default format can be set via the `timeDateFormat` config option.
+- `date` — formats a date string. Uses [dayjs](https://day.js.org/) format tokens. A default format can be set via the `timeDateFormat` config option.
+  - Nunjucks: `{{ "2024-01-15" | date("MMMM D, YYYY") }}`
+  - Liquid: `{{ "2024-01-15" | date: "MMMM D, YYYY" }}`
 
 - `concat` — returns a new array with the value appended (does not mutate the original):
-
-```nunjucks
-{% set items = ["a", "b"] %}
-{% set more = items | concat("c") %}
-{# more = ["a", "b", "c"], items unchanged #}
-```
+  - Nunjucks: `{{ items | concat("c") }}`
+  - Liquid: `{{ items | concat: "c" }}`
 
 - `push` — appends a value to an array in place (mutates the original):
+  - Nunjucks: `{{ items | push("c") }}`
+  - Liquid: `{{ items | push: "c" }}`
 
-```nunjucks
-{% set items = ["a", "b"] %}
-{{ items | push("c") }}
-{# items = ["a", "b", "c"] #}
-```
+- `svg` — reads an SVG file and injects it inline. The path is resolved relative to the project root. Returns empty string if the file doesn't exist or isn't an SVG. Usage: `{{ 'src/icons/logo.svg' | svg }}`
 
-- `svg` — reads an SVG file and injects it inline. The path is resolved relative to the project root. Returns empty string if the file doesn't exist or isn't an SVG:
-
-```nunjucks
-{{ 'src/icons/logo.svg' | svg }}
-```
-
-- `highlight` — syntax-highlights a code string at build time using highlight.js. Takes an optional language argument:
-
-```nunjucks
-{{ someCodeVariable | highlight('javascript') }}
-```
-
-If the language is omitted, highlight.js will auto-detect it. Returns a `<pre><code class="hljs">` block with highlighted markup.
+- `highlight` — syntax-highlights a code string at build time using highlight.js. Takes an optional language argument. If the language is omitted, highlight.js will auto-detect it. Returns a `<pre><code class="hljs">` block with highlighted markup.
+  - Nunjucks: `{{ someCodeVariable | highlight('javascript') }}`
+  - Liquid: `{{ someCodeVariable | highlight: 'javascript' }}`
 
 - `srcset` — returns just the srcset attribute value:
 
@@ -782,6 +829,7 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
   - [x] Post published toggle
   - [x] RSS and ATOM generation for collections
   - [x] Support for images and creating srcsets
+- [x] Add Liquid template engine as a swappable alternative to Nunjucks
 
 ## Why?
 
