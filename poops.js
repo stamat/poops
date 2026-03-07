@@ -15,6 +15,7 @@ import Reactor from './lib/reactor.js'
 import Scripts from './lib/scripts.js'
 import log, { styledLog } from './lib/utils/log.js'
 import Styles from './lib/styles.js'
+import PostCSS from './lib/postcss.js'
 import Argoyle from 'argoyle'
 import portscanner from 'portscanner'
 
@@ -89,14 +90,16 @@ function setupWatchers(config, modules) {
         modules.reactor.compile().then(() => {
           if (modules.reactor.renderedChanged) {
             config.reactorData = modules.reactor.getRendered()
-            modules.markups.compile().catch(err => console.error(err))
+            modules.markups.compile().then(() => modules.postcss.compile()).catch(err => console.error(err))
           }
         }).catch(err => console.error(err))
       }
     }
-    if (/(\.sass|\.scss|\.css)$/i.test(file)) modules.styles.compile().catch(err => console.error(err))
+    if (/(\.sass|\.scss|\.css)$/i.test(file)) {
+      modules.styles.compile().then(() => modules.postcss.compile()).catch(err => console.error(err))
+    }
     if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.liquid|\.md)$/i.test(file)) {
-      modules.markups.compile().catch(err => console.error(err))
+      modules.markups.compile().then(() => modules.postcss.compile()).catch(err => console.error(err))
     }
 
     // TODO: We can actually reload the page only if the data file from data has changed.
@@ -124,6 +127,7 @@ function setupWatchers(config, modules) {
 // Main function 💩
 async function poops() {
   const styles = new Styles(config)
+  const postcss = new PostCSS(config)
   const reactor = new Reactor(config)
   const scripts = new Scripts(config)
   const markups = new Markups(config)
@@ -134,13 +138,14 @@ async function poops() {
   config.reactorData = reactor.getRendered()
   try { await scripts.compile() } catch (err) { console.error(err) }
   try { await markups.compile() } catch (err) { console.error(err) }
+  try { await postcss.compile() } catch (err) { console.error(err) }
   try { await copy.execute() } catch (err) { console.error(err) }
 
   if (build || (!config.watch && !config.livereload && !config.serve)) {
     process.exit(0)
   }
 
-  setupWatchers(config, { styles, reactor, scripts, markups, copy })
+  setupWatchers(config, { styles, postcss, reactor, scripts, markups, copy })
 }
 
 // CLI Header

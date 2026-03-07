@@ -28,6 +28,7 @@ It uses a simple config file where you define your input and output paths and it
 
 - Bundles SCSS/SASS to CSS
 - Uses [dart-sass](https://sass-lang.com/dart-sass) for SCSS/SASS bundling
+- PostCSS pipeline — use any PostCSS plugin including [Tailwind CSS](https://tailwindcss.com/)
 - Bundles JS/TS/JSX/TSX to IIFE/ESM/CJS
 - Uses [esbuild](https://esbuild.github.io/) for bundling and transpiling JS/TS/JSX/TSX to IIFE/ESM/CJS
 - React pre-rendering (Reactor) — renders React components to HTML at build time for static sites with optional hydration
@@ -154,7 +155,7 @@ Just create a `poops.json` file in the root of your project and add the followin
 }
 ```
 
-All config properties are optional except `scripts`, `styles` or `markups`. You have to specify at least one of them. If you don't have anything to consume, you won't poop. 💩
+All config properties are optional except `scripts`, `styles`, `postcss` or `markups`. You have to specify at least one of them. If you don't have anything to consume, you won't poop. 💩
 
 You can freely remove the properties that you don't need. For example, if you don't want to run a local server, just remove the `serve` property from the config.
 
@@ -334,6 +335,107 @@ Styles are bundled with [Dart Sass](https://sass-lang.com/dart-sass). You can sp
 ```
 
 As noted earlier, if you don't want to bundle styles, just remove the `styles` property from the config.
+
+### PostCSS (optional)
+
+Process CSS files with [PostCSS](https://postcss.org/) and any PostCSS plugins. This is a separate pipeline from Styles (Sass) — use it for tools like [Tailwind CSS](https://tailwindcss.com/), [Autoprefixer](https://github.com/postcss/autoprefixer), or any other PostCSS plugin.
+
+PostCSS and its plugins are **not** bundled with Poops. You need to install them in your project:
+
+```bash
+npm i -D postcss
+```
+
+Each PostCSS entry has the following properties:
+
+- `in` - the input CSS file path
+- `out` - the output path, can be a directory or a file path
+- `options` - options for the pipeline
+
+**Options:**
+
+- `plugins` - an array of PostCSS plugin names to load. Each entry can be a string (plugin name) or a tuple `["plugin-name", { options }]` for passing options to the plugin.
+- `minify` - whether to minify the output using `esbuild`. Default is `false`
+- `justMinified` - output only the minified file. Default is `false`
+
+`postcss` property can accept an array of configurations or a single configuration:
+
+```json
+{
+  "postcss": {
+    "in": "src/css/main.css",
+    "out": "dist/css/main.css",
+    "options": {
+      "plugins": ["@tailwindcss/postcss"],
+      "minify": true
+    }
+  }
+}
+```
+
+You can also pass options to plugins using the tuple form:
+
+```json
+{
+  "postcss": {
+    "in": "src/css/main.css",
+    "out": "dist/css/main.css",
+    "options": {
+      "plugins": [
+        ["autoprefixer", { "grid": true }]
+      ]
+    }
+  }
+}
+```
+
+**Build order:** PostCSS runs after Styles and Markups in the build pipeline. This means PostCSS plugins can reference the compiled markup output (e.g. Tailwind scanning HTML for utility classes). In watch mode, PostCSS is re-triggered after Styles or Markups recompile.
+
+#### Tailwind CSS Example
+
+The `example-tailwind/` directory demonstrates using Tailwind CSS v4 with Poops. To run it:
+
+```bash
+npm i -D postcss @tailwindcss/postcss tailwindcss
+node poops.js -c example-tailwind/poops.json
+```
+
+The example config (`example-tailwind/poops.json`):
+
+```json
+{
+  "postcss": {
+    "in": "example-tailwind/src/css/main.css",
+    "out": "example-tailwind/dist/css/main.css",
+    "options": {
+      "plugins": ["@tailwindcss/postcss"],
+      "minify": true
+    }
+  },
+  "markup": {
+    "in": "example-tailwind/src/markup",
+    "out": "example-tailwind/dist",
+    "site": {
+      "title": "Poops + Tailwind",
+      "description": "A Tailwind CSS example for Poops"
+    },
+    "includePaths": ["_layouts", "_partials"]
+  },
+  "serve": { "port": 4041, "base": "/example-tailwind/dist" },
+  "livereload": true,
+  "watch": ["example-tailwind/src"]
+}
+```
+
+The CSS entry file (`src/css/main.css`) simply imports Tailwind:
+
+```css
+@import "tailwindcss";
+```
+
+Then use Tailwind utility classes directly in your markup templates. Tailwind v4 auto-detects content sources, so no `tailwind.config.js` is needed.
+
+**Using Sass + Tailwind together:** If you want both Sass and Tailwind, keep them as separate pipelines writing to separate output files. The Sass pipeline compiles `.scss` to CSS, while the PostCSS pipeline handles Tailwind independently. They don't need to chain into each other unless you want PostCSS to post-process the Sass output (e.g. with Autoprefixer) — in that case, point `postcss.in` to the Sass output file and `postcss.out` to a different file so the original Sass output is preserved for re-processing.
 
 ### Markups
 
