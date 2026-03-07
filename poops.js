@@ -8,7 +8,6 @@ import http from 'node:http'
 import os from 'node:os'
 import fs from 'node:fs'
 import livereload from 'livereload'
-import Liquids from './lib/liquids.js'
 import Markups from './lib/markups.js'
 import path from 'node:path'
 import serveStatic from 'serve-static'
@@ -90,45 +89,33 @@ function setupWatchers(config, modules) {
         modules.reactor.compile().then(() => {
           if (modules.reactor.renderedChanged) {
             config.reactorData = modules.reactor.getRendered()
-            modules.liquids.compile().catch(err => console.error(err))
-            return modules.markups.compile()
+            modules.markups.compile().catch(err => console.error(err))
           }
         }).catch(err => console.error(err))
       }
     }
     if (/(\.sass|\.scss|\.css)$/i.test(file)) modules.styles.compile().catch(err => console.error(err))
-    if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) modules.markups.compile().catch(err => console.error(err))
-    if (/(\.html|\.xml|\.rss|\.atom|\.liquid|\.md)$/i.test(file)) modules.liquids.compile().catch(err => console.error(err))
+    if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.liquid|\.md)$/i.test(file)) {
+      modules.markups.compile().catch(err => console.error(err))
+    }
 
     // TODO: We can actually reload the page only if the data file from data has changed.
     if (/(\.json|\.ya?ml)$/i.test(file)) {
-      modules.markups.reloadDataFiles().then(() => {
-        return modules.markups.compile()
-      }).catch(err => console.error(err))
-
-      modules.liquids.reloadDataFiles().then(() => {
-        return modules.liquids.compile()
-      }).catch(err => console.error(err))
+      modules.markups.reloadDataFiles().then(() => modules.markups.compile()).catch(err => console.error(err))
     }
 
     doesFileBelongToPath(file, config.copy) && modules.copy.execute().catch(err => console.error(err))
   }).on('unlink', (file) => {
-    if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.md)$/i.test(file)) modules.markups.compile().catch(err => console.error(err))
-    if (/(\.html|\.xml|\.rss|\.atom|\.liquid|\.md)$/i.test(file)) modules.liquids.compile().catch(err => console.error(err))
+    if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.liquid|\.md)$/i.test(file)) {
+      modules.markups.compile().catch(err => console.error(err))
+    }
     modules.copy.unlink(file, doesFileBelongToPath(file, config.copy))
-  }).on('unlinkDir', (path) => {
-    doesFileBelongToPath(path, config.markup) && modules.markups.compile().catch(err => console.error(err))
-    doesFileBelongToPath(path, config.liquid) && modules.liquids.compile().catch(err => console.error(err))
-    modules.copy.unlink(path, doesFileBelongToPath(path, config.copy))
+  }).on('unlinkDir', (dirPath) => {
+    doesFileBelongToPath(dirPath, config.markup) && modules.markups.compile().catch(err => console.error(err))
+    modules.copy.unlink(dirPath, doesFileBelongToPath(dirPath, config.copy))
   }).on('add', (file) => {
     if (/(\.json|\.ya?ml)$/i.test(file)) {
-      modules.markups.reloadDataFiles().then(() => {
-        return modules.markups.compile()
-      }).catch(err => console.error(err))
-
-      modules.liquids.reloadDataFiles().then(() => {
-        return modules.liquids.compile()
-      }).catch(err => console.error(err))
+      modules.markups.reloadDataFiles().then(() => modules.markups.compile()).catch(err => console.error(err))
     }
     doesFileBelongToPath(file, config.copy) && modules.copy.execute().catch(err => console.error(err))
   })
@@ -140,7 +127,6 @@ async function poops() {
   const reactor = new Reactor(config)
   const scripts = new Scripts(config)
   const markups = new Markups(config)
-  const liquids = new Liquids(config)
   const copy = new Copy(config)
 
   try { await styles.compile() } catch (err) { console.error(err) }
@@ -148,14 +134,13 @@ async function poops() {
   config.reactorData = reactor.getRendered()
   try { await scripts.compile() } catch (err) { console.error(err) }
   try { await markups.compile() } catch (err) { console.error(err) }
-  try { await liquids.compile() } catch (err) { console.error(err) }
   try { await copy.execute() } catch (err) { console.error(err) }
 
   if (build || (!config.watch && !config.livereload && !config.serve)) {
     process.exit(0)
   }
 
-  setupWatchers(config, { styles, reactor, scripts, markups, liquids, copy })
+  setupWatchers(config, { styles, reactor, scripts, markups, copy })
 }
 
 // CLI Header

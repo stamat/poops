@@ -38,7 +38,8 @@
       "justMinified": false
     }
   }],
-  "liquid": {
+  "markup": {
+    "engine": "liquid",
     "in": "example/src/liquid",
     "out": "example/dist",
     "site": {
