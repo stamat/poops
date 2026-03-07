@@ -64,7 +64,7 @@
     "sass": "^1.63.4",
     "sass-path-resolver": "^1.0.2",
     "sass-token-importer": "^1.0.0",
-    "serve-static": "^1.15.0",
+    "serve-static": "^2.2.1",
     "yaml": "^2.3.1"
   },
   "devDependencies": {
