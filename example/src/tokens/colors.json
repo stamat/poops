@@ -1,0 +1,11 @@
+{
+  "color": {
+    "$type": "color",
+    "primary": { "$value": "#0066cc" },
+    "secondary": { "$value": "#ff6600" },
+    "accent": { "$value": "#9b59b6" },
+    "text": { "$value": "#333333" },
+    "background": { "$value": "#f5f5f5" },
+    "link": { "$value": "{color.primary}" }
+  }
+}

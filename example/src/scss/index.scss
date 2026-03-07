@@ -8,6 +8,7 @@
   $paragraph-font: c.$paragraph-font,
 );
 @use 'sulphuris';
+@use 'style/tokens-test';
 
 @import 'style/index.scss';
 @import 'style/test';

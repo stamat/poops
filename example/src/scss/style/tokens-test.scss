@@ -1,0 +1,29 @@
+@use "token:colors" as c;
+@use "token:spacing" as s;
+
+.token-test {
+  color: c.$color-primary;
+  background-color: c.$color-background;
+
+  a {
+    color: c.$color-link;
+
+    &:hover {
+      color: c.$color-secondary;
+    }
+  }
+
+  padding: s.$spacing-md;
+  margin-bottom: s.$spacing-lg;
+
+  &__header {
+    color: c.$color-accent;
+    padding: s.$spacing-sm s.$spacing-md;
+  }
+
+  &__body {
+    color: c.$color-text;
+    padding: s.$spacing-md;
+    gap: s.$spacing-xs;
+  }
+}

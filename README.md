@@ -28,6 +28,7 @@ It uses a simple config file where you define your input and output paths and it
 
 - Bundles SCSS/SASS to CSS
 - Uses [dart-sass](https://sass-lang.com/dart-sass) for SCSS/SASS bundling
+- Design token support — import JSON tokens (W3C DTCG & Style Dictionary) as SCSS variables or maps
 - PostCSS pipeline — use any PostCSS plugin including [Tailwind CSS](https://tailwindcss.com/)
 - Bundles JS/TS/JSX/TSX to IIFE/ESM/CJS
 - Uses [esbuild](https://esbuild.github.io/) for bundling and transpiling JS/TS/JSX/TSX to IIFE/ESM/CJS
@@ -306,6 +307,9 @@ Styles are bundled with [Dart Sass](https://sass-lang.com/dart-sass). You can sp
 - `sourcemap` - whether to generate sourcemaps or not, sourcemaps are generated only for non-minified files since they are useful for debugging. Default is `false`
 - `minify` - whether to minify the output or not, minification is performed by `esbuild`. Default is `false`
 - `justMinified` - whether you want to have a minified file as output only. Removes the non-minified file from the output. Useful for production builds. Defaults to `false`.
+- `tokenPaths` - a string or array of directory paths containing JSON design token files. Enables the [`sass-token-importer`](https://github.com/stamat/sass-token-importer) which lets you `@use` JSON tokens directly in SCSS. Supports [W3C DTCG](https://design-tokens.github.io/community-group/format/) and [Style Dictionary](https://amzn.github.io/style-dictionary/) formats with auto-detection.
+- `tokenOutput` - output mode for design tokens: `"variables"` (default) generates flat SCSS variables, `"map"` generates nested Sass maps.
+- `resolveAliases` - whether to resolve `{path.to.token}` alias references in design tokens. Default is `true`.
 
 `styles` property can accept an array of style configurations or just a single style configuration. If you want to bundle multiple styles, just add them to the `styles` array:
 
@@ -331,6 +335,64 @@ Styles are bundled with [Dart Sass](https://sass-lang.com/dart-sass). You can sp
       }
     }
   ]
+}
+```
+
+#### Design Tokens
+
+You can import JSON design token files directly into your SCSS using the `token:` prefix. Define your tokens in JSON once and use them as SCSS variables — no manual variable files to keep in sync.
+
+Given a token file `src/tokens/colors.json`:
+
+```json
+{
+  "color": {
+    "$type": "color",
+    "primary": { "$value": "#0066cc" },
+    "secondary": { "$value": "#ff6600" },
+    "link": { "$value": "{color.primary}" }
+  }
+}
+```
+
+Add `tokenPaths` to your styles config:
+
+```json
+{
+  "styles": [{
+    "in": "src/scss/index.scss",
+    "out": "dist/css/styles.css",
+    "options": {
+      "tokenPaths": ["src/tokens"]
+    }
+  }]
+}
+```
+
+Then use the `token:` prefix in your SCSS:
+
+```scss
+@use "token:colors" as c;
+
+.btn {
+  color: c.$color-primary;
+}
+.btn:hover {
+  color: c.$color-secondary;
+}
+a {
+  color: c.$color-link; // resolved from {color.primary} → #0066cc
+}
+```
+
+For Sass maps instead of flat variables, set `"tokenOutput": "map"`:
+
+```scss
+@use "sass:map";
+@use "token:colors" as c;
+
+.btn {
+  color: map.get(c.$color, primary);
 }
 ```
 

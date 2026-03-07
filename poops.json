@@ -35,7 +35,8 @@
     "options": {
       "sourcemap": true,
       "minify": true,
-      "justMinified": false
+      "justMinified": false,
+      "tokenPaths": ["example/src/tokens"]
     }
   }],
   "markup": {
