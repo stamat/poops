@@ -38,28 +38,27 @@
       "justMinified": false
     }
   }],
-  "markup": {
-    "in": "example/src/markup",
+  "liquid": {
+    "in": "example/src/liquid",
     "out": "example/dist",
-    "options": {
-      "site": {
-        "title": "💩 Poops",
-        "description": "Straightforward, no-bullshit bundler for the web.",
-        "url": "https://stamat.github.io/poops"
-      },
-      "data": [
-        "_data/features.yaml",
-        "_data/links.json",
-        "_data/poops.yaml"
-      ],
-      "includePaths": [
-        "_layouts",
-        "_partials"
-      ],
-      "timeDateFormat": "MMM D, YYYY",
-      "searchIndex": "search-index.json",
-      "sitemap": "sitemap.xml"
-    }
+    "site": {
+      "title": "💩 Poops",
+      "description": "Straightforward, no-bullshit bundler for the web.",
+      "url": "https://stamat.github.io/poops"
+    },
+    "data": [
+      "_data/features.yaml",
+      "_data/links.json",
+      "_data/poops.yaml",
+      "_data/fonts.json"
+    ],
+    "includePaths": [
+      "_layouts",
+      "_partials"
+    ],
+    "timeDateFormat": "MMM D, YYYY",
+    "searchIndex": "search-index.json",
+    "sitemap": "sitemap.xml"
   },
   "copy": [
     {

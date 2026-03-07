@@ -1,0 +1,13 @@
+---
+layout: default
+subtitle: <strong>Client-only React</strong>
+---
+{% include "site-header.liquid" %}
+
+<h1>Client-only React Example</h1>
+<p>This component renders entirely on the client — no SSG prerendering.</p>
+
+<div id="clock-root"></div>
+<script async type="text/javascript" src="{{ relativePathPrefix }}js/react-app.min.js"></script>
+
+{% include "site-footer.liquid" %}

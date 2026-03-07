@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ page.title }} | {{ site.title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{{ page.description | default: site.description }}">
+  <link rel="alternate" type="application/rss+xml" href="{{ site.url }}/changelog/feed.rss">
+  {% googleFonts fonts %}
+  <link rel="stylesheet" href="{{ relativePathPrefix }}css/styles.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<body class="bg-brownish">
+
+  {% include "site-header.liquid" %}
+
+  <div class="container">
+    {% block content %} {% endblock %}
+
+    <hr>
+  </div>
+
+  {% include "site-footer.liquid" %}
+
+  {% if livereload_port %}
+  <script>document.write('<script src="http://'
+    + (location.host || 'localhost').split(':')[0]
+    + ':{{livereload_port}}/livereload.js?snipver=1"></'
+    + 'script>')</script>
+  {% endif %}
+
+  <script async type="text/javascript" src="{{ relativePathPrefix }}js/scripts.min.js"></script>
+</body>
+</html>
