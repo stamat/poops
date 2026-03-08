@@ -507,6 +507,7 @@ Then use Tailwind utility classes directly in your markup templates. Tailwind v4
 - `site` (optional) - global data that will be available to all templates in the markup directory. Like site title, description, social media links, etc. You can then use this data in your templates `{{ site.title }}` for instance.
 - `data` (optional) - is an array of JSON or YAML data files, that once loaded will be available to all templates in the markup directory. If you provide a path to a file for instance `links.json` with a `facebook` property, you can then use this data in your templates `{{ links.facebook }}`. The base name of the file will be used as the variable name, with spaces, dashes and dots replaced with underscores. So `the awesome-links.json` will be available as `{{ the_awesome_links.facebook }}` in your templates. The root directory of the data files is `in` directory. So if you have a `data` directory in your `in` directory, you can specify the data files like this `data: ["data/links.json"]`. The same goes for the YAML files.
 - `includePaths` - an array of paths to directories that will be added to the template engine's include paths. Useful if you want to separate template partials and layouts. For instance, if you have a `_includes` directory with a `header.njk` (or `header.liquid`) partial that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the partial.
+- `baseURL` (optional) - a base URL prefix to use instead of relative path prefixes. When set, `{{ relativePathPrefix }}` will always resolve to this value (with a trailing slash ensured) instead of being computed relative to each page's depth. Useful when deploying under a subdirectory (e.g. `"/blog"` for `domain.com/blog/`). When not set, relative prefixes (`./`, `../`, etc.) are used, which work for any deployment location including subdirectories and `file://` URLs.
 
 **💡 NOTE:** If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the global variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
 
@@ -527,7 +528,8 @@ Here is a sample markup configuration using the default Nunjucks engine:
     ],
     "includePaths": [
       "_includes"
-    ]
+    ],
+    "baseURL": "/blog"
   }
 }
 ```
