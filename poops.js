@@ -28,6 +28,7 @@ const cli = new Argoyle(pkg.version)
   .option('config', { short: 'c', value: '<path>', description: 'Specify the config file' })
   .option('port', { short: 'p', value: '<number>', description: 'Specify the port for the server, overrides the config file' })
   .option('livereload-port', { short: 'l', value: '<number>', description: 'Specify the port for the livereload server, overrides the config file' })
+  .option('base-url', { short: 'u', value: '<path>', description: 'Set the base URL prefix for markup, overrides the config file' })
 
 let flags, positionals
 try {
@@ -41,6 +42,7 @@ const build = flags.build
 const defaultConfigPath = flags.config || positionals[0] || 'poops.json'
 const overridePort = flags.port
 const overrideLivereloadPort = flags['livereload-port']
+const overrideBaseURL = flags['base-url']
 
 let configPath = path.join(cwd, defaultConfigPath)
 if (!pathExists(configPath)) configPath = path.join(cwd, '💩.json') // TODO: Ok dude, I know it's late, but you can do better than this.
@@ -177,6 +179,10 @@ if (config.includePaths) {
 // Backwards compatibility: support "ssg" as alias for "reactor"
 if (!config.reactor && config.ssg) {
   config.reactor = config.ssg
+}
+
+if (overrideBaseURL && config.markup) {
+  config.markup.baseURL = overrideBaseURL
 }
 
 async function getAvailablePort(port, max) {
