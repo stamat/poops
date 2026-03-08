@@ -68,6 +68,22 @@ or pass a custom config. This is useful when you have multiple environments:
 
 `poops yourAwesomeConfig.json` or `💩 yourAwesomeConfig.json`
 
+**CLI Options:**
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--build` | `-b` | Build the project and exit |
+| `--config <path>` | `-c` | Specify the config file |
+| `--port <number>` | `-p` | Specify the server port, overrides config |
+| `--livereload-port <number>` | `-l` | Specify the livereload port, overrides config |
+| `--base-url <path>` | `-u` | Set the base URL prefix for markup, overrides config |
+
+The `--base-url` flag is particularly useful for CI/CD pipelines where the deploy path may differ per environment:
+
+```bash
+poops --build --base-url /blog
+```
+
 If you have installed Poops locally you can run it with `npx poops` or `npx 💩` or add a script to your `package.json`:
 
 ```json
