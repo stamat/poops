@@ -1,12 +1,9 @@
 ---
-layout: default
+layout: blog
 subtitle: <strong>React? No problem!</strong>
 ---
-{% include "site-header.html" %}
 
 <h1>React JSX Example</h1>
 
 <div id="root">{{ app_html | safe }}</div>
 <script async type="text/javascript" src="{{ relativePathPrefix }}js/app-hydrate.min.js"></script>
-
-{% include "site-footer.html" %}
