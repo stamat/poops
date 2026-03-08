@@ -206,11 +206,22 @@ async function startServer() {
   await poops() // Initial compilation before starting the server
   const app = connect()
 
-  if (config.serve.base && pathExists(cwd, config.serve.base)) {
-    app.use(serveStatic(path.join(cwd, config.serve.base)))
-  } else {
-    app.use(serveStatic(cwd))
-  }
+  const base = config.serve.base && pathExists(cwd, config.serve.base)
+    ? path.join(cwd, config.serve.base)
+    : cwd
+
+  app.use(serveStatic(base))
+
+  // Serve 404.html for unmatched routes
+  const notFoundPage = path.join(base, '404.html')
+  app.use((req, res) => {
+    res.statusCode = 404
+    if (pathExists(notFoundPage)) {
+      fs.createReadStream(notFoundPage).pipe(res)
+    } else {
+      res.end('Not Found')
+    }
+  })
 
   let port = overridePort || config.serve.port || 4040
   if (!overridePort) port = await getAvailablePort(port, port + 10)
