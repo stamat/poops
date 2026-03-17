@@ -744,6 +744,21 @@ All filters are available in both engines. The only syntax difference is how arg
   - Nunjucks: `{{ someCodeVariable | highlight('javascript') }}`
   - Liquid: `{{ someCodeVariable | highlight: 'javascript' }}`
 
+- `groupby` — groups an array of objects by a field value. Returns an array of `{ key, items }` objects. Supports an optional second argument for date part extraction (`year`, `month`, `day`). Groups preserve insertion order, so if items are sorted by date descending, groups will be too.
+  - Nunjucks: `{{ changelog.items | groupby("author") }}` or `{{ changelog.items | groupby("date", "year") }}`
+  - Liquid: `{{ changelog.items | groupby: "author" }}` or `{{ changelog.items | groupby: "date", "year" }}`
+
+  Example — group posts by year:
+  ```nunjucks
+  {% set byYear = changelog.items | groupby("date", "year") %}
+  {% for group in byYear %}
+    <h2>{{ group.key }}</h2>
+    {% for post in group.items %}
+      <p>{{ post.title }}</p>
+    {% endfor %}
+  {% endfor %}
+  ```
+
 - `srcset` — returns just the srcset attribute value:
 
 ```html
