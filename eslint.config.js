@@ -1,6 +1,7 @@
 import neostandard from 'neostandard'
 
 export default [
+  { ignores: ['example/dist/**'] },
   ...neostandard(),
   {
     rules: {

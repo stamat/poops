@@ -43,7 +43,7 @@
   },
   "scripts": {
     "build": "node ./poops.js -b",
-    "lint": "eslint ./poops.js",
+    "lint": "eslint .",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
   },
   "dependencies": {
