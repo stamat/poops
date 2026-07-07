@@ -87,10 +87,10 @@ function setupWatchers(config, modules) {
   // awaitWriteFinish: wait for saves to finish writing before recompiling, so a
   // mid-write (truncated/partial) file is never read. Fixes intermittent broken
   // builds on editor save. ponytail: default thresholds are fine; bump if slow disks flake.
-  chokidar.watch(config.watch, {
-    ignoreInitial: true,
-    awaitWriteFinish: { stabilityThreshold: 150, pollInterval: 50 }
-  }).on('change', (file) => {
+  // Shared by 'change' and 'add': editors with atomic saves (rename-write)
+  // fire unlink+add instead of change, so both events must trigger the same
+  // rebuilds. 'add' also covers genuinely new files (e.g. a new markup page).
+  const compileChanged = (file) => {
     if (/(\.m?jsx?|\.tsx?)$/i.test(file)) {
       modules.scripts.compile().catch(err => console.error(err))
 
@@ -116,20 +116,22 @@ function setupWatchers(config, modules) {
     }
 
     doesFileBelongToPath(file, config.copy) && modules.copy.execute().catch(err => console.error(err))
-  }).on('unlink', (file) => {
-    if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.liquid|\.md)$/i.test(file)) {
-      modules.markups.compile().catch(err => console.error(err))
-    }
-    modules.copy.unlink(file, doesFileBelongToPath(file, config.copy))
-  }).on('unlinkDir', (dirPath) => {
-    doesFileBelongToPath(dirPath, config.markup) && modules.markups.compile().catch(err => console.error(err))
-    modules.copy.unlink(dirPath, doesFileBelongToPath(dirPath, config.copy))
-  }).on('add', (file) => {
-    if (/(\.json|\.ya?ml)$/i.test(file)) {
-      modules.markups.reloadDataFiles().then(() => modules.markups.compile()).catch(err => console.error(err))
-    }
-    doesFileBelongToPath(file, config.copy) && modules.copy.execute().catch(err => console.error(err))
-  })
+  }
+
+  chokidar.watch(config.watch, {
+    ignoreInitial: true,
+    awaitWriteFinish: { stabilityThreshold: 150, pollInterval: 50 }
+  }).on('change', compileChanged)
+    .on('add', compileChanged)
+    .on('unlink', (file) => {
+      if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.liquid|\.md)$/i.test(file)) {
+        modules.markups.compile().catch(err => console.error(err))
+      }
+      modules.copy.unlink(file, doesFileBelongToPath(file, config.copy))
+    }).on('unlinkDir', (dirPath) => {
+      doesFileBelongToPath(dirPath, config.markup) && modules.markups.compile().catch(err => console.error(err))
+      modules.copy.unlink(dirPath, doesFileBelongToPath(dirPath, config.copy))
+    })
 }
 
 // Main function 💩
