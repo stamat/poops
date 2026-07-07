@@ -84,7 +84,13 @@ function setupWatchers(config, modules) {
 
   // TODO: think about watching the updates of the config file itself, we can reload the config and recompile everything.
   // TODO: ability to automatically create a watch list of directories if watch is set to true. The list will be generated from the `in` property of each task.
-  chokidar.watch(config.watch, { ignoreInitial: true }).on('change', (file) => {
+  // awaitWriteFinish: wait for saves to finish writing before recompiling, so a
+  // mid-write (truncated/partial) file is never read. Fixes intermittent broken
+  // builds on editor save. ponytail: default thresholds are fine; bump if slow disks flake.
+  chokidar.watch(config.watch, {
+    ignoreInitial: true,
+    awaitWriteFinish: { stabilityThreshold: 150, pollInterval: 50 }
+  }).on('change', (file) => {
     if (/(\.m?jsx?|\.tsx?)$/i.test(file)) {
       modules.scripts.compile().catch(err => console.error(err))
 
