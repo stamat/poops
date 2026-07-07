@@ -1,0 +1,53 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # NODE_OPTIONS is set via env instead of the npm test script because the
+      # script's POSIX `VAR=value` syntax does not work in the Windows shell.
+      - name: Test
+        run: npx jest
+        env:
+          NODE_OPTIONS: --experimental-vm-modules
+
+      - name: Build example site
+        run: npm run build
+
+      # Assert artifacts rather than exit code: poops -b currently exits 0
+      # even when compiles fail (IMPROVEMENT-PLAN.md #15). On Windows a
+      # path-handling regression compiles zero files, so these checks catch it.
+      - name: Verify build output
+        shell: bash
+        run: |
+          test -f example/dist/index.html
+          test -f example/dist/sitemap.xml
+          test -f example/dist/search-index.json
+          ! grep -q '\\' example/dist/sitemap.xml
+          ! grep -q '\\\\' example/dist/search-index.json
