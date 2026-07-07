@@ -110,7 +110,6 @@ function setupWatchers(config, modules) {
       modules.markups.compile().then(() => modules.postcss.compile()).catch(err => console.error(err))
     }
 
-    // TODO: We can actually reload the page only if the data file from data has changed.
     if (/(\.json|\.ya?ml)$/i.test(file)) {
       modules.markups.reloadDataFiles().then(() => modules.markups.compile()).catch(err => console.error(err))
     }
