@@ -13,7 +13,7 @@ import path from 'node:path'
 import serveStatic from 'serve-static'
 import Reactor from './lib/reactor.js'
 import Scripts from './lib/scripts.js'
-import log, { styledLog } from './lib/utils/log.js'
+import log, { styledLog, hasLoggedErrors } from './lib/utils/log.js'
 import Styles from './lib/styles.js'
 import PostCSS from './lib/postcss.js'
 import Argoyle from 'argoyle'
@@ -142,16 +142,24 @@ async function poops() {
   const markups = new Markups(config)
   const copy = new Copy(config)
 
-  try { await styles.compile() } catch (err) { console.error(err) }
-  try { await reactor.compile() } catch (err) { console.error(err) }
+  // Thrown errors are caught so one failing step doesn't stop the rest;
+  // `failed` + hasLoggedErrors() (module-internal, swallowed errors) decide
+  // the build exit code, so a broken compile can't ship as a green build.
+  let failed = false
+  const step = async(task) => {
+    try { await task() } catch (err) { failed = true; console.error(err) }
+  }
+
+  await step(() => styles.compile())
+  await step(() => reactor.compile())
   config.reactorData = reactor.getRendered()
-  try { await scripts.compile() } catch (err) { console.error(err) }
-  try { await markups.compile() } catch (err) { console.error(err) }
-  try { await postcss.compile() } catch (err) { console.error(err) }
-  try { await copy.execute() } catch (err) { console.error(err) }
+  await step(() => scripts.compile())
+  await step(() => markups.compile())
+  await step(() => postcss.compile())
+  await step(() => copy.execute())
 
   if (build || (!config.watch && !config.livereload && !config.serve)) {
-    process.exit(0)
+    process.exit(failed || hasLoggedErrors() ? 1 : 0)
   }
 
   setupWatchers(config, { styles, postcss, reactor, scripts, markups, copy })
