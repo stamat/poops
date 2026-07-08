@@ -90,7 +90,9 @@ function setupWatchers(config, modules) {
   // Shared by 'change' and 'add': editors with atomic saves (rename-write)
   // fire unlink+add instead of change, so both events must trigger the same
   // rebuilds. 'add' also covers genuinely new files (e.g. a new markup page).
-  const compileChanged = (file) => {
+  // Rebuild branches shared by change/add/deletion: a deletion needs the same
+  // rebuilds (a deleted-but-still-imported file must surface the error).
+  const rebuild = (file) => {
     if (/(\.m?jsx?|\.tsx?)$/i.test(file)) {
       modules.scripts.compile().catch(err => console.error(err))
 
@@ -113,24 +115,56 @@ function setupWatchers(config, modules) {
     if (/(\.json|\.ya?ml)$/i.test(file)) {
       modules.markups.reloadDataFiles().then(() => modules.markups.compile()).catch(err => console.error(err))
     }
+  }
 
+  const compileChanged = (file) => {
+    rebuild(file)
     doesFileBelongToPath(file, config.copy) && modules.copy.execute().catch(err => console.error(err))
+  }
+
+  // Atomic-save editors (rename-write) fire unlink+add for every save, so an
+  // unlink only counts as a real deletion if no add for the same path follows
+  // within the settle window. Must outlive the 150ms awaitWriteFinish delay
+  // on 'add'. ponytail: fixed 300ms; make configurable if slow disks flake.
+  const UNLINK_SETTLE_MS = 300
+  const pendingUnlinks = new Map()
+
+  const scheduleUnlink = (target, handler) => {
+    clearTimeout(pendingUnlinks.get(target))
+    pendingUnlinks.set(target, setTimeout(() => {
+      pendingUnlinks.delete(target)
+      handler(target)
+    }, UNLINK_SETTLE_MS))
+  }
+
+  const handleDeleted = (file) => {
+    modules.markups.removeOutput(file)
+    rebuild(file)
+    modules.copy.unlink(file, doesFileBelongToPath(file, config.copy))
+  }
+
+  const handleDeletedDir = (dirPath) => {
+    modules.markups.removeOutput(dirPath)
+    if (doesFileBelongToPath(dirPath, config.markup)) {
+      modules.markups.compile().then(() => modules.postcss.compile()).catch(err => console.error(err))
+    }
+    modules.copy.unlink(dirPath, doesFileBelongToPath(dirPath, config.copy))
   }
 
   chokidar.watch(config.watch, {
     ignoreInitial: true,
     awaitWriteFinish: { stabilityThreshold: 150, pollInterval: 50 }
   }).on('change', compileChanged)
-    .on('add', compileChanged)
-    .on('unlink', (file) => {
-      if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.liquid|\.md)$/i.test(file)) {
-        modules.markups.compile().catch(err => console.error(err))
+    .on('add', (file) => {
+      const pending = pendingUnlinks.get(file)
+      if (pending) {
+        clearTimeout(pending)
+        pendingUnlinks.delete(file)
       }
-      modules.copy.unlink(file, doesFileBelongToPath(file, config.copy))
-    }).on('unlinkDir', (dirPath) => {
-      doesFileBelongToPath(dirPath, config.markup) && modules.markups.compile().catch(err => console.error(err))
-      modules.copy.unlink(dirPath, doesFileBelongToPath(dirPath, config.copy))
+      compileChanged(file)
     })
+    .on('unlink', (file) => scheduleUnlink(file, handleDeleted))
+    .on('unlinkDir', (dirPath) => scheduleUnlink(dirPath, handleDeletedDir))
 }
 
 // Main function 💩
