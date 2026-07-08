@@ -635,6 +635,13 @@ Output:
 - Defaults: `sizes="100vw"`, `loading="lazy"`
 - Falls back to a plain `<img src="...">` if no variants are found
 
+**[poops-images](https://github.com/stamat/poops-images) integration:** if a `.poops-images-cache.json` compile cache is found in the output directory (poops-images writes one next to the images it generates), Poops reads variants from it instead of scanning the directory. On top of the scan behavior above, the cache gives you:
+
+- `width` and `height` attributes on the `<img>` element (exact dimensions from the cache — prevents layout shift). Pass your own `width`/`height` kwargs to override.
+- Correct `src` when the source format was converted (e.g. `photo.heic` → `photo.jpg`), even when there are no size variants.
+- Named sizes (`photo-thumb-200w.jpg`) and preprocessed outputs (`photo-blurred-640w.jpg`) are kept out of the srcset — they are crops and effects with their own aspect ratios. Only plain `{name}-{width}w.{ext}` variants (from the poops-images `widths` option) are used.
+- EXIF metadata via the `exif` filter (see below).
+
 ##### googleFonts
 
 Generates Google Fonts `<link>` tags with preconnect hints. Accepts an array of font names (strings) or font objects with weight/italic options.
@@ -771,6 +778,25 @@ All filters are available in both engines. The only syntax difference is how arg
 ```
 
 Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo-960w.webp 960w`
+
+- `exif` — returns the EXIF metadata object for an image from the [poops-images](https://github.com/stamat/poops-images) compile cache (`.poops-images-cache.json` in the output directory), or `null` if there is no cache or no EXIF data. The object includes camera (`make`, `model`, `lensModel`), exposure (`fNumber`, `exposure.formatted`, `iso`, `focalLength35mm`), `dateTime`, and `gps` (`latitude.formatted`, `longitude.formatted`, `altitude`, and a ready-made `googleMapsUrl`).
+
+  Example — a photo with date and location caption:
+  ```nunjucks
+  {% set meta = 'static/photo.jpeg' | exif %}
+  <figure>
+    {% image 'static/photo.jpeg', alt='Sendai at dusk' %}
+    {% if meta %}
+      <figcaption>
+        {{ meta.dateTime | date("MMMM D, YYYY") }}
+        {% if meta.gps %}
+          — <a href="{{ meta.gps.googleMapsUrl }}">{{ meta.gps.latitude.formatted }}, {{ meta.gps.longitude.formatted }}</a>
+        {% endif %}
+        {% if meta.model %}· {{ meta.model }}{% endif %}
+      </figcaption>
+    {% endif %}
+  </figure>
+  ```
 
 #### Search Index & Sitemap
 
