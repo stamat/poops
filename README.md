@@ -798,6 +798,48 @@ Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo
   </figure>
   ```
 
+- `images` — lists all images under a site-relative directory from the [poops-images](https://github.com/stamat/poops-images) compile cache. Returns an array of `{ path, width, height, date, exif, outputs }` objects, or an empty array if there is no cache:
+
+  - `path` — site-relative source path, feeds straight into the `{% image %}` tag
+  - `date` — `exif.dateTime` when the photo has EXIF, file modification time otherwise — so sorting and grouping work for every image
+  - `outputs` — every generated file for the image (site-relative), useful for picking LQIP or preprocessed variants
+  - Pass a subdirectory (`'images/2025'`) to scope the list
+
+  Combined with `groupby`, engine-native sorting and the `{% image %}` tag, a photo gallery is a pure template concern:
+
+  Nunjucks:
+  ```nunjucks
+  {% for group in 'images' | images | sort(reverse=true, attribute='date') | groupby("date", "year") %}
+    <h2>{{ group.key }}</h2>
+    <div class="grid">
+      {% for img in group.items %}
+        <figure>
+          {% image img.path, alt='', sizes='(max-width: 640px) 50vw, 25vw' %}
+          {% if img.exif and img.exif.gps %}
+            <figcaption>
+              <a href="{{ img.exif.gps.googleMapsUrl }}">📍</a> {{ img.date | date("MMM D, YYYY") }}
+            </figcaption>
+          {% endif %}
+        </figure>
+      {% endfor %}
+    </div>
+  {% endfor %}
+  ```
+
+  Liquid:
+  ```liquid
+  {% assign imgs = 'images' | images | sort: 'date' | reverse %}
+  {% assign groups = imgs | groupby: "date", "year" %}
+  {% for group in groups %}
+    <h2>{{ group.key }}</h2>
+    <div class="grid">
+      {% for img in group.items %}
+        <figure>{% image img.path, alt: '' %}</figure>
+      {% endfor %}
+    </div>
+  {% endfor %}
+  ```
+
 #### Search Index & Sitemap
 
 Poops can automatically generate a JSON search index and/or an XML sitemap from your compiled pages. Both are generated in a single pass during the markup compilation phase.
