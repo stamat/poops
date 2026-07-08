@@ -3,3 +3,5 @@ example/dist
 .DS_Store
 .vscode
 .claude
+*.reactor-tmp-*
+*.reactor-bundle-*
