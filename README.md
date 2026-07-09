@@ -1013,6 +1013,18 @@ Live reload options:
 
 - `port` - the port on which the livereload server will run
 - `exclude` - an array of files and directories to exclude from livereload
+- `extraExts` - an array of extra file extensions (without the dot) that trigger a browser refresh, added to the defaults
+- `exts` - an array of file extensions that replaces the default list entirely
+
+By default a refresh is triggered by changes to: `html`, `css`, `js`, `png`, `gif`, `jpg`, `php`, `php5`, `py`, `rb`, `erb`, `coffee`. If you work with other file types, for example Slim or Nunjucks templates, add them:
+
+```json
+{
+  "livereload": {
+    "extraExts": ["slim", "njk"]
+  }
+}
+```
 
 `livereload` can only be `true`, which means that it will run on the default port (`35729`) or you can specify a port:
 

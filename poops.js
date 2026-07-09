@@ -72,7 +72,9 @@ function setupLiveReloadServer(config) {
 
   const liveReloadServer = livereload.createServer({
     exclusions: [...new Set(liveReloadExcludes)],
-    port: config.livereload_port
+    port: config.livereload_port,
+    exts: config.livereload.exts, // replaces the default watched extensions
+    extraExts: config.livereload.extraExts // adds to the defaults
   })
   styledLog(`🔃 {dim}LiveReload  :{/} ${liveReloadServer.config.port}`)
   console.log()
