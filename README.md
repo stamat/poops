@@ -70,13 +70,13 @@ or pass a custom config. This is useful when you have multiple environments:
 
 **CLI Options:**
 
-| Flag | Short | Description |
-|------|-------|-------------|
-| `--build` | `-b` | Build the project and exit |
-| `--config <path>` | `-c` | Specify the config file |
-| `--port <number>` | `-p` | Specify the server port, overrides config |
-| `--livereload-port <number>` | `-l` | Specify the livereload port, overrides config |
-| `--base-url <path>` | `-u` | Set the base URL prefix for markup, overrides config |
+| Flag                         | Short | Description                                          |
+| ---------------------------- | ----- | ---------------------------------------------------- |
+| `--build`                    | `-b`  | Build the project and exit                           |
+| `--config <path>`            | `-c`  | Specify the config file                              |
+| `--port <number>`            | `-p`  | Specify the server port, overrides config            |
+| `--livereload-port <number>` | `-l`  | Specify the livereload port, overrides config        |
+| `--base-url <path>`          | `-u`  | Set the base URL prefix for markup, overrides config |
 
 The `--base-url` flag is particularly useful for CI/CD pipelines where the deploy path may differ per environment:
 
@@ -146,14 +146,8 @@ Just create a `poops.json` file in the root of your project and add the followin
       "title": "Poops",
       "description": "A super simple bundler for simple web projects."
     },
-    "data": [
-      "data/links.json",
-      "data/poops.yaml"
-    ],
-    "includePaths": [
-      "_layouts",
-      "_partials"
-    ]
+    "data": ["data/links.json", "data/poops.yaml"],
+    "includePaths": ["_layouts", "_partials"]
   },
   "copy": [
     {
@@ -375,13 +369,15 @@ Add `tokenPaths` to your styles config:
 
 ```json
 {
-  "styles": [{
-    "in": "src/scss/index.scss",
-    "out": "dist/css/styles.css",
-    "options": {
-      "tokenPaths": ["src/tokens"]
+  "styles": [
+    {
+      "in": "src/scss/index.scss",
+      "out": "dist/css/styles.css",
+      "options": {
+        "tokenPaths": ["src/tokens"]
+      }
     }
-  }]
+  ]
 }
 ```
 
@@ -459,9 +455,7 @@ You can also pass options to plugins using the tuple form:
     "in": "src/css/main.css",
     "out": "dist/css/main.css",
     "options": {
-      "plugins": [
-        ["autoprefixer", { "grid": true }]
-      ]
+      "plugins": [["autoprefixer", { "grid": true }]]
     }
   }
 }
@@ -538,13 +532,8 @@ Here is a sample markup configuration using the default Nunjucks engine:
       "title": "My Awesome Site",
       "description": "This is my awesome site"
     },
-    "data": [
-      "data/links.json",
-      "data/other.yaml"
-    ],
-    "includePaths": [
-      "_includes"
-    ],
+    "data": ["data/links.json", "data/other.yaml"],
+    "includePaths": ["_includes"],
     "baseURL": "/blog"
   }
 }
@@ -562,14 +551,8 @@ To use Liquid instead, set the `engine` property:
       "title": "My Awesome Site",
       "description": "This is my awesome site"
     },
-    "data": [
-      "_data/links.json",
-      "_data/other.yaml"
-    ],
-    "includePaths": [
-      "_layouts",
-      "_partials"
-    ]
+    "data": ["_data/links.json", "_data/other.yaml"],
+    "includePaths": ["_layouts", "_partials"]
   }
 }
 ```
@@ -580,14 +563,14 @@ If your project doesn't have markups, you can remove the `markup` property from 
 
 Both engines support the same feature set (collections, pagination, search index, sitemap, custom tags, and filters). The main differences are in template syntax:
 
-| Feature | Nunjucks | Liquid |
-|---------|----------|--------|
-| File extension | `.njk` | `.liquid` |
-| Inheritance | `{% extends "base.html" %}` | `{% layout "base.liquid" %}` |
-| Default values | `{{ x or "fallback" }}` | `{{ x \| default: "fallback" }}` |
-| Contains check | `{% if "x" in items %}` | `{% if items contains "x" %}` |
-| Safe output | `{{ html \| safe }}` | `{{ html }}` (no escaping by default) |
-| Includes | `{% include "partial.njk" %}` | `{% render "partial.liquid" %}` |
+| Feature        | Nunjucks                      | Liquid                                |
+| -------------- | ----------------------------- | ------------------------------------- |
+| File extension | `.njk`                        | `.liquid`                             |
+| Inheritance    | `{% extends "base.html" %}`   | `{% layout "base.liquid" %}`          |
+| Default values | `{{ x or "fallback" }}`       | `{{ x \| default: "fallback" }}`      |
+| Contains check | `{% if "x" in items %}`       | `{% if items contains "x" %}`         |
+| Safe output    | `{{ html \| safe }}`          | `{{ html }}` (no escaping by default) |
+| Includes       | `{% include "partial.njk" %}` | `{% render "partial.liquid" %}`       |
 
 Both engines process `.html` and `.md` files in addition to their native extension.
 
@@ -619,7 +602,11 @@ sort: date
     "out": "dist",
     "collections": [
       "changelog",
-      { "name": "blog", "paginate": 5, "sort": { "by": "title", "order": "asc" } }
+      {
+        "name": "blog",
+        "paginate": 5,
+        "sort": { "by": "title", "order": "asc" }
+      }
     ]
   }
 }
@@ -646,13 +633,13 @@ An item with `published: false` in its front matter is excluded from the collect
 
 **Pagination.** With `paginate: N` set, the collection's index file is rendered once per page of N items: page 1 to `out/changelog/index.html`, page 2 to `out/changelog/2/index.html`, and so on. Inside the index template the collection object carries the page state:
 
-| Variable | Description |
-|----------|-------------|
-| `pageItems` | the items on the current page |
-| `pageNumber` / `totalPages` | current page (1-based) / total page count |
-| `pageUrl` | URL of the current page (`changelog`, `changelog/2`, …) |
-| `nextPage` / `nextPageUrl` | next page number / URL, `null` on the last page |
-| `prevPage` / `prevPageUrl` | previous page number / URL, `null` on the first page |
+| Variable                    | Description                                             |
+| --------------------------- | ------------------------------------------------------- |
+| `pageItems`                 | the items on the current page                           |
+| `pageNumber` / `totalPages` | current page (1-based) / total page count               |
+| `pageUrl`                   | URL of the current page (`changelog`, `changelog/2`, …) |
+| `nextPage` / `nextPageUrl`  | next page number / URL, `null` on the last page         |
+| `prevPage` / `prevPageUrl`  | previous page number / URL, `null` on the first page    |
 
 From the example site's `changelog/index.html`:
 
@@ -685,11 +672,13 @@ Poops can generate responsive `<img>` elements with `srcset` attributes. Image p
 **`{% image %}` tag** — generates a full `<img>` element:
 
 Nunjucks:
+
 ```nunjucks
 {% image 'static/photo.jpg', alt='Hero', class='hero-img', sizes='(max-width: 640px) 100vw, 50vw' %}
 ```
 
 Liquid:
+
 ```liquid
 {% image 'static/photo.jpg', alt: 'Hero', class: 'hero-img', sizes: '(max-width: 640px) 100vw, 50vw' %}
 ```
@@ -730,16 +719,19 @@ Output:
 Generates Google Fonts `<link>` tags with preconnect hints. Accepts an array of font names (strings) or font objects with weight/italic options.
 
 Nunjucks (supports inline arrays):
+
 ```nunjucks
 {% googleFonts ["Open Sans", "Roboto"] %}
 ```
 
 Liquid (pass a variable — inline arrays are not supported in Liquid syntax):
+
 ```liquid
 {% googleFonts fonts %}
 ```
 
 Where `fonts` is defined in a data file (e.g. `fonts.json`):
+
 ```json
 ["Open Sans", "Roboto"]
 ```
@@ -764,7 +756,7 @@ With specific weights and italics (Nunjucks):
 With specific weights and italics (Liquid — via data file):
 
 ```json
-["DM Sans", {"name": "Poppins", "weights": [400, 700], "ital": true}]
+["DM Sans", { "name": "Poppins", "weights": [400, 700], "ital": true }]
 ```
 
 Font object options:
@@ -839,6 +831,7 @@ All filters are available in both engines. The only syntax difference is how arg
   - Liquid: `{{ changelog.items | groupby: "author" }}` or `{{ changelog.items | groupby: "date", "year" }}`
 
   Example — group posts by year:
+
   ```nunjucks
   {% set byYear = changelog.items | groupby("date", "year") %}
   {% for group in byYear %}
@@ -865,6 +858,7 @@ Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo
 - `exif` — returns the EXIF metadata object for an image from the [poops-images](https://github.com/stamat/poops-images) compile cache (`.poops-images-cache.json` in the output directory), or `null` if there is no cache or no EXIF data. The object includes camera (`make`, `model`, `lensModel`), exposure (`fNumber`, `exposure.formatted`, `iso`, `focalLength35mm`), `dateTime`, and `gps` (`latitude.formatted`, `longitude.formatted`, `altitude`, and a ready-made `googleMapsUrl`).
 
   Example — a photo with date and location caption:
+
   ```nunjucks
   {% set meta = 'static/photo.jpeg' | exif %}
   <figure>
@@ -882,7 +876,6 @@ Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo
   ```
 
 - `images` — lists all images under a site-relative directory from the [poops-images](https://github.com/stamat/poops-images) compile cache. Returns an array of `{ path, width, height, date, exif, outputs }` objects, or an empty array if there is no cache:
-
   - `path` — site-relative source path, feeds straight into the `{% image %}` tag
   - `date` — `exif.dateTime` when the photo has EXIF, file modification time otherwise — so sorting and grouping work for every image
   - `outputs` — every generated file for the image (site-relative), useful for picking LQIP or preprocessed variants
@@ -891,6 +884,7 @@ Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo
   Combined with `groupby`, engine-native sorting and the `{% image %}` tag, a photo gallery is a pure template concern:
 
   Nunjucks:
+
   ```nunjucks
   {% for group in 'images' | images | sort(reverse=true, attribute='date') | groupby("date", "year") %}
     <h2>{{ group.key }}</h2>
@@ -910,6 +904,7 @@ Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo
   ```
 
   Liquid:
+
   ```liquid
   {% assign imgs = 'images' | images | sort: 'date' | reverse %}
   {% assign groups = imgs | groupby: "date", "year" %}
@@ -1173,23 +1168,6 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
   "includePaths": ["node_modules", "lib"]
 }
 ```
-
-## Todo
-
-- [ ] Run esbuild for each input path individually if there are multiple input paths
-- [ ] Styles `in` should be able to support array of inputs like we have it on scripts
-- [ ] Build a cli config creation helper tool. If the user doesn't have a config file, we can ask them a few questions and create a config file for them. Create Yeoman generator for poops projects.
-- [x] Add nunjucks static templating
-  - [x] Refactor nunjucks implementation
-  - [x] Complete documentation for nunjucks
-  - [x] Add markdown support
-  - [x] Front Matter support
-  - [x] Future implementation: posts and custom collections, so we can have a real static site generator
-  - [x] Collection pagination system
-  - [x] Post published toggle
-  - [x] RSS and ATOM generation for collections
-  - [x] Support for images and creating srcsets
-- [x] Add Liquid template engine as a swappable alternative to Nunjucks
 
 ## Why?
 
