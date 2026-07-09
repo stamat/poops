@@ -88,7 +88,7 @@ function setupWatchers(config, modules) {
   // TODO: ability to automatically create a watch list of directories if watch is set to true. The list will be generated from the `in` property of each task.
   // awaitWriteFinish: wait for saves to finish writing before recompiling, so a
   // mid-write (truncated/partial) file is never read. Fixes intermittent broken
-  // builds on editor save. ponytail: default thresholds are fine; bump if slow disks flake.
+  // builds on editor save. Bump thresholds if slow disks flake.
   // Shared by 'change' and 'add': editors with atomic saves (rename-write)
   // fire unlink+add instead of change, so both events must trigger the same
   // rebuilds. 'add' also covers genuinely new files (e.g. a new markup page).
@@ -127,7 +127,7 @@ function setupWatchers(config, modules) {
   // Atomic-save editors (rename-write) fire unlink+add for every save, so an
   // unlink only counts as a real deletion if no add for the same path follows
   // within the settle window. Must outlive the 150ms awaitWriteFinish delay
-  // on 'add'. ponytail: fixed 300ms; make configurable if slow disks flake.
+  // on 'add'. Fixed 300ms; make configurable if slow disks flake.
   const UNLINK_SETTLE_MS = 300
   const pendingUnlinks = new Map()
 
