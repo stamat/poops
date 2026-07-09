@@ -9,6 +9,7 @@ import os from 'node:os'
 import fs from 'node:fs'
 import livereload from 'livereload'
 import Markups from './lib/markups.js'
+import Images from './lib/images.js'
 import path from 'node:path'
 import serveStatic from 'serve-static'
 import Reactor from './lib/reactor.js'
@@ -119,8 +120,20 @@ function setupWatchers(config, modules) {
     }
   }
 
+  // Source image extensions handled by poops-images. The doesFileBelongToPath
+  // guard (against config.images.in) also breaks the feedback loop: generated
+  // variants land in the `out` dir, never in `in`, so they don't retrigger.
+  const imageExtRe = /(\.jpe?g|\.png|\.tiff?|\.webp|\.heic|\.heif|\.svg|\.gif)$/i
+  const belongsToImages = (file) => imageExtRe.test(file) && doesFileBelongToPath(file, config.images)
+
   const compileChanged = (file) => {
     rebuild(file)
+    if (belongsToImages(file)) {
+      modules.images.compile()
+        .then(() => modules.markups.compile())
+        .then(() => modules.postcss.compile())
+        .catch(err => console.error(err))
+    }
     doesFileBelongToPath(file, config.copy) && modules.copy.execute().catch(err => console.error(err))
   }
 
@@ -141,6 +154,14 @@ function setupWatchers(config, modules) {
 
   const handleDeleted = (file) => {
     modules.markups.removeOutput(file)
+    if (belongsToImages(file)) {
+      // Deleted source: drop its variants + cache entry, then recompile markup
+      // so galleries/srcsets reading the image cache no longer reference it.
+      modules.images.remove(file)
+        .then(() => modules.markups.compile())
+        .then(() => modules.postcss.compile())
+        .catch(err => console.error(err))
+    }
     rebuild(file)
     modules.copy.unlink(file, doesFileBelongToPath(file, config.copy))
   }
@@ -175,6 +196,7 @@ async function poops() {
   const postcss = new PostCSS(config)
   const reactor = new Reactor(config)
   const scripts = new Scripts(config)
+  const images = new Images(config)
   const markups = new Markups(config)
   const copy = new Copy(config)
 
@@ -190,6 +212,7 @@ async function poops() {
   await step(() => reactor.compile())
   config.reactorData = reactor.getRendered()
   await step(() => scripts.compile())
+  await step(() => images.compile()) // before markups: engines read the poops-images cache
   await step(() => markups.compile())
   await step(() => postcss.compile())
   await step(() => copy.execute())
@@ -198,7 +221,7 @@ async function poops() {
     process.exit(failed || hasLoggedErrors() ? 1 : 0)
   }
 
-  setupWatchers(config, { styles, postcss, reactor, scripts, markups, copy })
+  setupWatchers(config, { styles, postcss, reactor, scripts, images, markups, copy })
 }
 
 // CLI Header
@@ -234,6 +257,12 @@ if (!config.reactor && config.ssg) {
 
 if (overrideBaseURL && config.markup) {
   config.markup.baseURL = overrideBaseURL
+}
+
+// poops-images resolves custom handlers/composites relative to the config file;
+// without this it would default to cwd. Matches poops-images' own loadConfig.
+if (config.images && typeof config.images === 'object' && config.images.configDir === undefined) {
+  config.images.configDir = path.dirname(configPath)
 }
 
 async function getAvailablePort(port, max) {

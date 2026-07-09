@@ -34,10 +34,14 @@
     "static-site-generator"
   ],
   "peerDependencies": {
-    "postcss": "^8.0.0"
+    "postcss": "^8.0.0",
+    "poops-images": ">=1.2.0"
   },
   "peerDependenciesMeta": {
     "postcss": {
+      "optional": true
+    },
+    "poops-images": {
       "optional": true
     }
   },

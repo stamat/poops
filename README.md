@@ -988,6 +988,39 @@ All front matter fields are passed through to the index automatically. Internal 
 
 Pages with `published: false` in their front matter are excluded from both outputs.
 
+### Images (optional)
+
+Process and optimize images — compression, responsive size variants, format conversion (WebP/AVIF), crops and EXIF extraction — by running [poops-images](https://github.com/stamat/poops-images) as part of the build. This is what feeds the `{% image %}` tag, the `exif`/`images` filters and the `.poops-images-cache.json` compile cache described in [Custom Tags](#custom-tags) and [Custom Filters](#custom-filters).
+
+poops-images (and its `sharp` dependency) is **not** bundled with Poops. Install it in your project only if you use the `images` config:
+
+```bash
+npm i poops-images
+```
+
+If the `images` key is present but poops-images is not installed, Poops logs a warning and skips image processing — the rest of the build still runs.
+
+The `images` value is a poops-images config object (see the [poops-images options reference](https://github.com/stamat/poops-images#configuration)). The most common keys:
+
+- `in` — source images directory
+- `out` — output directory (keep it distinct from `in`, and outside your watched source, so generated variants don't retrigger the build)
+- `sizes` — responsive widths to generate
+- `format` — target formats (e.g. `["webp"]`, or `"smart"` to keep whichever of JPEG/WebP is smaller)
+- `verbose` - defaults to `false`, so you get a single `[image]` summary line (count + time) instead of one log per file. Set `"verbose": true` to restore the per-file logs.
+
+```json
+{
+  "images": {
+    "in": "src/images",
+    "out": "dist/images",
+    "sizes": [{ "width": 640 }, { "width": 1280 }],
+    "format": "smart"
+  }
+}
+```
+
+Images are processed **before** markup, so `{% image %}` and the `images` filter always read a fresh cache. In watch mode, changing a source image reprocesses it and recompiles markup; deleting one removes its generated variants and updates the galleries that referenced it. Custom handlers and composite overlays resolve relative to your `poops.json`.
+
 ### Copy
 
 Configuration entry to copy files or directories - copy your static files like images and fonts, for instance, from `src` to `dist` directory. This feature was added to enable moving static files if you deploy GitHub pages via a GitHub action. If you don't want to use this feature, simply exclude the `copy` property from your config file.
