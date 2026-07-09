@@ -591,6 +591,89 @@ Both engines support the same feature set (collections, pagination, search index
 
 Both engines process `.html` and `.md` files in addition to their native extension.
 
+#### Collections & Pagination
+
+Collections turn a directory of pages into a sorted, optionally paginated list — blog posts, changelog entries, documentation. A collection maps to a direct subdirectory of your markup `in` directory: every `.html`, `.njk`, `.liquid` or `.md` file inside it (except the `index.*` file) becomes a collection item.
+
+There are two ways to declare a collection:
+
+**1. Front matter auto-discovery** — add `collection` to the front matter of the directory's index file:
+
+```yaml
+---
+title: Changelog
+collection: true
+paginate: 10
+sort: date
+---
+```
+
+`collection: true` uses the directory name as the collection name; a string (e.g. `collection: changelog`) names it explicitly. `paginate` and `sort` are optional.
+
+**2. Config** — list collections in the markup config. The name must match a subdirectory of `in`:
+
+```json
+{
+  "markup": {
+    "in": "src/markup",
+    "out": "dist",
+    "collections": [
+      "changelog",
+      { "name": "blog", "paginate": 5, "sort": { "by": "title", "order": "asc" } }
+    ]
+  }
+}
+```
+
+**Sorting.** By default items are sorted by `date`, newest first. `sort` can be a field name shorthand (`"sort": "title"`) or an object `{ "by": "field", "order": "asc" | "desc" }`. Sorting by `date` compares dates (default order `desc`); any other field compares alphabetically (default order `asc`).
+
+**Items.** Each item exposes its own front matter plus properties Poops adds:
+
+- `url` - the item's output path relative to the site root (e.g. `changelog/my-post.html`)
+- `title` - falls back to the file name if not set in front matter
+- `date` - falls back to the file's modification time if not set, with a build warning. Set a real `date` in front matter — mtime is meaningless on CI checkouts (git clone resets it), so undated posts will reshuffle between deploys.
+- `wordcount`, `fileName`, `filePath`, `collection`
+
+An item with `published: false` in its front matter is excluded from the collection and its page is not built.
+
+**Using collections in templates.** Every collection is available as a global variable named after it, on every page:
+
+```nunjucks
+{% for post in changelog.items %}
+  <a href="{{ relativePathPrefix }}{{ post.url }}">{{ post.title }}</a> — {{ post.date | date }}
+{% endfor %}
+```
+
+**Pagination.** With `paginate: N` set, the collection's index file is rendered once per page of N items: page 1 to `out/changelog/index.html`, page 2 to `out/changelog/2/index.html`, and so on. Inside the index template the collection object carries the page state:
+
+| Variable | Description |
+|----------|-------------|
+| `pageItems` | the items on the current page |
+| `pageNumber` / `totalPages` | current page (1-based) / total page count |
+| `pageUrl` | URL of the current page (`changelog`, `changelog/2`, …) |
+| `nextPage` / `nextPageUrl` | next page number / URL, `null` on the last page |
+| `prevPage` / `prevPageUrl` | previous page number / URL, `null` on the first page |
+
+From the example site's `changelog/index.html`:
+
+```nunjucks
+{% for post in changelog.pageItems %}
+  <div class="post">
+    <h2><a href="{{ relativePathPrefix }}{{ post.url }}">{{ post.title }}</a></h2>
+    <div class="date">{{ post.date | date }}</div>
+    {{ post.description }}
+  </div>
+{% endfor %}
+
+{% if changelog.totalPages > 1 %}
+  {% if changelog.nextPageUrl %}<a href="{{ relativePathPrefix }}{{ changelog.nextPageUrl }}">Next</a>{% endif %}
+  {{ changelog.pageNumber }} of {{ changelog.totalPages }}
+  {% if changelog.prevPageUrl %}<a href="{{ relativePathPrefix }}{{ changelog.prevPageUrl }}">Previous</a>{% endif %}
+{% endif %}
+```
+
+Item pages themselves are compiled like any other markup file, preserving the directory structure: `src/markup/changelog/my-post.md` → `dist/changelog/my-post.html`. A collection directory without an index file still builds its items and exposes the collection to templates — only the paginated listing pages are skipped.
+
 #### Custom Tags
 
 ##### image
