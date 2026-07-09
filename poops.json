@@ -58,7 +58,8 @@
     ],
     "timeDateFormat": "MMM D, YYYY",
     "searchIndex": "search-index.json",
-    "sitemap": "sitemap.xml"
+    "sitemap": "sitemap.xml",
+    "nav": "nav.json"
   },
   "copy": [
     {

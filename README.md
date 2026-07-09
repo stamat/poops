@@ -511,7 +511,7 @@ Then use Tailwind utility classes directly in your markup templates. Tailwind v4
 
 ### Markups
 
-- `engine` (optional) - the template engine to use. Can be `"nunjucks"` (default) or `"liquid"`. [Nunjucks](https://mozilla.github.io/nunjucks/) is a Mozilla template engine inspired by Jinja2. [Liquid](https://liquidjs.com/) is a Shopify-compatible template engine. Both engines support the same tags, filters, collections, search index, and sitemap features documented below.
+- `engine` (optional) - the template engine to use. Can be `"nunjucks"` (default) or `"liquid"`. [Nunjucks](https://mozilla.github.io/nunjucks/) is a Mozilla template engine inspired by Jinja2. [Liquid](https://liquidjs.com/) is a Shopify-compatible template engine. Both engines support the same tags, filters, collections, search index, sitemap, and navigation tree features documented below.
 - `in` - the input path, can be a directory or a file path, but please just use it as a directory path for now. All files in this directory will be processed and the structure of the directory will be preserved in the output directory with exception to directories that begin with an underscore `_` will be ignored.
 - `out` - the output path, can be only a directory path (for now)
 - `site` (optional) - global data that will be available to all templates in the markup directory. Like site title, description, social media links, etc. You can then use this data in your templates `{{ site.title }}` for instance.
@@ -561,7 +561,7 @@ If your project doesn't have markups, you can remove the `markup` property from 
 
 #### Nunjucks vs Liquid
 
-Both engines support the same feature set (collections, pagination, search index, sitemap, custom tags, and filters). The main differences are in template syntax:
+Both engines support the same feature set (collections, pagination, search index, sitemap, navigation tree, custom tags, and filters). The main differences are in template syntax:
 
 | Feature        | Nunjucks                      | Liquid                                |
 | -------------- | ----------------------------- | ------------------------------------- |
@@ -918,11 +918,11 @@ Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo
   {% endfor %}
   ```
 
-#### Search Index & Sitemap
+#### Search Index, Sitemap & Navigation
 
-Poops can automatically generate a JSON search index and/or an XML sitemap from your compiled pages. Both are generated in a single pass during the markup compilation phase.
+Poops can automatically generate a JSON search index, an XML sitemap and a navigation tree from your compiled pages. All are generated in a single pass during the markup compilation phase.
 
-To enable, add `searchIndex` and/or `sitemap` to your markup config:
+To enable, add `searchIndex`, `sitemap` and/or `nav` to your markup config:
 
 ```json
 {
@@ -987,6 +987,105 @@ All front matter fields are passed through to the index automatically. Internal 
 **Sitemap** generates a standard `sitemap.xml` with `<loc>` and `<lastmod>` (from front matter `date`). If `site.url` is set in your markup config, it is prepended to all URLs. Collection index/pagination pages are included in the sitemap but excluded from the search index.
 
 Pages with `published: false` in their front matter are excluded from both outputs.
+
+**Navigation tree** builds your page hierarchy as sidebar-ready data, exposed two ways: as the `nav` template global (loaded automatically, always reflecting the current build) and as a nested JSON file for client-side rendering. Subpages nest automatically from URL structure: `guide/index.md` becomes a parent node and `guide/getting-started.md`, `guide/advanced/config.md` become its (and its subsections') children. Add `nav` to your markup config:
+
+```json
+{
+  "markup": {
+    "in": "src/markup",
+    "out": "dist",
+    "options": {
+      "nav": "nav.json"
+    }
+  }
+}
+```
+
+The string shorthand sets the output filename. For docs sites, use the object form:
+
+```json
+{
+  "nav": {
+    "output": "nav.json",
+    "root": "docs",
+    "collections": "index",
+    "home": false
+  }
+}
+```
+
+**Navigation options:**
+
+- `output` — output filename, written to the markup output directory
+- `collections` — how to treat collection pages (default `true`):
+  - `true` — include every collection page, nested under its collection
+  - `false` — exclude all collection pages (drops a blog's posts from the sidebar)
+  - `["docs", ...]` — allowlist; only these collections' pages are included (non-collection pages are always kept)
+  - `"index"` — include only each collection's landing page as a single leaf, not its posts
+- `home` — `false` drops the site's root index page (url `""`) from the tree (default `true`)
+- `root` — scope the tree to a subdirectory (e.g. `"docs"`); its children are emitted at the top level and the section's own index page is pinned first as the overview link. URLs are kept full (`docs/getting-started`), so the homepage is naturally excluded
+
+**Front matter fields** that shape the tree:
+
+- `order` — a number that sorts a page within its sibling level (optional). Pages without `order` fall to the bottom, sorted alphabetically by title — so a hand-authored docs sequence (`1`, `2`, `3`) wins over alphabetical. This applies to the homepage too: give it `order: 0` in its front matter to pin it to the top, otherwise it sorts last like any page without `order`.
+- `nav: false` — hide a page from the sidebar (it stays in the search index and sitemap).
+- `navTitle` — a sidebar label that overrides `title`.
+
+**Navigation output format** — each node has a `title`, a `url` (omitted on synthesized section nodes that have no index page of their own), an `order` when set, and `children` when it has subpages:
+
+```json
+[
+  { "title": "Guide", "url": "guide", "order": 1, "children": [
+    { "title": "Getting Started", "url": "guide/getting-started", "order": 1 },
+    { "title": "Advanced", "url": "guide/advanced", "children": [
+      { "title": "Config", "url": "guide/advanced/config" }
+    ]}
+  ]}
+]
+```
+
+Pages with `published: false` or `nav: false` are excluded. If nothing survives filtering, an empty array `[]` is written so consumers never have to special-case a missing file.
+
+**Rendering the sidebar.** The tree is arbitrarily deep, so render it with a recursive template. The `nav` global is built from front matter in a pre-pass before templating, so it always reflects the current build — no need to load the generated `nav.json` back in via `data` (which would be one build behind). The written `nav.json` is for client-side rendering (`fetch('/nav.json')`). Prefix each `url` with `relativePathPrefix` so links resolve from any page depth.
+
+Nunjucks — a self-recursing macro:
+
+```njk
+{% macro navtree(items) %}
+<ul>
+  {% for item in items %}
+  <li>
+    {% if item.url != null %}<a href="{{ relativePathPrefix }}{{ item.url }}">{{ item.title }}</a>
+    {% else %}<span>{{ item.title }}</span>{% endif %}
+    {% if item.children %}{{ navtree(item.children) }}{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% endmacro %}
+
+{{ navtree(nav) }}
+```
+
+Note the `!= null` check: the homepage node's `url` is an empty string (a valid link — `relativePathPrefix` resolves it), while synthesized section nodes have no `url` at all. A plain `{% if item.url %}` would wrongly demote the homepage to a `<span>`. Node titles already have `navTitle` applied, so `{{ item.title }}` is all you need.
+
+Liquid — a partial that recurses via `render` (save as `_partials/navtree.liquid`). Liquid treats empty strings as truthy, so the plain `if` is safe here:
+
+```liquid
+<ul>
+  {% for item in items %}
+  <li>
+    {% if item.url %}<a href="{{ relativePathPrefix }}{{ item.url }}">{{ item.title }}</a>
+    {% else %}<span>{{ item.title }}</span>{% endif %}
+    {% if item.children %}{% render 'navtree', items: item.children, relativePathPrefix: relativePathPrefix %}{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+```
+
+```liquid
+{% render 'navtree', items: nav, relativePathPrefix: relativePathPrefix %}
+```
 
 ### Images (optional)
 
