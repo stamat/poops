@@ -293,6 +293,11 @@ async function startServer() {
 // Start the webserver
 if (!build && config.serve) {
   startServer()
+} else if (!build && config.livereload) {
+  // livereload without serve: still needs the livereload server
+  resolveLiveReloadPort(config)
+    .then(poops)
+    .then(() => setupLiveReloadServer(config))
 } else {
   poops()
 }
