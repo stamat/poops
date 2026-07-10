@@ -63,6 +63,7 @@ a:hover { text-decoration: underline; }
   gap: 0.75rem;
   padding: 0 1rem;
   background: var(--bg);
+  border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
 .brand {
@@ -140,7 +141,7 @@ a:hover { text-decoration: underline; }
   color: var(--fg);
 }
 .search-results a:hover, .search-results a.active { background: var(--bg-alt); text-decoration: none; }
-.search-results .sr-title { font-weight: 600; font-size: 0.9rem; }
+.search-results .sr-title { font-weight: 600; font-size: 0.9rem; display: block; }
 .search-results .sr-desc { font-size: 0.8rem; color: var(--fg-muted); }
 .search-results .sr-empty { padding: 0.6rem; color: var(--fg-muted); font-size: 0.9rem; }
 
@@ -206,9 +207,7 @@ a:hover { text-decoration: underline; }
 
 // permalink "#" in the left gutter, revealed on heading hover/focus
 .heading-anchor {
-  position: absolute;
-  left: -1.1em;
-  padding-right: 0.3em;
+  padding-left: 0.3em;
   color: var(--fg-muted);
   opacity: 0;
   text-decoration: none;
@@ -296,15 +295,18 @@ a:hover { text-decoration: underline; }
 .admonition {
   --adm: var(--accent);
   margin: 0 0 1.25rem;
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--adm);
+  border: 1px solid var(--adm);
+  border-left: 1px solid var(--adm) !important;
   border-radius: var(--radius);
-  background: color-mix(in srgb, var(--adm) 7%, var(--bg));
-  padding: 0.75rem 1rem;
+  padding: 0 !important;
 }
-.admonition > :last-child { margin-bottom: 0; }
+.admonition p { padding: 0 1rem; }
+.admonition p:last-child { margin-bottom: 0.75rem; }
 .admonition-title {
-  margin: 0 0 0.4rem;
+  background: color-mix(in srgb, var(--adm) 7%, var(--bg));
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem !important;
+  margin-bottom: 0.4rem !important;
   font-weight: 700;
   font-size: 0.9rem;
   color: var(--adm);
