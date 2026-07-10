@@ -87,15 +87,31 @@ With `paginate: N`, the collection's index renders once per page: page 1 → `bl
 page 2 → `blog/2/index.html`, and so on. Inside the index, the collection object carries page
 state — `pageItems`, `pageNumber`, `totalPages`, `nextPageUrl`, `prevPageUrl`:
 
+Set `paginate: N` on the collection index front matter (or the collection entry in `markup.collections`);
+without it, there is only one page and the pagination globals stay at their single-page defaults.
+
 ```nunjucks
 {% raw %}{% for post in blog.pageItems %}
   <h2><a href="{{ relativePathPrefix }}{{ post.url }}">{{ post.title }}</a></h2>
 {% endfor %}
+{% pagination blog %}{% endraw %}
+```
 
-{% if blog.totalPages > 1 %}
-  {% if blog.prevPageUrl %}<a href="{{ relativePathPrefix }}{{ blog.prevPageUrl }}">Previous</a>{% endif %}
-  {{ blog.pageNumber }} / {{ blog.totalPages }}
-  {% if blog.nextPageUrl %}<a href="{{ relativePathPrefix }}{{ blog.nextPageUrl }}">Next</a>{% endif %}
+`{% raw %}{% pagination blog %}{% endraw %}` works in both Nunjucks and Liquid.
+
+> [!NOTE]
+> `{% raw %}{% pagination blog %}{% endraw %}` is just a convenience tag. The generated globals
+> are always available, so you can render pagination manually when you need custom markup.
+
+```nunjucks
+{% raw %}{% if blog.totalPages > 1 %}
+  <nav aria-label="Pagination">
+    {% if blog.prevPageUrl %}<a href="{{ relativePathPrefix }}{{ blog.prevPageUrl }}">Previous</a>{% endif %}
+    <span data-page="{{ blog.pageNumber }}" data-total-pages="{{ blog.totalPages }}">
+      Page {{ blog.pageNumber }} of {{ blog.totalPages }}
+    </span>
+    {% if blog.nextPageUrl %}<a href="{{ relativePathPrefix }}{{ blog.nextPageUrl }}">Next</a>{% endif %}
+  </nav>
 {% endif %}{% endraw %}
 ```
 
