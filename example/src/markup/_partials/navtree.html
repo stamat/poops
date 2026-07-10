@@ -1,4 +1,4 @@
-{% macro navtree(items, pageUrl, prefix) %}
+{% macro navtree(items, pageUrl, prefix, toc) %}
 <ul class="nav-list">
   {% for item in items %}
     {% if item.children %}
@@ -7,20 +7,20 @@
           <summary>{{ item.title }}</summary>
           <ul class="nav-list">
             {% if item.url != null %}
-              <li><a class="nav-link{% if item.url == pageUrl %} active{% endif %}" href="{{ prefix }}{{ item.url }}">Overview</a></li>
+              <li><a class="nav-link{% if item.url == pageUrl %} active{% endif %}" href="{{ prefix }}{{ item.url }}">Overview</a>{% if item.url == pageUrl %}{{ toc }}{% endif %}</li>
             {% endif %}
             {% for child in item.children %}
               {% if child.children %}
-                {{ navtree([child], pageUrl, prefix) }}
+                {{ navtree([child], pageUrl, prefix, toc) }}
               {% else %}
-                <li><a class="nav-link{% if child.url == pageUrl %} active{% endif %}" href="{{ prefix }}{{ child.url }}">{{ child.title }}</a></li>
+                <li><a class="nav-link{% if child.url == pageUrl %} active{% endif %}" href="{{ prefix }}{{ child.url }}">{{ child.title }}</a>{% if child.url == pageUrl %}{{ toc }}{% endif %}</li>
               {% endif %}
             {% endfor %}
           </ul>
         </details>
       </li>
     {% else %}
-      <li><a class="nav-link{% if item.url == pageUrl %} active{% endif %}" href="{{ prefix }}{{ item.url }}">{{ item.title }}</a></li>
+      <li><a class="nav-link{% if item.url == pageUrl %} active{% endif %}" href="{{ prefix }}{{ item.url }}">{{ item.title }}</a>{% if item.url == pageUrl %}{{ toc }}{% endif %}</li>
     {% endif %}
   {% endfor %}
 </ul>

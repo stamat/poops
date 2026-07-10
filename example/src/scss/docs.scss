@@ -4,7 +4,6 @@
 :root {
   --topbar-h: 3.25rem;
   --sidebar-w: 16rem;
-  --toc-w: 14rem;
   --content-max: 46rem;
   --radius: 0.5rem;
   --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -223,39 +222,22 @@ a:hover { text-decoration: underline; }
 .prose img { max-width: 100%; height: auto; border-radius: var(--radius); }
 .prose hr { border: 0; border-top: 1px solid var(--border); margin: 2rem 0; }
 
-// ---- Table of contents (right column) ----
-.toc-sidebar {
-  position: sticky;
-  top: var(--topbar-h);
-  flex: 0 0 var(--toc-w);
-  width: var(--toc-w);
-  max-height: calc(100vh - var(--topbar-h));
-  overflow-y: auto;
-  padding: 2rem 1rem 3rem 0;
-}
-.toc-title {
-  margin: 0 0 0.5rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--fg-muted);
+// ---- Table of contents (nested under the active nav link) ----
+.nav-link.active + .toc {
+  margin: 0.25rem 0 0.5rem 0.6rem;
+  border-left: 1px solid var(--border);
+  padding-left: 0.5rem;
 }
 .toc ul { list-style: none; margin: 0; padding: 0; }
 .toc a {
   display: block;
   padding: 0.2rem 0.5rem;
-  border-left: 2px solid transparent;
   color: var(--fg-muted);
   font-size: 0.85rem;
   line-height: 1.4;
 }
 .toc a:hover { color: var(--fg); text-decoration: none; }
 .toc .toc-h3 a { padding-left: 1.25rem; }
-
-@media (max-width: 1180px) {
-  .toc-sidebar { display: none; }
-}
 
 // inline code
 .prose :not(pre) > code {
