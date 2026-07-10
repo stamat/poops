@@ -3,7 +3,7 @@
 import chokidar from 'chokidar'
 import connect from 'connect'
 import Copy from './lib/copy.js'
-import { pathExists, doesFileBelongToPath } from './lib/utils/helpers.js'
+import { pathExists, doesFileBelongToPath, pathContainsPathSegment } from './lib/utils/helpers.js'
 import http from 'node:http'
 import os from 'node:os'
 import fs from 'node:fs'
@@ -85,8 +85,6 @@ function setupLiveReloadServer(config) {
 function setupWatchers(config, modules) {
   if (!config.watch) return
 
-  // TODO: think about watching the updates of the config file itself, we can reload the config and recompile everything.
-  // TODO: ability to automatically create a watch list of directories if watch is set to true. The list will be generated from the `in` property of each task.
   // awaitWriteFinish: wait for saves to finish writing before recompiling, so a
   // mid-write (truncated/partial) file is never read. Fixes intermittent broken
   // builds on editor save. Bump thresholds if slow disks flake.
@@ -95,8 +93,19 @@ function setupWatchers(config, modules) {
   // rebuilds. 'add' also covers genuinely new files (e.g. a new markup page).
   // Rebuild branches shared by change/add/deletion: a deletion needs the same
   // rebuilds (a deleted-but-still-imported file must surface the error).
+  // Scripts/styles outputs can land inside a watched dir (e.g. a Shopify
+  // theme's assets/): the compiler's own write must not retrigger that
+  // compiler, or watch loops forever. Zones are the dirs the compilers write
+  // into; only their own extensions are skipped there, so e.g. a hand-edited
+  // .liquid asset in the same dir still rebuilds markup.
+  const outputZones = [config.scripts, config.styles].flat()
+    .filter((entry) => entry && entry.out)
+    .map((entry) => (path.extname(entry.out) ? path.dirname(entry.out) : entry.out))
+    .filter((zone) => zone && zone !== '.')
+  const isBuildOutput = (file) => outputZones.some((zone) => pathContainsPathSegment(file, zone))
+
   const rebuild = (file) => {
-    if (/(\.m?jsx?|\.tsx?)$/i.test(file)) {
+    if (/(\.m?jsx?|\.tsx?)$/i.test(file) && !isBuildOutput(file)) {
       modules.scripts.compile().catch(err => console.error(err))
 
       if (modules.reactor.belongsToReactor(file)) {
@@ -108,7 +117,7 @@ function setupWatchers(config, modules) {
         }).catch(err => console.error(err))
       }
     }
-    if (/(\.sass|\.scss|\.css)$/i.test(file)) {
+    if (/(\.sass|\.scss|\.css)$/i.test(file) && !isBuildOutput(file)) {
       modules.styles.compile().then(() => modules.postcss.compile()).catch(err => console.error(err))
     }
     if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.liquid|\.md)$/i.test(file)) {
