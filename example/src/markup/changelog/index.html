@@ -12,20 +12,8 @@ sort: date
 {% set byYear = changelog.items | groupby("date", "year") %}
 {% for group in byYear %}
 
-  <p>{{ group.key }}</p>
+  <h2 class="h3">{{ group.key }}</h2>
   {% for post in group.items %}
-    <p><a href="{{ post.url }}">{{ post.title }}</a> <small>({{ (post.wordcount / 200) | round(0, "ceil") }} min read)</small></p>
+    <p class="d-flex justify-space-between flex-nowrap"><a class="text-decoration-none" href="{{ relativePathPrefix }}{{ post.url }}">{{ post.title }}</a> <small class="pt-4 pl-16"><time style="font-family: monospace; white-space: nowrap;" datetime="{{ post.date | date('YYYY-MM-DD') }}">{{ post.date | date('MMM DD') }}</time></small></p>
   {% endfor %}
 {% endfor %}
-
-{% if changelog.totalPages > 1 %}
-  {% if changelog.nextPageUrl %}
-    <a href="{{ relativePathPrefix }}{{ changelog.nextPageUrl }}">Next</a>
-  {% endif %}
-
-  {{ changelog.pageNumber }} of {{ changelog.totalPages }}
-
-  {% if changelog.prevPageUrl %}
-    <a href="{{ relativePathPrefix }}{{ changelog.prevPageUrl }}">Previous</a>
-  {% endif %}
-{% endif %}

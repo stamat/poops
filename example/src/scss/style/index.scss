@@ -109,22 +109,23 @@ $prose-border: rgba(130, 79, 45, 0.25); // brand brown, faded
   line-height: 1.65;
 }
 
-.prose h1,
-.prose h2,
-.prose h3,
-.prose h4 {
+.prose h1, .prose .h1,
+.prose h2, .prose .h2,
+.prose h3, .prose .h3,
+.prose h4, .prose .h4 {
   line-height: 1.25;
   letter-spacing: normal; // reset sulphuris negative tracking
+  border-bottom: 0;
 }
-.prose h1 { font-size: 2rem; margin: 0 0 1rem; }
-.prose h2 {
+.prose h1, .prose .h1 { font-size: 2rem; margin: 0 0 1rem; }
+.prose h2, .prose .h2 {
   font-size: 1.5rem;
   margin: 2.5rem 0 1rem;
   padding-bottom: 0.3rem;
   border-bottom: 1px solid $prose-border;
 }
-.prose h3 { font-size: 1.2rem; margin: 2rem 0 0.75rem; }
-.prose h4 { font-size: 1rem; margin: 1.5rem 0 0.5rem; }
+.prose h3, .prose .h3 { font-size: 1.2rem; margin: 2rem 0 0.75rem; }
+.prose h4, .prose .h4 { font-size: 1rem; margin: 1.5rem 0 0.5rem; }
 
 .prose p,
 .prose ul,
