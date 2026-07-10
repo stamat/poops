@@ -200,6 +200,9 @@ a:hover { text-decoration: underline; }
 }
 .prose { width: 100%; max-width: var(--content-max); }
 
+.prose a { text-decoration: underline; }
+.prose a:hover { text-decoration: none; }
+
 .prose h1, .prose h2, .prose h3, .prose h4 { position: relative; line-height: 1.25; scroll-margin-top: calc(var(--topbar-h) + 1rem); }
 .prose h1 { font-size: 2rem; margin: 0 0 1rem; }
 .prose h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
@@ -210,7 +213,7 @@ a:hover { text-decoration: underline; }
   padding-left: 0.3em;
   color: var(--fg-muted);
   opacity: 0;
-  text-decoration: none;
+  text-decoration: none !important;
 }
 .heading-anchor::before { content: "#"; }
 .prose :is(h1, h2, h3, h4):hover .heading-anchor,
@@ -304,9 +307,11 @@ a:hover { text-decoration: underline; }
 .admonition p:last-child { margin-bottom: 0.75rem; }
 .admonition-title {
   background: color-mix(in srgb, var(--adm) 7%, var(--bg));
-  border-radius: var(--radius);
-  padding: 0.75rem 1rem !important;
-  margin-bottom: 0.4rem !important;
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+  border-bottom: 1px solid var(--adm);
+  padding: 0.5rem 1rem !important;
+  margin-bottom: 0.75rem !important;
   font-weight: 700;
   font-size: 0.9rem;
   color: var(--adm);

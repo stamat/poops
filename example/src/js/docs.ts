@@ -4,9 +4,9 @@ type Kind = { cls: string; icon: string; label: string }
 
 const ADMONITIONS: Record<string, Kind> = {
   NOTE: { cls: 'note', icon: '✎', label: 'Note' },
-  INFO: { cls: 'info', icon: 'ℹ', label: 'Info' },
-  IMPORTANT: { cls: 'info', icon: 'ℹ', label: 'Important' },
-  TIP: { cls: 'tip', icon: '💡', label: 'Tip' },
+  INFO: { cls: 'info', icon: 'ⓘ', label: 'Info' },
+  IMPORTANT: { cls: 'info', icon: 'ⓘ', label: 'Important' },
+  TIP: { cls: 'tip', icon: '☆', label: 'Tip' },
   WARNING: { cls: 'warning', icon: '⚠', label: 'Warning' },
   CAUTION: { cls: 'warning', icon: '⚠', label: 'Caution' }
 }
