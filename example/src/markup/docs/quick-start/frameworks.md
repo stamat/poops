@@ -109,3 +109,5 @@ Load them with `{% raw %}{% static 'css/main.css' %}{% endraw %}` in your Django
 > [!INFO]
 > The same approach works for Rails/Django/Laravel or anything else: Symfony, Phoenix, Express,
 > Hugo, plain PHP. If it serves files from a folder, Poops can fill that folder.
+
+Next: [PostCSS & Tailwind](postcss-tailwind).

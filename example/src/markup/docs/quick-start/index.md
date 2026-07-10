@@ -89,6 +89,9 @@ Every key is independent:
 - **`reactor`** — build-time React rendering. See [React](react).
 - **`copy` / `serve` / `livereload` / `watch`** — static files and the dev loop.
 
+Bolting Poops onto WordPress, Laravel, Rails or Django instead of building a full static site? See
+[Use with frameworks](frameworks).
+
 > [!INFO]
 > Poops reads your project's `package.json` automatically and exposes it to templates as the
 > `package` global. So `{% raw %}{{ package.version }}{% endraw %}` just works — handy for a
