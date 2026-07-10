@@ -4,6 +4,7 @@
 :root {
   --topbar-h: 3.25rem;
   --sidebar-w: 16rem;
+  --toc-w: 14rem;
   --content-max: 46rem;
   --radius: 0.5rem;
   --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -199,14 +200,62 @@ a:hover { text-decoration: underline; }
 }
 .prose { width: 100%; max-width: var(--content-max); }
 
-.prose h1, .prose h2, .prose h3, .prose h4 { line-height: 1.25; scroll-margin-top: calc(var(--topbar-h) + 1rem); }
+.prose h1, .prose h2, .prose h3, .prose h4 { position: relative; line-height: 1.25; scroll-margin-top: calc(var(--topbar-h) + 1rem); }
 .prose h1 { font-size: 2rem; margin: 0 0 1rem; }
 .prose h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
 .prose h3 { font-size: 1.2rem; margin: 2rem 0 0.75rem; }
+
+// permalink "#" in the left gutter, revealed on heading hover/focus
+.heading-anchor {
+  position: absolute;
+  left: -1.1em;
+  padding-right: 0.3em;
+  color: var(--fg-muted);
+  opacity: 0;
+  text-decoration: none;
+}
+.heading-anchor::before { content: "#"; }
+.prose :is(h1, h2, h3, h4):hover .heading-anchor,
+.heading-anchor:focus { opacity: 1; }
+.heading-anchor:hover { color: var(--link); }
 .prose p, .prose ul, .prose ol { margin: 0 0 1rem; }
 .prose li { margin: 0.25rem 0; }
 .prose img { max-width: 100%; height: auto; border-radius: var(--radius); }
 .prose hr { border: 0; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+// ---- Table of contents (right column) ----
+.toc-sidebar {
+  position: sticky;
+  top: var(--topbar-h);
+  flex: 0 0 var(--toc-w);
+  width: var(--toc-w);
+  max-height: calc(100vh - var(--topbar-h));
+  overflow-y: auto;
+  padding: 2rem 1rem 3rem 0;
+}
+.toc-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fg-muted);
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc a {
+  display: block;
+  padding: 0.2rem 0.5rem;
+  border-left: 2px solid transparent;
+  color: var(--fg-muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.toc a:hover { color: var(--fg); text-decoration: none; }
+.toc .toc-h3 a { padding-left: 1.25rem; }
+
+@media (max-width: 1180px) {
+  .toc-sidebar { display: none; }
+}
 
 // inline code
 .prose :not(pre) > code {

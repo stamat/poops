@@ -23,6 +23,9 @@
     <button class="icon-btn" data-theme-toggle aria-label="Toggle dark mode"><span class="theme-sun">☀</span><span class="theme-moon">☾</span></button>
   </header>
 
+  {# render the page once, reuse for both the article and its table of contents #}
+  {% set pageBody %}{% block content %}{% endblock %}{% endset %}
+
   <div class="layout">
     <aside class="sidebar" data-sidebar>
       <nav class="nav">
@@ -33,13 +36,21 @@
 
     <main class="content">
       <article class="prose">
-        {% block content %}{% endblock %}
+        {{ pageBody }}
       </article>
       <footer class="page-footer">
         <a href="https://github.com/stamat/poops" target="_blank" rel="noopener">Poops</a> v{{ package.version }} —
         MIT licensed. Built with Poops. 💩
       </footer>
     </main>
+
+    {% set tocHtml = pageBody | toc %}
+    {% if tocHtml %}
+    <aside class="toc-sidebar">
+      <p class="toc-title">On this page</p>
+      {{ tocHtml }}
+    </aside>
+    {% endif %}
   </div>
 
   {% if livereload_port %}
