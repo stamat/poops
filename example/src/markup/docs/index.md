@@ -62,6 +62,33 @@ callbacks. If a feature isn't built in, you compose it from the pipelines above 
 PostCSS for Tailwind) or you contribute it. That constraint is the point — the config stays
 small and readable.
 
+## Who it's for
+
+Poops is a niche tool, not a general-purpose framework. It earns its keep in three spots:
+
+- **The anti-config build.** A marketing page or a couple of static templates with some SCSS
+  doesn't need a `webpack.config.js` or a dozen Vite plugins. One JSON block, `in` and `out`,
+  done.
+- **Design-token-driven micro-sites.** Poops reads the W3C [DTCG](https://www.designtokens.org/)
+  format natively and turns Figma-exported token JSON into SCSS variables — no separate Style
+  Dictionary or Gulp pipeline. Useful for design-system docs and standalone component libraries.
+- **Static sites with just enough React.** Write the site in Nunjucks or Liquid, then drop in
+  one or two interactive React components (a calculator, a filter UI) via the `reactor`
+  pipeline's zero-config SSR and hydration. SEO-friendly HTML, without the footprint of a full
+  React framework.
+
+## Where it has zero value
+
+- **Large SPAs.** No React Fast Refresh, no granular code splitting, no plugin ecosystem. Reach
+  for Next.js or Vite instead.
+- **Non-React component frameworks.** Vue, Svelte, Solid — not supported, not planned.
+- **Mission-critical enterprise infrastructure.** Poops is maintained by one person as a side
+  project. That's fine for a brochure site; think twice before betting production revenue on it.
+
+> [!NOTE]
+> If you're not sure whether Poops fits, the litmus test is size: small static site or design
+> system docs, yes; full application, no.
+
 ## Install
 
 Globally:
