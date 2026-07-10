@@ -18,6 +18,15 @@
       "format": "iife",
       "target": "es2019"
     }
+  }, {
+    "in": "example/src/js/docs.ts",
+    "out": "example/dist/js/docs.js",
+    "options": {
+      "minify": true,
+      "justMinified": true,
+      "format": "iife",
+      "target": "es2019"
+    }
   }],
   "reactor": [{
     "component": "example/src/js/App.jsx",
@@ -37,6 +46,13 @@
       "minify": true,
       "justMinified": false,
       "tokenPaths": ["example/src/tokens"]
+    }
+  }, {
+    "in": "example/src/scss/docs.scss",
+    "out": "example/dist/css/docs.css",
+    "options": {
+      "minify": true,
+      "justMinified": true
     }
   }],
   "markup": {
@@ -59,7 +75,11 @@
     "timeDateFormat": "MMM D, YYYY",
     "searchIndex": "search-index.json",
     "sitemap": "sitemap.xml",
-    "nav": "nav.json"
+    "nav": {
+      "output": "nav.json",
+      "root": "docs",
+      "collections": "index"
+    }
   },
   "copy": [
     {

@@ -1,0 +1,27 @@
+{% macro navtree(items, pageUrl, prefix) %}
+<ul class="nav-list">
+  {% for item in items %}
+    {% if item.children %}
+      <li class="nav-section">
+        <details open>
+          <summary>{{ item.title }}</summary>
+          <ul class="nav-list">
+            {% if item.url != null %}
+              <li><a class="nav-link{% if item.url == pageUrl %} active{% endif %}" href="{{ prefix }}{{ item.url }}">Overview</a></li>
+            {% endif %}
+            {% for child in item.children %}
+              {% if child.children %}
+                {{ navtree([child], pageUrl, prefix) }}
+              {% else %}
+                <li><a class="nav-link{% if child.url == pageUrl %} active{% endif %}" href="{{ prefix }}{{ child.url }}">{{ child.title }}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </details>
+      </li>
+    {% else %}
+      <li><a class="nav-link{% if item.url == pageUrl %} active{% endif %}" href="{{ prefix }}{{ item.url }}">{{ item.title }}</a></li>
+    {% endif %}
+  {% endfor %}
+</ul>
+{% endmacro %}
