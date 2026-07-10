@@ -31,6 +31,10 @@ as includes and not emitted.
 - **`site`** — global data available to every page as `site.*`.
 - **`data`** — JSON/YAML files loaded as globals, named after the file (`links.json` → `links`).
 - **`includePaths`** — extra folders on the include search path for partials/layouts.
+- **`baseURL`** *(optional)* — a fixed URL prefix that replaces the computed relative prefixes.
+  When set, `relativePathPrefix` always resolves to this value (trailing slash ensured) instead of
+  the page-depth `./`/`../`. Useful when deploying under a subdirectory, e.g. `"/blog"` for
+  `domain.com/blog/`. The `--base-url` CLI flag overrides it per environment.
 
 Every page can carry **front matter** — a YAML block at the top that sets `title`, `description`,
 `layout`, `date`, `order`, and any custom fields you invent:
@@ -189,5 +193,29 @@ The tag prefers `avif` > `webp` > original, prepends `relativePathPrefix`, defau
 > If you run [poops-images](https://github.com/stamat/poops-images), the tag also reads exact
 > `width`/`height` from its cache to prevent layout shift, and unlocks the `exif` and `images`
 > filters. More in [Images & galleries](../static-site/images-gallery).
+
+## Google Fonts
+
+The `{% raw %}{% googleFonts %}{% endraw %}` tag emits Google Fonts `<link>` tags with preconnect
+hints. Pass an array of font names, or objects for weights and italics:
+
+```nunjucks
+{% raw %}{% googleFonts ["DM Sans", {name: "Poppins", weights: [400, 700], ital: true}] %}{% endraw %}
+```
+
+Output:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans&family=Poppins:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+```
+
+Font object options: `name`, `weights` (e.g. `[400, 700]`), `ital` (include italics), `display`
+(defaults to `swap`).
+
+> [!NOTE]
+> Liquid syntax has no inline arrays — pass a variable instead: define the array in a data file
+> (e.g. `fonts.json`) and call `{% raw %}{% googleFonts fonts %}{% endraw %}`.
 
 Next, get a site building end to end in [Build a Static Site](../static-site/).

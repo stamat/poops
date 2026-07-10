@@ -104,8 +104,8 @@ Poops still builds your `index.html` — use `markup` for the shell so `relative
 ```
 
 > [!NOTE]
-> Install React in your project: `npm i react react-dom`. Poops resolves it from your
-> `node_modules` — it isn't a Poops dependency.
+> React comes from your project's `node_modules` (`npm i react react-dom`), not from Poops —
+> see [React](../quick-start/react).
 
 ## Develop and build
 

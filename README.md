@@ -705,6 +705,12 @@ From the example site's `changelog/index.html`:
 {% endif %}
 ```
 
+Or use the `{% pagination %}` shorthand tag (available in both engines), which renders Previous/Next links and a "page of total" counter — with `relativePathPrefix` applied — and outputs nothing when there is only one page:
+
+```nunjucks
+{% pagination changelog %}
+```
+
 Item pages themselves are compiled like any other markup file, preserving the directory structure: `src/markup/changelog/my-post.md` → `dist/changelog/my-post.html`. A collection directory without an index file still builds its items and exposes the collection to templates — only the paginated listing pages are skipped.
 
 #### Custom Tags

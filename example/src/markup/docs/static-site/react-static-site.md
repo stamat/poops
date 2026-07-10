@@ -2,49 +2,48 @@
 layout: docs
 title: A complete React static site
 navTitle: A complete React SSG
-description: Combine Reactor, styles and markup into a full pre-rendered, hydrated React static site.
+description: Turn the React SPA into a pre-rendered, hydrated static site — three changes to the setup from Build a React App.
 order: 6
 keywords: ["react", "ssg", "static site", "hydration", "reactor", "renderToString"]
 ---
 
 # A complete React static site
 
-Putting it together: a full site whose pages are React-rendered at build time and hydrated in the
-browser. Fast first paint (real HTML), full interactivity after hydration, and no runtime SSR
-server — it's static files.
+A full site whose pages are React-rendered at build time and hydrated in the browser: fast first
+paint (real HTML), full interactivity after hydration, and no runtime SSR server — it's static
+files.
 
-## Project layout
+This page builds directly on [Build a React App](../react-app/). Same project, same `App.jsx`,
+same styles and markup config. **Three changes** turn the client-only SPA into a pre-rendered,
+hydrated static site:
 
-```text
-react-site/
-├─ poops.json
-├─ package.json          # react + react-dom installed here
-└─ src/
-   ├─ scss/index.scss
-   ├─ js/
-   │  ├─ App.jsx          # the app, default export
-   │  └─ app-hydrate.jsx  # client hydration entry
-   └─ markup/
-      ├─ _layouts/default.html
-      └─ index.html       # injects the rendered app
-```
+## 1. Swap `scripts` for `reactor`
 
-## The app and its hydration entry
+Replace the SPA's `scripts` entry with a `reactor` entry. Everything else in the config —
+`styles`, `markup`, `serve`, `watch` — stays exactly as it was:
 
-```jsx
-// src/js/App.jsx
-import { useState } from 'react'
-
-export default function App() {
-  const [count, setCount] = useState(0)
-  return (
-    <main>
-      <h1>Poops + React</h1>
-      <button onClick={() => setCount(count + 1)}>Count: {count}</button>
-    </main>
-  )
+```json
+{
+  "reactor": [
+    {
+      "component": "src/js/App.jsx",
+      "inject": "app_html",
+      "in": "src/js/app-hydrate.jsx",
+      "out": "dist/js/app-hydrate.js",
+      "options": { "minify": true, "target": "es2019" }
+    }
+  ]
 }
 ```
+
+`component` is rendered to HTML at build time; the result is exposed to templates as `app_html`.
+`in`/`out` bundle the client entry that hydrates it. Full option reference in
+[React › Build-time pre-rendering](../quick-start/react#2-build-time-pre-rendering-the-reactor-key).
+
+## 2. Hydrate instead of mount
+
+The SPA's `main.tsx` called `createRoot`. Here the client entry *hydrates* the HTML that is
+already on the page:
 
 ```jsx
 // src/js/app-hydrate.jsx
@@ -54,35 +53,10 @@ import App from './App.jsx'
 hydrateRoot(document.getElementById('root'), <App />)
 ```
 
-## The config
+## 3. Inject the rendered HTML
 
-```json
-{
-  "styles": [
-    { "in": "src/scss/index.scss", "out": "dist/css/styles.css", "options": { "minify": true } }
-  ],
-  "reactor": [
-    {
-      "component": "src/js/App.jsx",
-      "inject": "app_html",
-      "in": "src/js/app-hydrate.jsx",
-      "out": "dist/js/app-hydrate.js",
-      "options": { "minify": true, "target": "es2019" }
-    }
-  ],
-  "markup": {
-    "in": "src/markup",
-    "out": "dist",
-    "site": { "title": "Poops + React" },
-    "includePaths": ["_layouts", "_partials"]
-  },
-  "serve": { "port": 4040, "base": "/dist" },
-  "livereload": true,
-  "watch": ["src"]
-}
-```
-
-## The page
+The SPA shipped an empty `<div id="root">`. Now the template drops the build-time HTML into it,
+then loads the hydration bundle:
 
 ```html
 {% raw %}{% extends "default.html" %}
@@ -108,10 +82,6 @@ hydrateRoot(document.getElementById('root'), <App />)
 > The server-rendered markup and the client's first render must match, or React logs a hydration
 > mismatch. Keep `App.jsx` deterministic at build time — no `Date.now()`, `Math.random()` or
 > browser-only APIs during the initial render.
-
-> [!INFO]
-> Want plain client-side React with no pre-rendering at all? Skip `reactor` and use the `scripts`
-> pipeline with `createRoot` — see [Build a React App](../react-app/).
 
 Full runnable examples live in the Poops repository's `example/` directory (`react.html` and
 `react-client.html`).

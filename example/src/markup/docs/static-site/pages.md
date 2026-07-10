@@ -119,7 +119,8 @@ const greet = (name) => `Hello, ${name}!`
 ## Useful filters
 
 Poops adds template filters usable in both engines — `slugify`, `markdown`, `date`, `jsonify`,
-`svg`, `highlight`, `groupby`, and the image helpers `srcset`, `exif`, `images`:
+`svg`, `highlight`, `groupby`, the array helpers `concat` (returns a new array with the value
+appended) and `push` (appends in place), and the image helpers `srcset`, `exif`, `images`:
 
 ```nunjucks
 {% raw %}<h1>{{ page.title }}</h1>

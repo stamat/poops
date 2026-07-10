@@ -52,6 +52,50 @@ filter always read a fresh cache.
 With the poops-images cache present you also get exact `width`/`height` attributes (no layout
 shift), correct `src` when the source format was converted, and EXIF via the `exif` filter.
 
+## Custom sizes (named crops)
+
+A plain size (`{ "width": 640 }`) is one rung of the responsive ladder. A **named** size is a fixed
+crop of its own — WordPress-style `add_image_size` — for a thumbnail, a hero banner, a social card:
+each has its own dimensions and crop anchor, independent of the responsive widths.
+
+```json
+{
+  "images": {
+    "in": "src/images",
+    "out": "dist/images",
+    "sizes": [
+      { "width": 640 },
+      { "width": 1280 },
+      { "name": "thumb", "width": 200, "height": 200, "crop": true },
+      { "name": "hero", "width": 1600, "height": 500, "crop": ["center", "top"] }
+    ],
+    "format": ["webp"]
+  }
+}
+```
+
+For `photo.jpg` that writes `photo-640w.webp` and `photo-1280w.webp` (the responsive ladder) plus
+`photo-thumb-200w.webp` and `photo-hero-1600w.webp` (the named crops).
+
+The plain-width variants feed the responsive `srcset` automatically; named crops (and preprocessed
+variants like `photo-blurred-640w.webp`) are deliberately kept out of it — they have their own
+aspect ratios. To emit one, point `{% raw %}{% image %}{% endraw %}` at the base name **plus the
+size name, without the width** — Poops discovers the actual output file, so soft crops (no fixed
+height) resolve too:
+
+```nunjucks
+{% raw %}{# responsive: uses the -640w / -1280w ladder #}
+{% image 'images/photo.jpg', alt='Hero', sizes='100vw' %}
+
+{# just the 200×200 thumb crop #}
+{% image 'images/photo-thumb.jpg', alt='' %}
+
+{# just the hero banner crop #}
+{% image 'images/photo-hero.jpg', alt='' %}{% endraw %}
+```
+
+Each named reference resolves to that one crop, e.g. `<img src="images/photo-thumb-200w.webp" …>`.
+
 ## A photo gallery
 
 The `images` filter lists every image under a directory from the cache. Combine it with
@@ -100,10 +144,5 @@ The `exif` filter returns camera, exposure, timestamp and GPS metadata:
 > [!TIP]
 > In watch mode, adding a source image processes it and rebuilds the galleries that reference it;
 > deleting one removes its variants and updates the galleries. You never hand-edit an image list.
-
-> [!NOTE]
-> Named crops (`photo-thumb-200w.jpg`) and preprocessed variants (`photo-blurred-640w.jpg`) are
-> kept out of `srcset` — they have their own aspect ratios. Only plain `{name}-{width}w.{ext}`
-> variants feed responsive `srcset`.
 
 Next: [A documentation site](docs-site).

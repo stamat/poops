@@ -77,13 +77,8 @@ The page ships as real HTML — the button is visible before any JS runs — and
 once React hydrates it.
 
 > [!NOTE]
-> Install React yourself: `npm i react react-dom`. Poops resolves them from your project's
-> `node_modules`; it never depends on them directly.
-
-> [!INFO]
-> `reactor` is independent from `scripts`. Editing the component re-renders and re-bundles just
-> that pipeline; markup recompiles only when the rendered HTML actually changes. Editing unrelated
-> JS only triggers `scripts`.
+> React comes from your project's `node_modules` (`npm i react react-dom`), and `reactor` is its
+> own pipeline, independent from `scripts` — details in [React](../quick-start/react).
 
 ## Server-only components
 

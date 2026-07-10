@@ -76,7 +76,7 @@ your users need. The trick is one `scripts` entry per target `format`, all readi
 entry file.
 
 ```json
-{
+{% raw %}{
   "scripts": [
     { "in": "src/index.ts", "out": "dist/mylib.esm.js",
       "options": { "format": "esm", "target": "es2019", "minify": true } },
@@ -86,7 +86,7 @@ entry file.
       "options": { "format": "iife", "target": "es2019", "minify": true } }
   ],
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */"
-}
+}{% endraw %}
 ```
 
 That gives you:
@@ -113,7 +113,7 @@ Wire the outputs into `package.json` so consumers get the right one automaticall
 
 > [!INFO]
 > The `banner` option stamps a comment on top of every output, templated from your `package.json`
-> — `name`, `version`, `homepage`, `license`, `author`, `description`. See the config reference
-> for details.
+> — `name`, `version`, `homepage`, `license`, `author`, `description`. See the
+> [configuration reference](../config-reference) for details.
 
 Next: [Transpiling CSS](transpiling-css).

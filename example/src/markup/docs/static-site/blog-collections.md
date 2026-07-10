@@ -85,7 +85,7 @@ Each item carries its front matter plus `url`, `title`, `date`, `wordcount`, `fi
 
 With `paginate: N`, the collection's index renders once per page: page 1 → `blog/index.html`,
 page 2 → `blog/2/index.html`, and so on. Inside the index, the collection object carries page
-state — `pageItems`, `pageNumber`, `totalPages`, `nextPageUrl`, `prevPageUrl`:
+state — `pageItems`, `pageNumber`, `totalPages`, `pageUrl`, `nextPageUrl`, `prevPageUrl`:
 
 Set `paginate: N` on the collection index front matter (or the collection entry in `markup.collections`);
 without it, there is only one page and the pagination globals stay at their single-page defaults.
