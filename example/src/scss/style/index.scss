@@ -12,6 +12,85 @@ a {
   color: #824F2D;
 }
 
+// GitHub icon button — docs .icon-btn shape, brand-brown color, no border.
+.gh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  color: #824F2D;
+}
+.gh-btn:hover { background: rgba(130, 79, 45, 0.1); }
+
+// ---- Site header ----
+$body-font: 'DM Sans', Helvetica, Arial, sans-serif; // docs body font, brand color kept
+
+// Logo: docs .brand typography (DM Sans 700, 1.1rem, gap .4rem), brand color.
+.brand-logo {
+  font-family: $body-font;
+  font-size: 1.1rem;
+  gap: 0.4rem;
+  line-height: 1;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.nav-link {
+  font-family: $body-font;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #824F2D;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.5rem;
+}
+.nav-link:hover,
+.nav-link.active { background: rgba(130, 79, 45, 0.1); }
+.nav-link.active { font-weight: 600; }
+
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  background: transparent;
+  border-radius: 0.5rem;
+  color: #824F2D;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.nav-toggle:hover { background: rgba(130, 79, 45, 0.1); }
+
+@media (max-width: 956px) {
+  .site-header { position: relative; }
+  .nav-toggle { display: inline-flex; }
+  .site-nav-links {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    min-width: 11rem;
+    padding: 0.5rem;
+    background: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 24px rgba(20, 24, 30, 0.15);
+    z-index: 50;
+    display: none;
+  }
+  .site-nav-links.open { display: flex; }
+  .nav-link { width: 100%; }
+}
+
 hr {
   border: 0;
   border-top: 3px dashed #824F2D;

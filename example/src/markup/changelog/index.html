@@ -2,19 +2,20 @@
 layout: blog
 title: Changelog
 description: Follow the latest changes of Poops.
-paginate: 10
 collection: true
 sort: date
 ---
 <div class="text-center">
   <h1>Changelog</h1>
 </div>
-{% for post in changelog.pageItems %}
-  <div class="post">
-    <h2><a href="{{ relativePathPrefix }}{{ post.url }}">{{ post.title }}</a></h2>
-    <div class="date">{{ post.date | date }}</div>
-    {{ post.description }}
-  </div>
+
+{% set byYear = changelog.items | groupby("date", "year") %}
+{% for group in byYear %}
+
+  <p>{{ group.key }}</p>
+  {% for post in group.items %}
+    <p><a href="{{ post.url }}">{{ post.title }}</a> <small>({{ (post.wordcount / 200) | round(0, "ceil") }} min read)</small></p>
+  {% endfor %}
 {% endfor %}
 
 {% if changelog.totalPages > 1 %}
