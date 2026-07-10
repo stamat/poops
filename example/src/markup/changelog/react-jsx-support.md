@@ -1,14 +1,10 @@
 ---
-layout: blog
+layout: post
 title: React JSX Support
 date: 2026-02-23
 description: Poops now supports bundling .jsx and .tsx React files out of the box. Powered by esbuild, you can bundle React components with zero extra configuration.
 published: true
 ---
-
-# {{ page.title }}
-
-> {{ page.description }}
 
 ### What's new?
 

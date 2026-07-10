@@ -1,14 +1,10 @@
 ---
-layout: blog
-title: Group posts by year with the groupby filter
+layout: post
+title: v1.2.3 — Group posts by year with the groupby filter
 date: 2026-07-07
 description: A new groupby filter lets you group any array of objects by a field, with optional date-part extraction for year, month or day. Perfect for listing posts per year. Ships alongside a wordcount helper and a baseURL CLI override.
 published: true
 ---
-
-# {{ page.title }}
-
-> {{ page.description }}
 
 The `groupby` filter groups an array of objects by a field value and returns an array of `{ key, items }`. Pass an optional second argument (`year`, `month`, `day`) to group by a date part instead of the raw value. Groups keep insertion order, so sort your posts date-descending and the years come out newest-first for free.
 
@@ -57,6 +53,6 @@ Bump 200 to whatever fits your audience — 225 for skimmers, 130 for dense tech
 
   <p>{{ group.key }}</p>
   {% for post in group.items %}
-    <p><a href="{{ post.url }}">{{ post.title }}</a> <small>({{ (post.wordcount / 200) | round(0, "ceil") }} min read)</small></p>
+    <p><a href="{{ relativePathPrefix }}{{ post.url }}">{{ post.title }}</a> <small>({{ (post.wordcount / 200) | round(0, "ceil") }} min read)</small></p>
   {% endfor %}
 {% endfor %}

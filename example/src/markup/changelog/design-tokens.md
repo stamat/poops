@@ -1,14 +1,10 @@
 ---
-layout: blog
+layout: post
 title: Design Token Support for Sass
 date: 2026-03-07
 description: Import JSON design tokens directly into your SCSS files. Supports W3C DTCG and Style Dictionary formats with alias resolution, flat variables, and Sass map output.
 published: true
 ---
-
-# {{ page.title }}
-
-> {{ page.description }}
 
 ### What's new?
 

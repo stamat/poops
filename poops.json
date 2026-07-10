@@ -60,7 +60,7 @@
     "out": "example/dist",
     "site": {
       "title": "💩 Poops",
-      "description": "A niche bundler for design-driven micro-sites — not a framework for building apps.",
+      "description": "A niche bundler for design-driven micro-sites and blogs.",
       "url": "https://stamat.github.io/poops"
     },
     "data": [

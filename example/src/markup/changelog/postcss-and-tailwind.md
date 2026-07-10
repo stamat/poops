@@ -1,14 +1,10 @@
 ---
-layout: blog
+layout: post
 title: PostCSS Pipeline & Tailwind CSS Support
 date: 2026-03-07
 description: Poops now has a general-purpose PostCSS pipeline. Use any PostCSS plugin — including Tailwind CSS v4 — alongside or instead of the Sass pipeline.
 published: true
 ---
-
-# {{ page.title }}
-
-> {{ page.description }}
 
 ### What's new?
 

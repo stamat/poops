@@ -1,13 +1,10 @@
 ---
-layout: blog
+layout: post
 title: Liquid Template Engine Support
 date: 2026-03-07
 description: Poops now supports Liquid as an alternative template engine alongside Nunjucks. Use .liquid files and familiar Liquid syntax for your templates, layouts, and includes.
 published: true
 ---
-# {{ page.title }}
-
-> {{ page.description }}
 
 ### What's new?
 

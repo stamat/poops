@@ -163,7 +163,7 @@ $prose-border: rgba(130, 79, 45, 0.25); // brand brown, faded
 
 .prose blockquote {
   margin: 0 0 1rem;
-  padding: 0.5rem 1rem;
-  border-left: 3px solid rgba(130, 79, 45, 0.4);
-  color: #6D6D6D;
+  padding: 1rem 2rem;
+  background: #824f2d1a;
+  border-radius: 0.5rem;
 }

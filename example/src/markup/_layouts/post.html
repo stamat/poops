@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ page.title }} | {{ site.title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{{ page.description or site.description }}">
+  <link rel="alternate" type="application/rss+xml" href="{{ site.url }}/changelog/feed.rss">
+  {% googleFonts ["DM Sans", {name: "Poppins", weights: [700]}] %}
+  <link rel="stylesheet" href="{{ relativePathPrefix }}css/styles.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<body class="bg-brownish">
+
+  {% include "site-header.html" %}
+
+  <div class="container prose">
+
+    <h1>{{ page.title }}</h1>
+
+    <div style="font-family: monospace; white-space: nowrap;"><time datetime="{{ page.date | date('YYYY-MM-DD') }}">{{ page.date | date('MMM DD, YYYY') }}</time> <span class="px-8">|</span> {{ (page.wordcount / 200) | round(0, "ceil") }} min read</div>
+    <br>
+    <blockquote>{{ page.description }}</blockquote>
+    
+    {% block content %} {% endblock %}
+
+    <hr>
+  </div>
+
+  {% include "site-footer.html" %}
+
+  {% if livereload_port %}
+  <script>document.write('<script src="http://'
+    + (location.host || 'localhost').split(':')[0]
+    + ':{{livereload_port}}/livereload.js?snipver=1"></'
+    + 'script>')</script>
+  {% endif %}
+
+  <script async type="text/javascript" src="{{ relativePathPrefix }}js/scripts.min.js"></script>
+</body>
+</html>
