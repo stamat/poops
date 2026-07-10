@@ -103,6 +103,63 @@ the syntax differs:
 > Pick the engine you already know. There is no functional reason to prefer one over the other in
 > Poops — the collections, nav, search and image features are engine-agnostic.
 
+## Custom engines
+
+`engine` also accepts a **module specifier** — an npm package name or a path relative to your
+project root — so you can bring your own template engine or extend a built-in one. The module's
+default export must be an engine class:
+
+```json
+{
+  "markup": {
+    "in": "src/markup",
+    "out": "dist",
+    "engine": "poops-shopify"
+  }
+}
+```
+
+An engine class implements this contract (the two built-ins in
+[`lib/markup/engines/`](https://github.com/stamat/poops/tree/main/lib/markup/engines) are the
+reference implementations):
+
+```js
+export default class MyEngine {
+  constructor(templatesDir, includePaths, options) {}      // options: { autoescape }
+  get fileExtension() { return '.liquid' }                 // native template extension
+  get indexableExtensions() { return new Set(['.html']) }  // eligible for search index / nav
+  get markupExtensions() { return 'html|liquid|md' }       // glob alternation of processed extensions
+  registerFilters({ timeDateFormat, markupOut }) {}
+  registerTags(getOutputDir) {}
+  setGlobal(key, value) {}
+  removeGlobal(key) {}
+  async render(templatePath, context) { return 'html' }    // templatePath is an absolute path
+  async renderString(source, context) { return 'html' }
+}
+```
+
+Optionally implement `replaceOutExtensions(outputPath)` to control how source extensions map to
+output (the default maps `.md` / `.njk` / `.liquid` to `.html`; a theme engine might flatten paths
+instead).
+
+The easy path is **extending a built-in** — deep imports are supported for exactly this:
+
+```js
+import LiquidEngine from 'poops/lib/markup/engines/liquid.js'
+
+export default class MyEngine extends LiquidEngine {
+  registerFilters(opts) {
+    super.registerFilters(opts)
+    this.engine.registerFilter('shout', (str) => String(str).toUpperCase())
+  }
+}
+```
+
+> [!NOTE]
+> The specifier resolves against your project's `node_modules` (or a relative path from the project
+> root), so a locally linked engine works too. [`poops-shopify`](https://github.com/stamat/poops-shopify)
+> is a full example — a Shopify Liquid engine that maps templates into a theme directory.
+
 ## Images
 
 Both engines ship an `{% raw %}{% image %}{% endraw %}` tag that emits a responsive `<img>` with a
