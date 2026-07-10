@@ -574,6 +574,52 @@ Both engines support the same feature set (collections, pagination, search index
 
 Both engines process `.html` and `.md` files in addition to their native extension.
 
+#### Custom Engines
+
+The `engine` option also accepts a module specifier — an npm package name or a path relative to your project root. The module's default export must be an engine class:
+
+```json
+{
+  "markup": {
+    "in": "src/markup",
+    "out": "dist",
+    "engine": "poops-shopify"
+  }
+}
+```
+
+An engine class implements this contract (see [`lib/markup/engines/`](lib/markup/engines/) for the two built-in reference implementations):
+
+```js
+export default class MyEngine {
+  constructor(templatesDir, includePaths, options) {}      // options: { autoescape }
+  get fileExtension() { return '.liquid' }                 // native template extension
+  get indexableExtensions() { return new Set(['.html']) }  // extensions eligible for search index/nav
+  get markupExtensions() { return 'html|liquid|md' }       // glob alternation of processed extensions
+  registerFilters({ timeDateFormat, markupOut }) {}
+  registerTags(getOutputDir) {}
+  setGlobal(key, value) {}
+  removeGlobal(key) {}
+  async render(templatePath, context) { return 'html' }    // templatePath is an absolute file path
+  async renderString(source, context) { return 'html' }
+}
+```
+
+Optionally, an engine may implement `replaceOutExtensions(outputPath)` to control how source extensions map to output extensions (the default maps `.md`/`.njk`/`.liquid` to `.html`).
+
+The easiest starting point is extending a built-in engine — deep imports are intentionally supported for this:
+
+```js
+import LiquidEngine from 'poops/lib/markup/engines/liquid.js'
+
+export default class MyEngine extends LiquidEngine {
+  registerFilters(opts) {
+    super.registerFilters(opts)
+    this.engine.registerFilter('shout', (str) => String(str).toUpperCase())
+  }
+}
+```
+
 #### Collections & Pagination
 
 Collections turn a directory of pages into a sorted, optionally paginated list — blog posts, changelog entries, documentation. A collection maps to a direct subdirectory of your markup `in` directory: every `.html`, `.njk`, `.liquid` or `.md` file inside it (except the `index.*` file) becomes a collection item.
