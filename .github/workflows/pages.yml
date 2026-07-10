@@ -34,7 +34,7 @@ jobs:
 
       # Build the project
       - name: Build the project
-        run: npm run build
+        run: npm run build -- --base-url /${{ github.event.repository.name }}
 
       # Upload the build output as an artifact
       - name: Upload artifact
