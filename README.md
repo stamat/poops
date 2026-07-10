@@ -858,7 +858,7 @@ All filters are available in both engines. The only syntax difference is how arg
 
 - `jsonify` — serializes a value to JSON. Usage: `{{ myObject | jsonify }}`
 
-- `markdown` — renders a markdown string to HTML. Usage: `{{ "**bold**" | markdown }}`
+- `markdown` — renders a markdown string to HTML with GitHub-style emoji shortcodes (e.g. `:rocket:` → 🚀). Usage: `{{ "**bold** :rocket:" | markdown }}`
 
 - `date` — formats a date string. Uses [dayjs](https://day.js.org/) format tokens. A default format can be set via the `timeDateFormat` config option.
   - Nunjucks: `{{ "2024-01-15" | date("MMMM D, YYYY") }}`
