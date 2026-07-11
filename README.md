@@ -465,37 +465,34 @@ You can also pass options to plugins using the tuple form:
 
 #### Tailwind CSS Example
 
-The `example-tailwind/` directory demonstrates using Tailwind CSS v4 with Poops. To run it:
+Install the deps, then use a config like this:
 
 ```bash
 npm i -D postcss @tailwindcss/postcss tailwindcss
-node poops.js -c example-tailwind/poops.json
 ```
-
-The example config (`example-tailwind/poops.json`):
 
 ```json
 {
   "postcss": {
-    "in": "example-tailwind/src/css/main.css",
-    "out": "example-tailwind/dist/css/main.css",
+    "in": "src/css/main.css",
+    "out": "dist/css/main.css",
     "options": {
       "plugins": ["@tailwindcss/postcss"],
       "minify": true
     }
   },
   "markup": {
-    "in": "example-tailwind/src/markup",
-    "out": "example-tailwind/dist",
+    "in": "src/markup",
+    "out": "dist",
     "site": {
       "title": "Poops + Tailwind",
       "description": "A Tailwind CSS example for Poops"
     },
     "includePaths": ["_layouts", "_partials"]
   },
-  "serve": { "port": 4041, "base": "/example-tailwind/dist" },
+  "serve": { "port": 4040, "base": "/dist" },
   "livereload": true,
-  "watch": ["example-tailwind/src"]
+  "watch": ["src"]
 }
 ```
 

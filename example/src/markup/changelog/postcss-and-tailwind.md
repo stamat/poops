@@ -29,7 +29,19 @@ Add a `postcss` entry to your `poops.json`:
       "plugins": ["@tailwindcss/postcss"],
       "minify": true
     }
-  }
+  },
+  "markup": {
+    "in": "src/markup",
+    "out": "dist",
+    "site": {
+      "title": "Poops + Tailwind",
+      "description": "A Tailwind CSS example for Poops"
+    },
+    "includePaths": ["_layouts", "_partials"]
+  },
+  "serve": { "port": 4040, "base": "/dist" },
+  "livereload": true,
+  "watch": ["src"]
 }
 ```
 
@@ -80,11 +92,3 @@ The Sass and PostCSS pipelines are independent. If you want both, keep them writ
 ```
 
 If you want PostCSS to post-process Sass output (e.g. add vendor prefixes with Autoprefixer), point `postcss.in` to the Sass output file and `postcss.out` to a different path — so the original Sass output is preserved for re-processing on subsequent builds.
-
-### Try it
-
-A working Tailwind example is included in the repo:
-
-```bash
-node poops.js -c example-tailwind/poops.json
-```
