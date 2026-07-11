@@ -35,8 +35,8 @@ setup.
 
 Each entry has `in`, `out` and `options`:
 
-- **`in`** — entry file (use one file per entry).
-- **`out`** — output file.
+- **`in`** — an entry file, an array of entry files, or a [glob pattern](#globs-and-multiple-entry-files).
+- **`out`** — the output file, or a directory when `in` has multiple entries.
 - **`options`** — mostly passed straight through to esbuild.
 
 ### Options
@@ -68,6 +68,32 @@ Pass an array to bundle several entries:
   ]
 }
 ```
+
+## Globs and multiple entry files
+
+`in` also accepts a glob pattern or an array of entry files — each becomes its own bundle,
+handy for per-page scripts or theme sections:
+
+```json
+{
+  "scripts": [
+    { "in": "src/js/pages/*.js", "out": "dist/js/",
+      "options": { "minify": true, "format": "iife" } }
+  ]
+}
+```
+
+Arrays and globs mix freely:
+
+```json
+{ "in": ["src/js/main.ts", "src/js/pages/*.ts"], "out": "dist/js/" }
+```
+
+> [!NOTE]
+> With more than one entry file, `out` must be a directory. Entry points from different
+> directories nest their output under their common ancestor — `src/js/a/main.js` and
+> `src/js/b/main.js` become `dist/js/a/main.js` and `dist/js/b/main.js`, so same-named
+> entries never collide. Glob patterns always use `/` as the separator, even on Windows.
 
 ## Maintaining a JS library
 
