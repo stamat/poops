@@ -24,6 +24,37 @@ Intuitive with a minimal learning curve and minimal docs, utilizing the most eff
 
 It uses a simple config file where you define your input and output paths and it poops out your bundled files. Simple as that.
 
+## Table of Contents
+
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+  - [Scripts](#scripts)
+    - [JSX/TSX (React) Example](#jsxtsx-react-example)
+  - [Reactor (React Pre-rendering)](#reactor-react-pre-rendering)
+  - [Styles](#styles)
+    - [Design Tokens](#design-tokens)
+  - [PostCSS (optional)](#postcss-optional)
+    - [Tailwind CSS Example](#tailwind-css-example)
+  - [Markups](#markups)
+    - [Nunjucks vs Liquid](#nunjucks-vs-liquid)
+    - [Custom Engines](#custom-engines)
+    - [Collections & Pagination](#collections--pagination)
+    - [Custom Tags](#custom-tags)
+      - [image](#image)
+      - [googleFonts](#googlefonts)
+      - [highlight](#highlight)
+    - [Custom Filters](#custom-filters)
+    - [Search Index, Sitemap & Navigation](#search-index-sitemap--navigation)
+  - [Images (optional)](#images-optional)
+  - [Copy](#copy)
+  - [Banner (optional)](#banner-optional)
+  - [Local Server (optional)](#local-server-optional)
+  - [Live Reload (optional)](#live-reload-optional)
+  - [Watch (optional)](#watch-optional)
+  - [Include Paths (optional)](#include-paths-optional)
+- [Why?](#why)
+
 ## Features
 
 - Bundles SCSS/SASS to CSS
