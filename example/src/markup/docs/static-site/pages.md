@@ -4,7 +4,8 @@ title: Building pages
 navTitle: Building pages
 description: Layouts, partials, front matter and Markdown — the building blocks of every Poops page.
 order: 1
-keywords: ["pages", "layout", "partials", "front matter", "markdown", "includes"]
+keywords:
+  ["pages", "layout", "partials", "front matter", "markdown", "includes"]
 ---
 
 # Building pages
@@ -107,7 +108,7 @@ expressions work inside Markdown too. Fenced code blocks are **syntax-highlighte
 
 ````markdown
 ```js
-const greet = (name) => `Hello, ${name}!`
+const greet = (name) => `Hello, ${name}!`;
 ```
 ````
 
@@ -118,14 +119,20 @@ const greet = (name) => `Hello, ${name}!`
 
 ## Useful filters
 
-Poops adds template filters usable in both engines — `slugify`, `markdown`, `date`, `jsonify`,
-`svg`, `highlight`, `groupby`, the array helpers `concat` (returns a new array with the value
-appended) and `push` (appends in place), and the image helpers `srcset`, `exif`, `images`:
+Poops adds template filters usable in both engines — `slugify`, `markdown`, `toc`, `date`,
+`jsonify`, `svg`, `highlight`, `groupby`, the array helpers `concat` (returns a new array with the
+value appended) and `push` (appends in place), and the image helpers `srcset`, `exif`, `images`:
 
 ```nunjucks
 {% raw %}<h1>{{ page.title }}</h1>
 <time>{{ page.date | date("MMMM D, YYYY") }}</time>
 {{ "src/icons/logo.svg" | svg }}{% endraw %}
+```
+
+For markdown source, run `markdown` before `toc` so code-fence content doesn't get misread as headings:
+
+```nunjucks
+{% raw %}{{ page.content | markdown | toc }}{% endraw %}
 ```
 
 Next: [Images & galleries](images-gallery).
