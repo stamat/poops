@@ -115,6 +115,20 @@ An array of paths to watch; changes rebuild the affected pipeline:
 }
 ```
 
+Set it to `true` to derive the list automatically from every task's `in` path
+(file entries like a script/style bundle collapse to their parent dir so
+sibling imports still trigger a rebuild):
+
+```json
+{
+  "watch": true
+}
+```
+
+This covers sources that live under a task's own directory. Imports that reach
+*outside* it — a shared folder above the entry, `node_modules` — aren't watched;
+use an explicit array for those.
+
 ## `includePaths`
 
 Paths to resolve imports from (Sass `@use`, script imports). `node_modules` is the default —

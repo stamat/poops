@@ -3,7 +3,7 @@
 import chokidar from 'chokidar'
 import connect from 'connect'
 import Copy from './lib/copy.js'
-import { pathExists, doesFileBelongToPath, pathContainsPathSegment } from './lib/utils/helpers.js'
+import { pathExists, doesFileBelongToPath, pathContainsPathSegment, deriveWatchDirs } from './lib/utils/helpers.js'
 import http from 'node:http'
 import os from 'node:os'
 import fs from 'node:fs'
@@ -249,7 +249,9 @@ if (!pathExists(configPath)) {
 // Load poops.json
 const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
 
-if (config.watch) {
+if (config.watch === true) {
+  config.watch = deriveWatchDirs(config)
+} else if (config.watch) {
   config.watch = Array.isArray(config.watch) ? config.watch : [config.watch]
 }
 
