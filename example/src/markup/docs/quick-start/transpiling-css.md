@@ -30,8 +30,8 @@ fastest, most up-to-date Sass implementation.
 }
 ```
 
-- **`in`** — a single `.scss`/`.sass` entry file.
-- **`out`** — the output CSS file.
+- **`in`** — a `.scss`/`.sass` entry file, an array of entry files, or a [glob pattern](#globs-and-multiple-entry-files).
+- **`out`** — the output CSS file, or a directory when `in` has multiple entries.
 
 ### Options
 
@@ -60,6 +60,32 @@ fastest, most up-to-date Sass implementation.
   ]
 }
 ```
+
+## Globs and multiple entry files
+
+`in` also accepts a glob pattern or an array of entry files — handy when every top-level
+stylesheet should become its own CSS file (theme sections, per-page styles, …):
+
+```json
+{
+  "styles": [
+    { "in": "src/scss/*.scss", "out": "dist/css/",
+      "options": { "minify": true } }
+  ]
+}
+```
+
+Each matched file compiles separately to `dist/css/<name>.css`. Sass partials (`_*.scss`) are
+skipped — they're imports, not entry points. Arrays and globs mix freely:
+
+```json
+{ "in": ["src/scss/main.scss", "src/scss/pages/*.scss"], "out": "dist/css/" }
+```
+
+> [!NOTE]
+> With more than one entry file, `out` must be a directory. Output names come from the input's
+> basename, so two entries named `main.scss` in different directories would overwrite each other.
+> Glob patterns always use `/` as the separator, even on Windows.
 
 ## Resolving imports
 
