@@ -308,8 +308,8 @@ Poops does not need `react` or `react-dom` as its own dependency — they are re
 
 Styles are bundled with [Dart Sass](https://sass-lang.com/dart-sass). You can specify multiple styles to bundle. Each style has the following properties:
 
-- `in` - the input path, accepts only a path to a file
-- `out` - the output path, can be a directory or a file path, but please just use it as a filename
+- `in` - the input path, can be a file path, an array of file paths, or a glob pattern (e.g. `"src/scss/*.scss"`). Globs must use `/` separators (even on Windows) and skip Sass partials (`_*.scss`). Each matched file is compiled separately
+- `out` - the output path, can be a directory or a file path. With multiple inputs it must be a directory file path, but please just use it as a filename
 - `options` - the options for the bundler.
 
 **Options:**
@@ -592,16 +592,26 @@ An engine class implements this contract (see [`lib/markup/engines/`](lib/markup
 
 ```js
 export default class MyEngine {
-  constructor(templatesDir, includePaths, options) {}      // options: { autoescape }
-  get fileExtension() { return '.liquid' }                 // native template extension
-  get indexableExtensions() { return new Set(['.html']) }  // extensions eligible for search index/nav
-  get markupExtensions() { return 'html|liquid|md' }       // glob alternation of processed extensions
+  constructor(templatesDir, includePaths, options) {} // options: { autoescape }
+  get fileExtension() {
+    return ".liquid";
+  } // native template extension
+  get indexableExtensions() {
+    return new Set([".html"]);
+  } // extensions eligible for search index/nav
+  get markupExtensions() {
+    return "html|liquid|md";
+  } // glob alternation of processed extensions
   registerFilters({ timeDateFormat, markupOut }) {}
   registerTags(getOutputDir) {}
   setGlobal(key, value) {}
   removeGlobal(key) {}
-  async render(templatePath, context) { return 'html' }    // templatePath is an absolute file path
-  async renderString(source, context) { return 'html' }
+  async render(templatePath, context) {
+    return "html";
+  } // templatePath is an absolute file path
+  async renderString(source, context) {
+    return "html";
+  }
 }
 ```
 
@@ -610,12 +620,12 @@ Optionally, an engine may implement `replaceOutExtensions(outputPath)` to contro
 The easiest starting point is extending a built-in engine — deep imports are intentionally supported for this:
 
 ```js
-import LiquidEngine from 'poops/lib/markup/engines/liquid.js'
+import LiquidEngine from "poops/lib/markup/engines/liquid.js";
 
 export default class MyEngine extends LiquidEngine {
   registerFilters(opts) {
-    super.registerFilters(opts)
-    this.engine.registerFilter('shout', (str) => String(str).toUpperCase())
+    super.registerFilters(opts);
+    this.engine.registerFilter("shout", (str) => String(str).toUpperCase());
   }
 }
 ```
@@ -1088,12 +1098,23 @@ The string shorthand sets the output filename. For docs sites, use the object fo
 
 ```json
 [
-  { "title": "Guide", "url": "guide", "order": 1, "children": [
-    { "title": "Getting Started", "url": "guide/getting-started", "order": 1 },
-    { "title": "Advanced", "url": "guide/advanced", "children": [
-      { "title": "Config", "url": "guide/advanced/config" }
-    ]}
-  ]}
+  {
+    "title": "Guide",
+    "url": "guide",
+    "order": 1,
+    "children": [
+      {
+        "title": "Getting Started",
+        "url": "guide/getting-started",
+        "order": 1
+      },
+      {
+        "title": "Advanced",
+        "url": "guide/advanced",
+        "children": [{ "title": "Config", "url": "guide/advanced/config" }]
+      }
+    ]
+  }
 ]
 ```
 
