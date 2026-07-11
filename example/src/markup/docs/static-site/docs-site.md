@@ -96,6 +96,12 @@ Poops parses GitHub-style alert blockquotes during markdown render (via
 > A blue "Info" callout.
 ```
 
+Include the default alert styles once:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked-github-alerts/styles.css">
+```
+
 They render as alert `<div>` blocks with type classes (`-tip`, `-warning`, etc.), so markdown
 inside the callout still works.
 
