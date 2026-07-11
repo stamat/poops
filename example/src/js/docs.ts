@@ -1,36 +1,5 @@
 // Poops docs client. Vanilla, no deps — bundled to IIFE by poops.
 
-type Kind = { cls: string; icon: string; label: string }
-
-const ADMONITIONS: Record<string, Kind> = {
-  NOTE: { cls: 'note', icon: '✎', label: 'Note' },
-  INFO: { cls: 'info', icon: 'ⓘ', label: 'Info' },
-  IMPORTANT: { cls: 'info', icon: 'ⓘ', label: 'Important' },
-  TIP: { cls: 'tip', icon: '☆', label: 'Tip' },
-  WARNING: { cls: 'warning', icon: '⚠', label: 'Warning' },
-  CAUTION: { cls: 'warning', icon: '⚠', label: 'Caution' }
-}
-
-// Turn GitHub-style `> [!TIP]` blockquotes into styled admonitions.
-function upgradeAdmonitions(): void {
-  document.querySelectorAll<HTMLElement>('.prose blockquote').forEach((bq) => {
-    const first = bq.firstElementChild as HTMLElement | null
-    if (!first) return
-    const m = first.innerHTML.match(/^\s*\[!(\w+)\]\s*(?:<br\s*\/?>)?\s*/i)
-    if (!m) return
-    const kind = ADMONITIONS[m[1].toUpperCase()]
-    if (!kind) return
-    first.innerHTML = first.innerHTML.slice(m[0].length)
-    if (!first.innerHTML.trim()) first.remove()
-    bq.className = 'admonition ' + kind.cls
-    const title = document.createElement('p')
-    title.className = 'admonition-title'
-    title.setAttribute('data-icon', kind.icon)
-    title.textContent = kind.label
-    bq.insertBefore(title, bq.firstChild)
-  })
-}
-
 // Add a copy button to every code block.
 function addCopyButtons(): void {
   document.querySelectorAll<HTMLPreElement>('.prose pre').forEach((pre) => {
@@ -116,7 +85,6 @@ const BASE = (document.currentScript as HTMLScriptElement | null)?.dataset.base 
 function boot(): void {
   const base = BASE
   markActiveNav()
-  upgradeAdmonitions()
   addCopyButtons()
   setupTheme()
   setupMobileNav()

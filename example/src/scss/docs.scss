@@ -296,7 +296,8 @@ a:hover { text-decoration: underline; }
 .copy-btn.copied { color: #2f9e44; border-color: #2f9e44; }
 
 // ---- Admonitions ----
-.admonition {
+.admonition,
+.marked-github-alert {
   --adm: var(--accent);
   margin: 0 0 1.25rem;
   border: 1px solid var(--adm);
@@ -304,9 +305,12 @@ a:hover { text-decoration: underline; }
   border-radius: var(--radius);
   padding: 0 !important;
 }
-.admonition p { padding: 0 1rem; }
-.admonition p:last-child { margin-bottom: 0.75rem; }
-.admonition-title {
+.admonition p,
+.marked-github-alert p { padding: 0 1rem; }
+.admonition p:last-child,
+.marked-github-alert p:last-child { margin-bottom: 0.75rem; }
+.admonition-title,
+.marked-github-alert-title {
   background: color-mix(in srgb, var(--adm) 7%, var(--bg));
   border-top-left-radius: var(--radius);
   border-top-right-radius: var(--radius);
@@ -321,10 +325,21 @@ a:hover { text-decoration: underline; }
   gap: 0.4rem;
 }
 .admonition-title::before { content: attr(data-icon); }
-.admonition.info    { --adm: #1c7ed6; }
-.admonition.tip     { --adm: #2f9e44; }
-.admonition.warning { --adm: #e8590c; }
-.admonition.note    { --adm: #7048e8; }
+.marked-github-alert-title svg {
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
+}
+.admonition.info,
+.marked-github-alert-info,
+.marked-github-alert-important { --adm: #1c7ed6; }
+.admonition.tip,
+.marked-github-alert-tip { --adm: #2f9e44; }
+.admonition.warning,
+.marked-github-alert-warning,
+.marked-github-alert-caution { --adm: #e8590c; }
+.admonition.note,
+.marked-github-alert-note { --adm: #7048e8; }
 
 // ---- Footer ----
 .page-footer {

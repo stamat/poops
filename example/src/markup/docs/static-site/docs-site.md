@@ -82,8 +82,8 @@ The tree is arbitrarily deep, so render it with a self-recursing macro. Prefix e
 
 ## Admonitions (info / tip / warning)
 
-Poops renders Markdown blockquotes to `<blockquote>`. This site adds ~15 lines of client JS that
-upgrade GitHub-style alert blockquotes into coloured callouts. Author them as:
+Poops parses GitHub-style alert blockquotes during markdown render (via
+`marked-github-alerts`). Author them as:
 
 ```markdown
 > [!TIP]
@@ -96,9 +96,8 @@ upgrade GitHub-style alert blockquotes into coloured callouts. Author them as:
 > A blue "Info" callout.
 ```
 
-The JS finds each blockquote whose first line is `[!TYPE]`, strips the marker, and adds a class +
-title. Because the inner content is already parsed Markdown, links and formatting inside the
-callout work.
+They render as alert `<div>` blocks with type classes (`-tip`, `-warning`, etc.), so markdown
+inside the callout still works.
 
 ## Copy buttons on code
 
