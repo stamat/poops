@@ -797,11 +797,25 @@ Output:
 - Defaults: `sizes="100vw"`, `loading="lazy"`
 - Falls back to a plain `<img src="...">` if no variants are found
 
+**Named crops with `size`** — pass a `size` kwarg to build the `<img>` from a named crop/resize group instead of the default responsive widths. The whole group becomes its own srcset (each crop has its own aspect ratio), so a square thumbnail set, a wide banner set, etc. each get correct `srcset`/`width`/`height`:
+
+```nunjucks
+{% image 'static/photo.jpg', size='thumb', alt='', sizes='240px' %}
+```
+
+```html
+<img src="static/photo-thumb-480w.webp"
+     srcset="static/photo-thumb-480w.webp 480w, static/photo-thumb.webp 960w"
+     width="480" height="480" sizes="240px" alt="" loading="lazy">
+```
+
+This requires the [poops-images](https://github.com/stamat/poops-images) compile cache (named-size widths are read from it). The `size` name matches a named entry in your `images.sizes` config. The largest member of the group is written without a width suffix (`photo-thumb.webp`) — poops still srcsets it at its real width from the cache.
+
 **[poops-images](https://github.com/stamat/poops-images) integration:** if a `.poops-images-cache.json` compile cache is found in the output directory (poops-images writes one next to the images it generates), Poops reads variants from it instead of scanning the directory. On top of the scan behavior above, the cache gives you:
 
 - `width` and `height` attributes on the `<img>` element (exact dimensions from the cache — prevents layout shift). Pass your own `width`/`height` kwargs to override.
 - Correct `src` when the source format was converted (e.g. `photo.heic` → `photo.jpg`), even when there are no size variants.
-- Named sizes (`photo-thumb-200w.jpg`) and preprocessed outputs (`photo-blurred-640w.jpg`) are kept out of the srcset — they are crops and effects with their own aspect ratios. Only plain `{name}-{width}w.{ext}` variants (from the poops-images `widths` option) are used.
+- By default the srcset is built only from the plain `{name}-{width}w.{ext}` width variants. Named sizes (`photo-thumb-480w.webp`) and preprocessed outputs (`photo-blurred-640w.jpg`) are kept out of it — they are crops and effects with their own aspect ratios. Reach a named crop group on purpose with the `size` kwarg above (or the `srcset` filter's second argument).
 - EXIF metadata via the `exif` filter (see below).
 
 ##### googleFonts
@@ -945,6 +959,8 @@ All filters are available in both engines. The only syntax difference is how arg
 
 Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo-960w.webp 960w`
 
+  Pass a named crop/resize group as the second argument to get that group's srcset instead of the default widths: `{{ 'static/photo.jpg' | srcset: 'thumb' }}` → `static/photo-thumb-480w.webp 480w, static/photo-thumb.webp 960w`.
+
 - `exif` — returns the EXIF metadata object for an image from the [poops-images](https://github.com/stamat/poops-images) compile cache (`.poops-images-cache.json` in the output directory), or `null` if there is no cache or no EXIF data. The object includes camera (`make`, `model`, `lensModel`), exposure (`fNumber`, `exposure.formatted`, `iso`, `focalLength35mm`), `dateTime`, and `gps` (`latitude.formatted`, `longitude.formatted`, `altitude`, and a ready-made `googleMapsUrl`).
 
   Example — a photo with date and location caption:
@@ -969,19 +985,21 @@ Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo
   - `path` — site-relative source path, feeds straight into the `{% image %}` tag
   - `date` — `exif.dateTime` when the photo has EXIF, file modification time otherwise — so sorting and grouping work for every image
   - `outputs` — every generated file for the image (site-relative), useful for picking LQIP or preprocessed variants
-  - Pass a subdirectory (`'images/2025'`) to scope the list
+  - Pass a subdirectory (`'static/images/2025'`) to scope the list
 
-  Combined with `groupby`, engine-native sorting and the `{% image %}` tag, a photo gallery is a pure template concern:
+  **The path is relative to your markup `out` dir, not to `images.in`.** It mirrors where the generated images land — i.e. `images.out` made relative to markup `out`. So if `images.out` is `_site/static/images` and markup `out` is `_site`, the images live at `static/images` on the site and you call `'static/images' | images` (**not** `'images'`, which would look in `_site/images` and return `[]`). This is the same path you already pass to the `{% image %}` tag.
+
+  Combined with `groupby`, engine-native sorting and the `{% image %}` tag, a photo gallery is a pure template concern. This is the Instagram-style square grid — `size='thumb'` pulls the named crop group and its auto-generated srcset (define a `thumb` crop in `images.sizes`):
 
   Nunjucks:
 
   ```nunjucks
-  {% for group in 'images' | images | sort(reverse=true, attribute='date') | groupby("date", "year") %}
+  {% for group in 'static/images' | images | sort(reverse=true, attribute='date') | groupby("date", "year") %}
     <h2>{{ group.key }}</h2>
     <div class="grid">
       {% for img in group.items %}
         <figure>
-          {% image img.path, alt='', sizes='(max-width: 640px) 50vw, 25vw' %}
+          {% image img.path, size='thumb', alt='', sizes='(max-width: 640px) 50vw, 240px' %}
           {% if img.exif and img.exif.gps %}
             <figcaption>
               <a href="{{ img.exif.gps.googleMapsUrl }}">📍</a> {{ img.date | date("MMM D, YYYY") }}
@@ -996,13 +1014,13 @@ Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo
   Liquid:
 
   ```liquid
-  {% assign imgs = 'images' | images | sort: 'date' | reverse %}
+  {% assign imgs = 'static/images' | images | sort: 'date' | reverse %}
   {% assign groups = imgs | groupby: "date", "year" %}
   {% for group in groups %}
     <h2>{{ group.key }}</h2>
     <div class="grid">
       {% for img in group.items %}
-        <figure>{% image img.path, alt: '' %}</figure>
+        <figure>{% image img.path, size: 'thumb', alt: '' %}</figure>
       {% endfor %}
     </div>
   {% endfor %}
