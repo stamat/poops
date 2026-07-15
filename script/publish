@@ -87,17 +87,27 @@ async function runFile(cmd, args, exitOnError = true) {
   }
 }
 
+async function commit(message) {
+  const nothingStaged = await new Promise((resolve) =>
+    exec('git diff --cached --quiet', (err) => resolve(!err)))
+  if (nothingStaged) {
+    console.log(`Nothing staged, skipping commit: ${message}`)
+    return
+  }
+  await run(`git commit -m "${message}"`)
+}
+
 async function publish(version) {
   packageJson.version = version
   fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2) + '\n')
 
   await run('git add package.json')
-  await run(`git commit -m "Bump version to ${version}"`)
+  await commit(`Bump version to ${version}`)
 
   if (fs.existsSync(path.join(process.cwd(), 'script/build'))) {
     await run('script/build')
     await run('git add .')
-    await run(`git commit -m "Build version ${version}"`)
+    await commit(`Build version ${version}`)
   }
 
   await run(`git tag v${version}`)
