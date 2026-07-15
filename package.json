@@ -34,8 +34,8 @@
     "static-site-generator"
   ],
   "peerDependencies": {
-    "postcss": "^8.0.0",
-    "poops-images": ">=1.2.1"
+    "poops-images": ">=1.2.1",
+    "postcss": "^8.0.0"
   },
   "peerDependenciesMeta": {
     "postcss": {
@@ -61,9 +61,10 @@
     "highlight.js": "^11.11.1",
     "liquidjs": "^10.24.0",
     "livereload": "^0.9.3",
-    "marked": "^9.0.3",
+    "marked": "^18.0.6",
     "marked-github-alerts": "^1.0.1",
     "marked-github-emoji": "^1.0.2",
+    "marked-github-footnote": "^1.0.0",
     "nunjucks": "^3.2.4",
     "portscanner": "^2.2.0",
     "printstyle": "^1.0.0",
