@@ -9,10 +9,145 @@ keywords: ["config", "reference", "copy", "banner", "serve", "livereload", "watc
 
 # Configuration reference
 
-The pipeline keys have their own guides — [`scripts`](quick-start/transpiling-js),
-[`styles`](quick-start/transpiling-css), [`postcss`](quick-start/postcss-tailwind),
-[`markup`](quick-start/templating-html), [`reactor`](quick-start/react) and
-[`images`](static-site/images-gallery). This page covers everything else in `poops.json`.
+Every `poops.json` key, with a short explanation and example. The pipeline keys
+(`scripts`, `styles`, `postcss`, `markup`, `reactor`, `images`) each link to a full guide for the
+deep dive; everything else is documented in full on this page.
+
+## Every key
+
+| Key | Purpose | Documented in |
+| --- | --- | --- |
+| `scripts` | Bundle / transpile JS & TS (esbuild) | [↓](#scripts) |
+| `styles` | Compile Sass / CSS | [↓](#styles) |
+| `postcss` | PostCSS / Tailwind pass over compiled CSS | [↓](#postcss) |
+| `reactor` | Render React components to static HTML | [↓](#reactor) |
+| `images` | Responsive image processing | [↓](#images) |
+| `markup` | Templates → static site | [↓](#markup) |
+| `markup.searchIndex` | JSON search index of every page | [↓](#markup-searchindex) |
+| `markup.sitemap` | `sitemap.xml` generation | [↓](#markup-sitemap) |
+| `markup.nav` | Navigation-tree data | [↓](#markup-nav) |
+| `copy` | Copy static assets into the output | [↓](#copy) |
+| `banner` | Comment stamped on every output file | [↓](#banner) |
+| `serve` | Local dev server | [↓](#serve) |
+| `livereload` | Reload the browser on changes | [↓](#livereload) |
+| `watch` | Paths to watch (or `true` to auto-derive) | [↓](#watch) |
+| `includePaths` | Import-resolution roots (Sass `@use`, JS imports) | [↓](#includepaths) |
+
+The remaining `markup` sub-keys — `in`, `out`, `engine`, `site`, `data`, `includePaths`,
+`timeDateFormat`, `collections`, `baseURL`, `autoescape` — are covered in
+[Templating HTML](quick-start/templating-html). `ssg` is a backwards-compatible alias for `reactor`.
+
+## `scripts`
+
+Bundles and transpiles JavaScript / TypeScript with [esbuild](https://esbuild.github.io/). A single
+`{ in, out }` object or an array of them; `in` accepts a path, an array of paths, or globs. Per-entry
+`options` cover `sourcemap`, `minify`, `justMinified`, `format` and `target`.
+
+```json
+{
+  "scripts": {
+    "in": "src/js/main.ts",
+    "out": "dist/js/app.js",
+    "options": { "sourcemap": true, "minify": true, "format": "iife", "target": "es2019" }
+  }
+}
+```
+
+Full guide: [Transpiling JS](quick-start/transpiling-js).
+
+## `styles`
+
+Compiles Sass/SCSS (and plain CSS) to CSS. Same `{ in, out, options }` shape as `scripts`; `options`
+adds `tokenPaths` for design-token inputs. Pair it with [`postcss`](#postcss) for Autoprefixer or
+Tailwind.
+
+```json
+{
+  "styles": {
+    "in": "src/scss/index.scss",
+    "out": "dist/css/app.css",
+    "options": { "sourcemap": true, "minify": true }
+  }
+}
+```
+
+Full guide: [Transpiling CSS](quick-start/transpiling-css).
+
+## `postcss`
+
+Runs a [PostCSS](https://postcss.org/) pipeline — separate from the Sass `styles` step — for
+[Tailwind](https://tailwindcss.com/), Autoprefixer or any PostCSS plugin. `options.plugins` lists the
+plugins to load. Accepts one entry or an array. Needs `postcss` installed (`npm i -D postcss`).
+
+```json
+{
+  "postcss": {
+    "in": "src/css/main.css",
+    "out": "dist/css/main.css",
+    "options": { "plugins": ["@tailwindcss/postcss"], "minify": true }
+  }
+}
+```
+
+Full guide: [PostCSS & Tailwind](quick-start/postcss-tailwind).
+
+## `markup`
+
+Turns a directory of templates (Nunjucks or Liquid, plus Markdown) into a static site. Sub-keys:
+`in`, `out`, `engine`, `site`, `data`, `includePaths`, `timeDateFormat`, `collections`, `baseURL`,
+`autoescape`, plus [`searchIndex`](#markup-searchindex), [`sitemap`](#markup-sitemap) and
+[`nav`](#markup-nav) below.
+
+```json
+{
+  "markup": {
+    "engine": "nunjucks",
+    "in": "src/markup",
+    "out": "dist",
+    "site": { "title": "My Site", "description": "Built with Poops." }
+  }
+}
+```
+
+Full guide: [Templating HTML](quick-start/templating-html).
+
+## `reactor`
+
+Renders React components to static HTML at build time and emits a hydration bundle. `component` is
+the component rendered to markup, `inject` names the global the HTML is exposed as, and `in`/`out`
+are the client hydration entry/bundle.
+
+```json
+{
+  "reactor": {
+    "component": "src/js/App.jsx",
+    "inject": "app_html",
+    "in": "src/js/app-hydrate.jsx",
+    "out": "dist/js/app-hydrate.js"
+  }
+}
+```
+
+Full guide: [React](quick-start/react).
+
+## `images`
+
+Responsive image processing — resize, convert (WebP/AVIF), crop and read EXIF — via
+[poops-images](https://github.com/stamat/poops-images). `sizes` is the responsive ladder plus any
+named crops; `format` lists output formats.
+
+```json
+{
+  "images": {
+    "in": "src/images",
+    "out": "dist/images",
+    "sizes": [{ "width": 640 }, { "width": 1280 }, { "name": "thumb", "width": 200, "height": 200, "crop": true }],
+    "format": ["webp"]
+  }
+}
+```
+
+Full guide: [Images & galleries](static-site/images-gallery).
 
 ## `copy`
 

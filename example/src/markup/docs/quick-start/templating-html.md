@@ -57,6 +57,89 @@ The body is rendered by the engine (and Markdown, for `.md`), then wrapped in th
 > depth. Prefix asset and link URLs with it and your site works from any subdirectory or even
 > `file://`.
 
+## Markdown
+
+`.md` files are rendered to HTML before the engine wraps them in a layout, so a page can be pure
+Markdown with front matter — Jekyll-style. The same renderer powers the `markdown` filter, so inline
+Markdown in a template produces identical output.
+
+### GitHub Flavored Markdown (GFM)
+
+Poops renders [GFM](https://github.github.com/gfm/) plus a few GitHub extras — the Markdown you
+already write in a repo README works here:
+
+| Feature | Syntax |
+| --- | --- |
+| Tables | `\| a \| b \|` with a `\| --- \| --- \|` divider row |
+| Task lists | `- [ ] todo` / `- [x] done` |
+| Strikethrough | `~~gone~~` |
+| Autolinks | a bare `https://…` URL becomes a link |
+| Emoji shortcodes | `:rocket:` → 🚀 |
+| Footnotes | `text[^1]` with a `[^1]: note` definition |
+| Alerts | `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`, `[!INFO]` |
+
+Alerts render as styled callout blocks (`[!INFO]` is a Poops-added variant — the others are
+GitHub's). Every heading also gets a slug `id` and an empty permalink anchor (`.heading-anchor`), so
+table-of-contents generation and in-page links work with no extra markup.
+
+> [!NOTE]
+> To show a template tag literally inside a fenced code block, wrap the sample in a `raw` block so
+> the engine prints it verbatim instead of evaluating it.
+
+### Syntax highlighting
+
+Fenced code blocks are highlighted at **build time** with
+[highlight.js](https://highlightjs.org/) — no client-side script, no theme JS. Tag the fence with a
+language; an unknown or missing language falls back to auto-detection. Registered languages (with
+aliases):
+
+| Language | Fence tags |
+| --- | --- |
+| JavaScript | `javascript`, `js` |
+| TypeScript | `typescript`, `ts` |
+| CSS | `css` |
+| Sass (SCSS) | `scss` |
+| HTML / XML | `html`, `xml` |
+| JSON | `json` |
+| Bash | `bash`, `sh` |
+| Shell session | `shell` |
+| Python | `python`, `py` |
+| Ruby | `ruby`, `rb` |
+| PHP | `php` |
+| Java | `java` |
+| C | `c` |
+| C++ | `cpp` |
+| C# | `csharp`, `cs` |
+| Go | `go` |
+| Rust | `rust`, `rs` |
+| YAML | `yaml`, `yml` |
+| Markdown | `markdown`, `md` |
+| SQL | `sql` |
+| Diff | `diff` |
+
+The output carries `hljs` and `language-{tag}` classes on the `<code>` element — pair it with any
+highlight.js stylesheet for colors. Tag a fence with a language:
+
+````markdown
+```javascript
+export function greet(name) {
+  const msg = `Hello, ${name}!`
+  console.log(msg)
+  return msg
+}
+```
+````
+
+…and it renders highlighted at build time:
+
+```javascript
+export function greet(name) {
+  const msg = `Hello, ${name}!`
+  console.log(msg)
+  return msg
+}
+```
+
 ## Nunjucks (default)
 
 [Nunjucks](https://mozilla.github.io/nunjucks/) is Mozilla's Jinja2-inspired engine. A layout

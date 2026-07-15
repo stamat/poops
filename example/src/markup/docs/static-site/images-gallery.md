@@ -79,22 +79,22 @@ For `photo.jpg` that writes `photo-640w.webp` and `photo-1280w.webp` (the respon
 
 The plain-width variants feed the responsive `srcset` automatically; named crops (and preprocessed
 variants like `photo-blurred-640w.webp`) are deliberately kept out of it — they have their own
-aspect ratios. To emit one, point `{% raw %}{% image %}{% endraw %}` at the base name **plus the
-size name, without the width** — Poops discovers the actual output file, so soft crops (no fixed
-height) resolve too:
+aspect ratios. To emit one, pass the size name as the **`size` kwarg** — Poops pulls that whole
+crop group from the compile cache and builds its own srcset, so soft crops (no fixed height)
+resolve too (needs [poops-images](https://github.com/stamat/poops-images) ≥ 1.2.1):
 
 ```nunjucks
 {% raw %}{# responsive: uses the -640w / -1280w ladder #}
 {% image 'images/photo.jpg', alt='Hero', sizes='100vw' %}
 
 {# just the 200×200 thumb crop #}
-{% image 'images/photo-thumb.jpg', alt='' %}
+{% image 'images/photo.jpg', size='thumb', alt='', sizes='200px' %}
 
 {# just the hero banner crop #}
-{% image 'images/photo-hero.jpg', alt='' %}{% endraw %}
+{% image 'images/photo.jpg', size='hero', alt='' %}{% endraw %}
 ```
 
-Each named reference resolves to that one crop, e.g. `<img src="images/photo-thumb-200w.webp" …>`.
+Each named reference resolves to that crop group, e.g. `<img src="images/photo-thumb-200w.webp" …>`.
 
 ## A photo gallery
 
