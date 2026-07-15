@@ -55,31 +55,28 @@ async function resolveLiveReloadPort(config) {
   config.livereload_port = liveReloadPort
 }
 
+// The livereload server never fs-watches: watching the project meant every
+// output file written during a build fired its own reload (dozens of browser
+// flickers per build, some mid-write). Instead the rebuild chains in
+// setupWatchers call reload() once their compile settles; the debounce folds
+// the several module compiles one save triggers into a single refresh.
+// 500ms: long enough to fold cascaded chains — a style/script compile writes
+// into a watched copy source (Shopify theme assets/), whose chokidar event
+// (awaitWriteFinish 150ms) triggers the copy-to-dist chain ~300-400ms after
+// the first chain's reload. One save = one refresh, after dist is current.
+let liveReloadServer = null
+let reloadTimer = null
+function reload() {
+  if (!liveReloadServer) return
+  clearTimeout(reloadTimer)
+  reloadTimer = setTimeout(() => liveReloadServer.refresh('/'), 500)
+}
+
 function setupLiveReloadServer(config) {
-  if (!config.livereload) return null
-  const liveReloadExcludes = ['.git', '.svn', '.hg']
-
-  if (config.watch) {
-    liveReloadExcludes.push(...config.watch)
-  }
-
-  if (config.includePaths) {
-    liveReloadExcludes.push(...config.includePaths)
-  }
-
-  if (config.livereload.exclude) {
-    liveReloadExcludes.push(...config.livereload.exclude)
-  }
-
-  const liveReloadServer = livereload.createServer({
-    exclusions: [...new Set(liveReloadExcludes)],
-    port: config.livereload_port,
-    exts: config.livereload.exts, // replaces the default watched extensions
-    extraExts: config.livereload.extraExts // adds to the defaults
-  })
+  if (!config.livereload) return
+  liveReloadServer = livereload.createServer({ port: config.livereload_port })
   styledLog(`🔃 {dim}LiveReload  :{/} ${liveReloadServer.config.port}`)
   console.log()
-  liveReloadServer.watch(cwd)
 }
 
 function setupWatchers(config, modules) {
@@ -106,26 +103,26 @@ function setupWatchers(config, modules) {
 
   const rebuild = (file) => {
     if (/(\.m?jsx?|\.tsx?)$/i.test(file) && !isBuildOutput(file)) {
-      modules.scripts.compile().catch(err => console.error(err))
+      modules.scripts.compile().then(() => reload()).catch(err => console.error(err))
 
       if (modules.reactor.belongsToReactor(file)) {
         modules.reactor.compile().then(() => {
           if (modules.reactor.renderedChanged) {
             config.reactorData = modules.reactor.getRendered()
-            modules.markups.compile().then(() => modules.postcss.compile()).catch(err => console.error(err))
+            modules.markups.compile().then(() => modules.postcss.compile()).then(() => reload()).catch(err => console.error(err))
           }
         }).catch(err => console.error(err))
       }
     }
     if (/(\.sass|\.scss|\.css)$/i.test(file) && !isBuildOutput(file)) {
-      modules.styles.compile().then(() => modules.postcss.compile()).catch(err => console.error(err))
+      modules.styles.compile().then(() => modules.postcss.compile()).then(() => reload()).catch(err => console.error(err))
     }
     if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.liquid|\.md)$/i.test(file)) {
-      modules.markups.compile().then(() => modules.postcss.compile()).catch(err => console.error(err))
+      modules.markups.compile().then(() => modules.postcss.compile()).then(() => reload()).catch(err => console.error(err))
     }
 
     if (/(\.json|\.ya?ml)$/i.test(file)) {
-      modules.markups.reloadDataFiles().then(() => modules.markups.compile()).catch(err => console.error(err))
+      modules.markups.reloadDataFiles().then(() => modules.markups.compile()).then(() => reload()).catch(err => console.error(err))
     }
   }
 
@@ -141,9 +138,10 @@ function setupWatchers(config, modules) {
       modules.images.compile()
         .then(() => modules.markups.compile())
         .then(() => modules.postcss.compile())
+        .then(() => reload())
         .catch(err => console.error(err))
     }
-    doesFileBelongToPath(file, config.copy) && modules.copy.execute().catch(err => console.error(err))
+    doesFileBelongToPath(file, config.copy) && modules.copy.execute().then(() => reload()).catch(err => console.error(err))
   }
 
   // Atomic-save editors (rename-write) fire unlink+add for every save, so an
@@ -169,6 +167,7 @@ function setupWatchers(config, modules) {
       modules.images.remove(file)
         .then(() => modules.markups.compile())
         .then(() => modules.postcss.compile())
+        .then(() => reload())
         .catch(err => console.error(err))
     }
     rebuild(file)
@@ -178,7 +177,7 @@ function setupWatchers(config, modules) {
   const handleDeletedDir = (dirPath) => {
     modules.markups.removeOutput(dirPath)
     if (doesFileBelongToPath(dirPath, config.markup)) {
-      modules.markups.compile().then(() => modules.postcss.compile()).catch(err => console.error(err))
+      modules.markups.compile().then(() => modules.postcss.compile()).then(() => reload()).catch(err => console.error(err))
     }
     modules.copy.unlink(dirPath, doesFileBelongToPath(dirPath, config.copy))
   }
