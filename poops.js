@@ -64,12 +64,38 @@ async function resolveLiveReloadPort(config) {
 // into a watched copy source (Shopify theme assets/), whose chokidar event
 // (awaitWriteFinish 150ms) triggers the copy-to-dist chain ~300-400ms after
 // the first chain's reload. One save = one refresh, after dist is current.
+//
+// reload(file) collects paths over the debounce window. If everything in the
+// window is .css, each path is sent so the livereload client hot-swaps
+// stylesheets in place (no page reload, styles update without flicker);
+// anything else escalates to one full '/' refresh.
 let liveReloadServer = null
 let reloadTimer = null
-function reload() {
+const reloadPaths = new Set()
+function reload(file) {
   if (!liveReloadServer) return
+  reloadPaths.add(file || '/')
   clearTimeout(reloadTimer)
-  reloadTimer = setTimeout(() => liveReloadServer.refresh('/'), 500)
+  reloadTimer = setTimeout(() => {
+    const paths = [...reloadPaths]
+    reloadPaths.clear()
+    if (paths.every((p) => p.endsWith('.css'))) {
+      paths.forEach((p) => liveReloadServer.refresh(p))
+    } else {
+      liveReloadServer.refresh('/')
+    }
+  }, 500)
+}
+
+// The css output paths of the styles entries — what the styles chain reports
+// to reload() so style edits hot-swap. A directory `out` maps to the entry
+// point's basename, mirroring how the styles compiler names its output file.
+function styleOutputs(config) {
+  return [config.styles].flat()
+    .filter((entry) => entry && entry.in && entry.out)
+    .map((entry) => (path.extname(entry.out)
+      ? entry.out
+      : path.join(entry.out, path.basename(entry.in).replace(/\.(sass|scss)$/i, '.css'))))
 }
 
 function setupLiveReloadServer(config) {
@@ -115,7 +141,9 @@ function setupWatchers(config, modules) {
       }
     }
     if (/(\.sass|\.scss|\.css)$/i.test(file) && !isBuildOutput(file)) {
-      modules.styles.compile().then(() => modules.postcss.compile()).then(() => reload()).catch(err => console.error(err))
+      modules.styles.compile().then(() => modules.postcss.compile())
+        .then(() => styleOutputs(config).forEach((out) => reload(out)))
+        .catch(err => console.error(err))
     }
     if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.liquid|\.md)$/i.test(file)) {
       modules.markups.compile().then(() => modules.postcss.compile()).then(() => reload()).catch(err => console.error(err))
@@ -141,7 +169,11 @@ function setupWatchers(config, modules) {
         .then(() => reload())
         .catch(err => console.error(err))
     }
-    doesFileBelongToPath(file, config.copy) && modules.copy.execute().then(() => reload()).catch(err => console.error(err))
+    // A copied .css (e.g. the styles compiler's own output landing in a copy
+    // source) stays a hot-swap; any other copied file needs a full reload.
+    doesFileBelongToPath(file, config.copy) && modules.copy.execute()
+      .then(() => reload(/\.css$/i.test(file) ? file : undefined))
+      .catch(err => console.error(err))
   }
 
   // Atomic-save editors (rename-write) fire unlink+add for every save, so an
