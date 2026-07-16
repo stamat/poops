@@ -128,6 +128,9 @@ function setupWatchers(config, modules) {
   const isBuildOutput = (file) => outputZones.some((zone) => pathContainsPathSegment(file, zone))
 
   const rebuild = (file) => {
+    // Engines that keep compiled templates across compiles (nunjucks) drop
+    // exactly this file's entries; shared by change/add/unlink via rebuild.
+    modules.markups.invalidate(file)
     if (/(\.m?jsx?|\.tsx?)$/i.test(file) && !isBuildOutput(file)) {
       modules.scripts.compile().then(() => reload()).catch(err => console.error(err))
 
@@ -207,6 +210,7 @@ function setupWatchers(config, modules) {
   }
 
   const handleDeletedDir = (dirPath) => {
+    modules.markups.invalidate(dirPath) // prefix match drops every template under it
     modules.markups.removeOutput(dirPath)
     if (doesFileBelongToPath(dirPath, config.markup)) {
       modules.markups.compile().then(() => modules.postcss.compile()).then(() => reload()).catch(err => console.error(err))
