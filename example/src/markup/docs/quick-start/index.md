@@ -3,7 +3,7 @@ layout: docs
 title: Quick Start
 navTitle: Quick Start
 description: The initial idea behind Poops and the structure of the poops.json config file.
-order: 1
+order: 2
 keywords: ["quick start", "config", "poops.json", "cli"]
 ---
 
@@ -38,13 +38,13 @@ Installed locally, use `npx` or a `package.json` script:
 
 ## CLI options
 
-| Flag | Short | Description |
-| --- | --- | --- |
-| `--build` | `-b` | Build once and exit (no watch/serve) |
-| `--config <path>` | `-c` | Use a specific config file |
-| `--port <number>` | `-p` | Server port, overrides config |
-| `--livereload-port <number>` | `-l` | LiveReload port, overrides config |
-| `--base-url <path>` | `-u` | Base URL prefix for markup, overrides config |
+| Flag                         | Short | Description                                  |
+| ---------------------------- | ----- | -------------------------------------------- |
+| `--build`                    | `-b`  | Build once and exit (no watch/serve)         |
+| `--config <path>`            | `-c`  | Use a specific config file                   |
+| `--port <number>`            | `-p`  | Server port, overrides config                |
+| `--livereload-port <number>` | `-l`  | LiveReload port, overrides config            |
+| `--base-url <path>`          | `-u`  | Base URL prefix for markup, overrides config |
 
 `--base-url` is the one you'll reach for in CI, where the deploy path differs per environment:
 
@@ -60,12 +60,18 @@ treat it as a menu.
 ```json
 {
   "scripts": [
-    { "in": "src/js/main.ts", "out": "dist/js/scripts.js",
-      "options": { "minify": true, "format": "iife", "target": "es2019" } }
+    {
+      "in": "src/js/main.ts",
+      "out": "dist/js/scripts.js",
+      "options": { "minify": true, "format": "iife", "target": "es2019" }
+    }
   ],
   "styles": [
-    { "in": "src/scss/index.scss", "out": "dist/css/styles.css",
-      "options": { "sourcemap": true, "minify": true } }
+    {
+      "in": "src/scss/index.scss",
+      "out": "dist/css/styles.css",
+      "options": { "sourcemap": true, "minify": true }
+    }
   ],
   "markup": {
     "in": "src/markup",

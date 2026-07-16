@@ -3,8 +3,21 @@ layout: docs
 title: Configuration reference
 navTitle: Config reference
 description: Every poops.json key that isn't a pipeline guide of its own — copy, banner, serve, livereload, watch, includePaths, search index, sitemap and nav options.
-order: 4
-keywords: ["config", "reference", "copy", "banner", "serve", "livereload", "watch", "includePaths", "searchIndex", "sitemap", "nav"]
+order: 1
+keywords:
+  [
+    "config",
+    "reference",
+    "copy",
+    "banner",
+    "serve",
+    "livereload",
+    "watch",
+    "includePaths",
+    "searchIndex",
+    "sitemap",
+    "nav",
+  ]
 ---
 
 # Configuration reference
@@ -13,25 +26,25 @@ Every `poops.json` key, with a short explanation and example. The pipeline keys
 (`scripts`, `styles`, `postcss`, `markup`, `reactor`, `images`) each link to a full guide for the
 deep dive; everything else is documented in full on this page.
 
-## Every key
+**Every key**
 
-| Key | Purpose | Documented in |
-| --- | --- | --- |
-| `scripts` | Bundle / transpile JS & TS (esbuild) | [↓](#scripts) |
-| `styles` | Compile Sass / CSS | [↓](#styles) |
-| `postcss` | PostCSS / Tailwind pass over compiled CSS | [↓](#postcss) |
-| `reactor` | Render React components to static HTML | [↓](#reactor) |
-| `images` | Responsive image processing | [↓](#images) |
-| `markup` | Templates → static site | [↓](#markup) |
-| `markup.searchIndex` | JSON search index of every page | [↓](#markup-searchindex) |
-| `markup.sitemap` | `sitemap.xml` generation | [↓](#markup-sitemap) |
-| `markup.nav` | Navigation-tree data | [↓](#markup-nav) |
-| `copy` | Copy static assets into the output | [↓](#copy) |
-| `banner` | Comment stamped on every output file | [↓](#banner) |
-| `serve` | Local dev server | [↓](#serve) |
-| `livereload` | Reload the browser on changes | [↓](#livereload) |
-| `watch` | Paths to watch (or `true` to auto-derive) | [↓](#watch) |
-| `includePaths` | Import-resolution roots (Sass `@use`, JS imports) | [↓](#includepaths) |
+| Key                  | Purpose                                           | Documented in            |
+| -------------------- | ------------------------------------------------- | ------------------------ |
+| `scripts`            | Bundle / transpile JS & TS (esbuild)              | [↓](#scripts)            |
+| `styles`             | Compile Sass / CSS                                | [↓](#styles)             |
+| `postcss`            | PostCSS / Tailwind pass over compiled CSS         | [↓](#postcss)            |
+| `reactor`            | Render React components to static HTML            | [↓](#reactor)            |
+| `images`             | Responsive image processing                       | [↓](#images)             |
+| `markup`             | Templates → static site                           | [↓](#markup)             |
+| `markup.searchIndex` | JSON search index of every page                   | [↓](#markup-searchindex) |
+| `markup.sitemap`     | `sitemap.xml` generation                          | [↓](#markup-sitemap)     |
+| `markup.nav`         | Navigation-tree data                              | [↓](#markup-nav)         |
+| `copy`               | Copy static assets into the output                | [↓](#copy)               |
+| `banner`             | Comment stamped on every output file              | [↓](#banner)             |
+| `serve`              | Local dev server                                  | [↓](#serve)              |
+| `livereload`         | Reload the browser on changes                     | [↓](#livereload)         |
+| `watch`              | Paths to watch (or `true` to auto-derive)         | [↓](#watch)              |
+| `includePaths`       | Import-resolution roots (Sass `@use`, JS imports) | [↓](#includepaths)       |
 
 The remaining `markup` sub-keys — `in`, `out`, `engine`, `site`, `data`, `includePaths`,
 `timeDateFormat`, `collections`, `baseURL`, `autoescape` — are covered in
@@ -48,7 +61,12 @@ Bundles and transpiles JavaScript / TypeScript with [esbuild](https://esbuild.gi
   "scripts": {
     "in": "src/js/main.ts",
     "out": "dist/js/app.js",
-    "options": { "sourcemap": true, "minify": true, "format": "iife", "target": "es2019" }
+    "options": {
+      "sourcemap": true,
+      "minify": true,
+      "format": "iife",
+      "target": "es2019"
+    }
   }
 }
 ```
@@ -141,7 +159,11 @@ named crops; `format` lists output formats.
   "images": {
     "in": "src/images",
     "out": "dist/images",
-    "sizes": [{ "width": 640 }, { "width": 1280 }, { "name": "thumb", "width": 200, "height": 200, "crop": true }],
+    "sizes": [
+      { "width": 640 },
+      { "width": 1280 },
+      { "name": "thumb", "width": 200, "height": 200, "crop": true }
+    ],
     "format": ["webp"]
   }
 }
@@ -158,7 +180,10 @@ paths:
 ```json
 {
   "copy": [
-    { "in": ["src/static/ogimage.jpg", "src/static/favicon.ico", "src/fonts"], "out": "dist" },
+    {
+      "in": ["src/static/ogimage.jpg", "src/static/favicon.ico", "src/fonts"],
+      "out": "dist"
+    },
     { "in": "images", "out": "dist/static" }
   ]
 }
@@ -199,21 +224,21 @@ A plain string works too — templating is optional.
 
 A local dev server:
 
-| Option | Meaning |
-| --- | --- |
-| `port` | Port to serve on (CLI `--port`/`-p` overrides). |
+| Option | Meaning                                                                |
+| ------ | ---------------------------------------------------------------------- |
+| `port` | Port to serve on (CLI `--port`/`-p` overrides).                        |
 | `base` | Base path of the server — where your built HTML lives, e.g. `"/dist"`. |
 
 ## `livereload`
 
 Reloads the browser on file changes. `true` runs on the default port `35729`, or pass options:
 
-| Option | Meaning |
-| --- | --- |
-| `port` | LiveReload port (CLI `--livereload-port`/`-l` overrides). |
-| `exclude` | Glob patterns to ignore, e.g. `["vendor/**/*"]`. |
+| Option      | Meaning                                                                       |
+| ----------- | ----------------------------------------------------------------------------- |
+| `port`      | LiveReload port (CLI `--livereload-port`/`-l` overrides).                     |
+| `exclude`   | Glob patterns to ignore, e.g. `["vendor/**/*"]`.                              |
 | `extraExts` | Extra file extensions (no dot) that trigger a refresh, added to the defaults. |
-| `exts` | Extension list that **replaces** the defaults entirely. |
+| `exts`      | Extension list that **replaces** the defaults entirely.                       |
 
 Default trigger extensions: `html`, `css`, `js`, `png`, `gif`, `jpg`, `php`, `php5`, `py`, `rb`,
 `erb`, `coffee`. Working with Nunjucks or Slim templates? Add them:
@@ -261,7 +286,7 @@ sibling imports still trigger a rebuild):
 ```
 
 This covers sources that live under a task's own directory. Imports that reach
-*outside* it — a shared folder above the entry, `node_modules` — aren't watched;
+_outside_ it — a shared folder above the entry, `node_modules` — aren't watched;
 use an explicit array for those.
 
 ## `includePaths`
@@ -280,13 +305,13 @@ Paths to resolve imports from (Sass `@use`, script imports). `node_modules` is t
 Writes a JSON search index of every page. A string sets the output filename with defaults; the
 object form takes options:
 
-| Option | Meaning |
-| --- | --- |
-| `output` | Output filename, written to the markup output directory. |
-| `minWordLength` | Minimum word length considered a keyword. Default `3`. |
-| `maxKeywords` | Maximum keywords per page. Default `20`. |
-| `globalFrequencyCeiling` | Drop words appearing in more than this fraction of pages. Default `0.8`. |
-| `stopWords` | `undefined` = bundled English list, `false` = disable, an inline array, or a path to a JSON array file. |
+| Option                   | Meaning                                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------------------- |
+| `output`                 | Output filename, written to the markup output directory.                                                |
+| `minWordLength`          | Minimum word length considered a keyword. Default `3`.                                                  |
+| `maxKeywords`            | Maximum keywords per page. Default `20`.                                                                |
+| `globalFrequencyCeiling` | Drop words appearing in more than this fraction of pages. Default `0.8`.                                |
+| `stopWords`              | `undefined` = bundled English list, `false` = disable, an inline array, or a path to a JSON array file. |
 
 All front matter fields pass through to the index; internal fields (`content`, `isIndex`,
 `layout`, `published`) are stripped. A page's own `keywords` front matter overrides the
@@ -315,21 +340,26 @@ here but excluded from the search index. A string sets the filename; the object 
 Builds the page hierarchy as sidebar-ready data — the `nav` template global plus a nested JSON
 file. See [Building a documentation site](static-site/docs-site) for the walkthrough; the options:
 
-| Option | Meaning |
-| --- | --- |
-| `output` | Output filename, written to the markup output directory. |
+| Option        | Meaning                                                                                                                                                                                 |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `output`      | Output filename, written to the markup output directory.                                                                                                                                |
 | `collections` | `true` = include every collection page nested under its collection (default); `false` = exclude all; `["docs"]` = allowlist; `"index"` = only each collection's landing page as a leaf. |
-| `home` | `false` drops the site's root index page from the tree. Default `true`. |
-| `root` | Scope the tree to a subdirectory (e.g. `"docs"`); its children are emitted at the top level with the section index pinned first. |
+| `home`        | `false` drops the site's root index page from the tree. Default `true`.                                                                                                                 |
+| `root`        | Scope the tree to a subdirectory (e.g. `"docs"`); its children are emitted at the top level with the section index pinned first.                                                        |
 
 Each node has `title`, `url` (omitted on synthesized section nodes), `order` when set, and
 `children` when it has subpages:
 
 ```json
 [
-  { "title": "Guide", "url": "guide", "order": 1, "children": [
-    { "title": "Getting Started", "url": "guide/getting-started", "order": 1 }
-  ]}
+  {
+    "title": "Guide",
+    "url": "guide",
+    "order": 1,
+    "children": [
+      { "title": "Getting Started", "url": "guide/getting-started", "order": 1 }
+    ]
+  }
 ]
 ```
 

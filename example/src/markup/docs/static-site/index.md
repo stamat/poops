@@ -3,7 +3,7 @@ layout: docs
 title: Build a Static Site
 navTitle: Build a Static Site
 description: Use Poops as a Jekyll-inspired static site generator — pages, images, docs, blogs and React, all from one config.
-order: 2
+order: 3
 keywords: ["static site", "ssg", "jekyll", "pages", "blog", "docs"]
 ---
 
@@ -38,12 +38,28 @@ A config that ties it together:
 
 ```json
 {
-  "styles": [{ "in": "src/scss/index.scss", "out": "dist/css/styles.css", "options": { "minify": true } }],
-  "scripts": [{ "in": "src/js/main.ts", "out": "dist/js/scripts.js", "options": { "minify": true } }],
+  "styles": [
+    {
+      "in": "src/scss/index.scss",
+      "out": "dist/css/styles.css",
+      "options": { "minify": true }
+    }
+  ],
+  "scripts": [
+    {
+      "in": "src/js/main.ts",
+      "out": "dist/js/scripts.js",
+      "options": { "minify": true }
+    }
+  ],
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "site": { "title": "My Site", "description": "Built with Poops.", "url": "https://example.com" },
+    "site": {
+      "title": "My Site",
+      "description": "Built with Poops.",
+      "url": "https://example.com"
+    },
     "includePaths": ["_layouts", "_partials"],
     "searchIndex": "search-index.json",
     "sitemap": "sitemap.xml",
