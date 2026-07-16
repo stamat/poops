@@ -156,7 +156,9 @@ function setupWatchers(config, modules) {
     }
 
     if (/(\.json|\.ya?ml)$/i.test(file)) {
-      modules.markups.reloadDataFiles().then(() => modules.markups.compile()).then(() => reload()).catch(err => console.error(err))
+      // Engine-owned markup with a data extension (Shopify templates/*.json)
+      // goes incremental; real data files reload globals + full compile.
+      modules.markups.compileDataChange(file).then(() => reload()).catch(err => console.error(err))
     }
   }
 
