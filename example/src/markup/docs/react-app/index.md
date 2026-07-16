@@ -3,8 +3,9 @@ layout: docs
 title: Build a React App
 navTitle: Build a React App
 description: Build a plain client-rendered React SPA with Poops — one scripts entry, createRoot, done.
-order: 3
-keywords: ["react", "spa", "app", "createRoot", "client", "scripts", "jsx", "tsx"]
+order: 4
+keywords:
+  ["react", "spa", "app", "createRoot", "client", "scripts", "jsx", "tsx"]
 ---
 
 # Build a React App
@@ -33,24 +34,24 @@ react-app/
 
 ```tsx
 // src/js/main.tsx
-import { createRoot } from 'react-dom/client'
-import App from './App'
+import { createRoot } from "react-dom/client";
+import App from "./App";
 
-createRoot(document.getElementById('root')!).render(<App />)
+createRoot(document.getElementById("root")!).render(<App />);
 ```
 
 ```tsx
 // src/js/App.tsx
-import { useState } from 'react'
+import { useState } from "react";
 
 export default function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
   return (
     <main>
       <h1>Hello from Poops</h1>
       <button onClick={() => setCount((c) => c + 1)}>Count: {count}</button>
     </main>
-  )
+  );
 }
 ```
 
@@ -62,11 +63,20 @@ export default function App() {
     {
       "in": "src/js/main.tsx",
       "out": "dist/js/app.js",
-      "options": { "minify": true, "format": "iife", "target": "es2019", "jsx": "automatic" }
+      "options": {
+        "minify": true,
+        "format": "iife",
+        "target": "es2019",
+        "jsx": "automatic"
+      }
     }
   ],
   "styles": [
-    { "in": "src/scss/index.scss", "out": "dist/css/styles.css", "options": { "minify": true } }
+    {
+      "in": "src/scss/index.scss",
+      "out": "dist/css/styles.css",
+      "options": { "minify": true }
+    }
   ],
   "markup": {
     "in": "src/markup",
@@ -91,16 +101,17 @@ Poops still builds your `index.html` — use `markup` for the shell so `relative
 ```html
 {% raw %}<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ site.title }}</title>
-  <link rel="stylesheet" href="{{ relativePathPrefix }}css/styles.min.css">
-</head>
-<body>
-  <div id="root"></div>
-  <script src="{{ relativePathPrefix }}js/app.min.js"></script>
-</body>
-</html>{% endraw %}
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ site.title }}</title>
+    <link rel="stylesheet" href="{{ relativePathPrefix }}css/styles.min.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="{{ relativePathPrefix }}js/app.min.js"></script>
+  </body>
+</html>
+{% endraw %}
 ```
 
 > [!NOTE]
