@@ -149,7 +149,10 @@ function setupWatchers(config, modules) {
         .catch(err => console.error(err))
     }
     if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.liquid|\.md)$/i.test(file)) {
-      modules.markups.compile().then(() => modules.postcss.compile()).then(() => reload()).catch(err => console.error(err))
+      // Incremental: re-render only the pages whose last render touched this
+      // file; falls back to a full compile for anything it can't prove safe
+      // (deletions, new files, collection members, engines without dep info).
+      modules.markups.compileIncremental(file).then(() => modules.postcss.compile()).then(() => reload()).catch(err => console.error(err))
     }
 
     if (/(\.json|\.ya?ml)$/i.test(file)) {
