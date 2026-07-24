@@ -1,18 +1,37 @@
 ---
 layout: post
-title: v1.6.0 — JSON-LD structured data with the jsonld filter
+title: v1.6.0 — SEO metadata with the og and jsonld filters
 date: 2026-07-25
-description: A new jsonld filter emits a schema.org JSON-LD block from a page's front matter — structured data for GEO (Generative Engine Optimization) and rich results, with zero config. The type auto-detects and a front-matter escape hatch gives you full control.
+description: Two new filters emit page metadata from front matter with zero config — og for Open Graph and Twitter card link previews, jsonld for schema.org structured data (GEO). Both auto-detect the page type and ship a front-matter escape hatch for full control.
 published: true
 ---
 
-The `jsonld` filter turns a page's front matter into a schema.org [JSON-LD](https://json-ld.org/) `<script type="application/ld+json">` block — the structured data that search engines and generative engines (GEO) read to understand your content. Drop it in your layout `<head>`:
+Two new filters generate the metadata that search engines, generative engines (GEO) and social platforms read — straight from your front matter, no per-page boilerplate. Drop both in your layout `<head>`:
 
 ```nunjucks
-{% raw %}{{ page | jsonld(site) }}{% endraw %}
+{% raw %}{{ page | og(site) }}
+{{ page | jsonld(site) }}{% endraw %}
 ```
 
-Liquid uses the colon syntax: `{% raw %}{{ page | jsonld: site }}{% endraw %}`.
+## Open Graph & Twitter cards — `og`
+
+The `og` filter emits [Open Graph](https://ogp.me/) and Twitter-card `<meta>` tags so links to your pages unfurl into rich previews in chat apps and social feeds. `og:type` is `article` when the page has a `date`, otherwise `website`. It pulls `title`, `description`, `url` (made absolute via `site.url`), `image`, `site_name` and `locale` from front matter and site data, adds `article:published_time` / `article:modified_time` / `article:author` for posts, and sets `twitter:card` to `summary_large_image` when there's an image. Attribute values are escaped.
+
+Set an `og` object in front matter to add or override any tag:
+
+```yaml
+---
+title: My post
+date: 2026-01-01
+image: static/cover.jpg
+og:
+  "og:image:alt": Cover illustration
+---
+```
+
+## JSON-LD structured data — `jsonld`
+
+The `jsonld` filter turns front matter into a schema.org [JSON-LD](https://json-ld.org/) `<script type="application/ld+json">` block — structured data search and generative engines read to understand your content. Liquid uses the colon syntax: `{% raw %}{{ page | jsonld: site }}{% endraw %}`.
 
 ## What it generates
 
@@ -47,4 +66,4 @@ jsonld:
 ---
 ```
 
-This very page emits a `BlogPosting` block — view source and look in the `<head>`.
+This very page emits both — an `article` Open Graph set and a `BlogPosting` JSON-LD block. View source and look in the `<head>`.

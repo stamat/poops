@@ -930,6 +930,22 @@ All filters are available in both engines. The only syntax difference is how arg
   - Nunjucks: `{{ someCodeVariable | highlight('javascript') }}`
   - Liquid: `{{ someCodeVariable | highlight: 'javascript' }}`
 
+- `og` — generates Open Graph (and a Twitter card) `<meta>` tags from a page's front matter and your `site` data, for link previews on social/chat platforms. Put it in your layout `<head>`. `og:type` auto-detects: `article` when the page has a `date`, otherwise `website`.
+  - Nunjucks: `{{ page | og(site) }}`
+  - Liquid: `{{ page | og: site }}`
+
+  Emits `og:title`, `og:description`, `og:type`, `og:url` (made absolute with `site.url`), `og:site_name` (from `site.title`), `og:locale` (`page.lang`/`site.lang`), `og:image` (`page.image`/`site.image`, made absolute), and `twitter:card` (`summary_large_image` when there's an image, else `summary`). For articles it adds `article:published_time`, `article:modified_time` and `article:author`. Attribute values are escaped. Set an `og` object in front matter to add or override any tag (e.g. `og:image:alt`, a fixed `twitter:card`):
+
+  ```yaml
+  ---
+  title: My post
+  date: 2026-01-01
+  image: static/cover.jpg
+  og:
+    "og:image:alt": Cover illustration
+  ---
+  ```
+
 - `jsonld` — generates a schema.org JSON-LD `<script type="application/ld+json">` block from a page's front matter and your `site` data, for GEO (Generative Engine Optimization) and structured data. Put it in your layout `<head>`. The `@type` auto-detects: `BlogPosting` when the page has a `date`, otherwise `WebPage`.
   - Nunjucks: `{{ page | jsonld(site) }}`
   - Liquid: `{{ page | jsonld: site }}`

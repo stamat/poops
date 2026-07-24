@@ -211,12 +211,26 @@ passed: Nunjucks uses parentheses `{% raw %}{{ x | filter("arg") }}{% endraw %}`
 | `srcset` | build a `srcset` for an image | `{% raw %}{{ 'photo.jpg' \| srcset }}{% endraw %}` |
 | `exif` | EXIF object for an image | `{% raw %}{{ 'photo.jpg' \| exif }}{% endraw %}` |
 | `images` | list images in a directory | `{% raw %}{{ 'static/img' \| images }}{% endraw %}` |
+| `og` | Open Graph + Twitter card `<meta>` | `{% raw %}{{ page \| og(site) }}{% endraw %}` |
 | `jsonld` | schema.org JSON-LD for GEO | `{% raw %}{{ page \| jsonld(site) }}{% endraw %}` |
 
 `srcset`, `exif` and `images` need the [poops-images](https://github.com/stamat/poops-images)
 compile cache — see [Images & galleries](../static-site/images-gallery).
 
-### JSON-LD structured data (GEO)
+### Social & structured data (Open Graph, JSON-LD)
+
+Two filters turn a page's front matter into the metadata search engines, generative engines (GEO)
+and social platforms read. Drop both in your layout `<head>`:
+
+```nunjucks
+{% raw %}{{ page | og(site) }}
+{{ page | jsonld(site) }}{% endraw %}
+```
+
+`og` emits Open Graph + Twitter-card `<meta>` tags for link previews. `og:type` is `article` when
+the page has a `date`, else `website`; it pulls `title`, `description`, `url`, `image` and
+`site_name`, adds `article:*` timestamps for posts, and picks `summary_large_image` when an image is
+set. Set an `og` object in front matter to add or override any tag (e.g. `og:image:alt`).
 
 `jsonld` turns a page's front matter into a schema.org
 `{% raw %}<script type="application/ld+json">{% endraw %}` block — the structured data search and
