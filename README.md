@@ -930,6 +930,24 @@ All filters are available in both engines. The only syntax difference is how arg
   - Nunjucks: `{{ someCodeVariable | highlight('javascript') }}`
   - Liquid: `{{ someCodeVariable | highlight: 'javascript' }}`
 
+- `jsonld` — generates a schema.org JSON-LD `<script type="application/ld+json">` block from a page's front matter and your `site` data, for GEO (Generative Engine Optimization) and structured data. Put it in your layout `<head>`. The `@type` auto-detects: `BlogPosting` when the page has a `date`, otherwise `WebPage`.
+  - Nunjucks: `{{ page | jsonld(site) }}`
+  - Liquid: `{{ page | jsonld: site }}`
+
+  It reads these front-matter fields when present: `title`, `description` (falls back to `site.description`), `url` (made absolute with `site.url`), `date` → `datePublished`, `updated` → `dateModified`, `author` (string or `{ name }`, falls back to `site.author`), `image`, `lang` → `inLanguage`, and `wordcount`. `publisher` comes from `site.title`. Front-matter values are escaped so they can't break out of the `<script>` tag.
+
+  For full control, set a `jsonld` object in front matter — its keys are merged over (and override) the generated defaults, including `@type`:
+
+  ```yaml
+  ---
+  title: How to brew coffee
+  date: 2026-01-01
+  jsonld:
+    "@type": HowTo
+    totalTime: PT5M
+  ---
+  ```
+
 - `groupby` — groups an array of objects by a field value. Returns an array of `{ key, items }` objects. Supports an optional second argument for date part extraction (`year`, `month`, `day`). Groups preserve insertion order, so if items are sorted by date descending, groups will be too.
   - Nunjucks: `{{ changelog.items | groupby("author") }}` or `{{ changelog.items | groupby("date", "year") }}`
   - Liquid: `{{ changelog.items | groupby: "author" }}` or `{{ changelog.items | groupby: "date", "year" }}`

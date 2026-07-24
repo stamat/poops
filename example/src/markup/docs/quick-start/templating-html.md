@@ -4,7 +4,7 @@ title: Templating HTML
 navTitle: Templating HTML
 description: Generate HTML with swappable template engines — Nunjucks or Liquid — plus front matter, data, includes and the image tag.
 order: 4
-keywords: ["templating", "nunjucks", "liquid", "html", "markdown", "front matter", "includes", "image"]
+keywords: ["templating", "nunjucks", "liquid", "html", "markdown", "front matter", "includes", "image", "filters", "jsonld", "json-ld", "structured data", "geo", "seo", "schema.org"]
 ---
 
 # Templating HTML
@@ -189,6 +189,58 @@ the syntax differs:
 > [!INFO]
 > Pick the engine you already know. There is no functional reason to prefer one over the other in
 > Poops — the collections, nav, search and image features are engine-agnostic.
+
+## Filters
+
+Both engines ship the same built-in filters. The only syntax difference is how arguments are
+passed: Nunjucks uses parentheses `{% raw %}{{ x | filter("arg") }}{% endraw %}`, Liquid uses a colon
+`{% raw %}{{ x | filter: "arg" }}{% endraw %}`.
+
+| Filter | Does | Example (Nunjucks) |
+| --- | --- | --- |
+| `slugify` | string → URL slug | `{% raw %}{{ title \| slugify }}{% endraw %}` |
+| `jsonify` | value → JSON string | `{% raw %}{{ obj \| jsonify }}{% endraw %}` |
+| `markdown` | Markdown → HTML (GFM) | `{% raw %}{{ text \| markdown }}{% endraw %}` |
+| `date` | format a date (dayjs tokens) | `{% raw %}{{ post.date \| date("MMM D, YYYY") }}{% endraw %}` |
+| `toc` | table of contents from headings | `{% raw %}{{ content \| toc }}{% endraw %}` |
+| `concat` | new array with value appended | `{% raw %}{{ items \| concat("c") }}{% endraw %}` |
+| `push` | append to an array in place | `{% raw %}{{ items \| push("c") }}{% endraw %}` |
+| `svg` | inline an SVG file | `{% raw %}{{ 'icons/logo.svg' \| svg }}{% endraw %}` |
+| `highlight` | syntax-highlight a code string | `{% raw %}{{ code \| highlight("js") }}{% endraw %}` |
+| `groupby` | group an array by a field | `{% raw %}{{ posts \| groupby("date", "year") }}{% endraw %}` |
+| `srcset` | build a `srcset` for an image | `{% raw %}{{ 'photo.jpg' \| srcset }}{% endraw %}` |
+| `exif` | EXIF object for an image | `{% raw %}{{ 'photo.jpg' \| exif }}{% endraw %}` |
+| `images` | list images in a directory | `{% raw %}{{ 'static/img' \| images }}{% endraw %}` |
+| `jsonld` | schema.org JSON-LD for GEO | `{% raw %}{{ page \| jsonld(site) }}{% endraw %}` |
+
+`srcset`, `exif` and `images` need the [poops-images](https://github.com/stamat/poops-images)
+compile cache — see [Images & galleries](../static-site/images-gallery).
+
+### JSON-LD structured data (GEO)
+
+`jsonld` turns a page's front matter into a schema.org
+`{% raw %}<script type="application/ld+json">{% endraw %}` block — the structured data search and
+generative engines (GEO) read. Drop it in your layout `<head>`:
+
+```nunjucks
+{% raw %}{{ page | jsonld(site) }}{% endraw %}
+```
+
+Liquid: `{% raw %}{{ page | jsonld: site }}{% endraw %}`. The `@type` auto-detects — `BlogPosting`
+when the page has a `date`, otherwise `WebPage` — pulling `title`, `description`, `url` (made
+absolute via `site.url`), `date`, `author`, `image` and more from front matter. Values are escaped so
+they can't break out of the `<script>`. For full control, set a `jsonld` object in front matter; its
+keys merge over (and override) the defaults, including `@type`:
+
+```yaml
+---
+title: How to brew coffee
+date: 2026-01-01
+jsonld:
+  "@type": HowTo
+  totalTime: PT5M
+---
+```
 
 ## Custom engines
 
