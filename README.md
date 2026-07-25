@@ -45,7 +45,7 @@ It uses a simple config file where you define your input and output paths and it
       - [googleFonts](#googlefonts)
       - [highlight](#highlight)
     - [Custom Filters](#custom-filters)
-    - [Search Index, Sitemap & Navigation](#search-index-sitemap--navigation)
+    - [Search Index, Sitemap, llms.txt & Navigation](#search-index-sitemap-llmstxt--navigation)
   - [Images (optional)](#images-optional)
   - [Copy](#copy)
   - [Banner (optional)](#banner-optional)
@@ -1060,11 +1060,11 @@ Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo
   {% endfor %}
   ```
 
-#### Search Index, Sitemap & Navigation
+#### Search Index, Sitemap, llms.txt & Navigation
 
-Poops can automatically generate a JSON search index, an XML sitemap and a navigation tree from your compiled pages. All are generated in a single pass during the markup compilation phase.
+Poops can automatically generate a JSON search index, an XML sitemap, an `llms.txt` and a navigation tree from your compiled pages. All are generated in a single pass during the markup compilation phase.
 
-To enable, add `searchIndex`, `sitemap` and/or `nav` to your markup config:
+To enable, add `searchIndex`, `sitemap`, `llms` and/or `nav` to your markup config:
 
 ```json
 {
@@ -1073,7 +1073,8 @@ To enable, add `searchIndex`, `sitemap` and/or `nav` to your markup config:
     "out": "dist",
     "options": {
       "searchIndex": "search-index.json",
-      "sitemap": "sitemap.xml"
+      "sitemap": "sitemap.xml",
+      "llms": "llms.txt"
     }
   }
 }
@@ -1092,6 +1093,12 @@ The string shorthand sets the output filename with default options. For more con
   },
   "sitemap": {
     "output": "sitemap.xml"
+  },
+  "llms": {
+    "output": "llms.txt",
+    "title": "My Site",
+    "description": "One-line summary of the site.",
+    "intro": "src/llms-intro.md"
   }
 }
 ```
@@ -1128,7 +1135,9 @@ All front matter fields are passed through to the index automatically. Internal 
 
 **Sitemap** generates a standard `sitemap.xml` with `<loc>` and `<lastmod>` (from front matter `date`). If `site.url` is set in your markup config, it is prepended to all URLs. Collection index/pagination pages are included in the sitemap but excluded from the search index.
 
-Pages with `published: false` in their front matter are excluded from both outputs.
+**llms.txt** generates an [`llms.txt`](https://llmstxt.org) — a Markdown index of your pages that LLMs and generative engines (GEO) read to understand your site. It has an `# H1` title, a `> ` blockquote summary, then `- [title](url): description` links grouped by URL path: the first folder is a `## section`, a second folder nests as a `### subsection` under it, and root-level pages fall under a lead "Pages" section. So `docs/config-reference.html` lands directly under `## Docs` while `docs/quick-start/x.html` lands under `### Quick Start` inside it. Collection items (which live under `collection/…`) group the same way and are ordered newest-first by their `date`; other sections keep file order. Set `intro` to a Markdown file path (relative to the project root) to insert free-form context between the blockquote and the link sections — a file authored for LLMs, e.g. `llms-intro.md`. Avoid `##` headings in it; they read as sections. (A raw README is a poor fit — badges, install noise and its own headings collide.) `title` and `description` default to your `site.title`/`site.description`; override them (and the lead section name via `sectionTitle`) with the object form. `site.url` makes the links absolute. Collection index/pagination pages are skipped, like the search index.
+
+Pages with `published: false` in their front matter are excluded from all outputs.
 
 **Navigation tree** builds your page hierarchy as sidebar-ready data, exposed two ways: as the `nav` template global (loaded automatically, always reflecting the current build) and as a nested JSON file for client-side rendering. Subpages nest automatically from URL structure: `guide/index.md` becomes a parent node and `guide/getting-started.md`, `guide/advanced/config.md` become its (and its subsections') children. Add `nav` to your markup config:
 

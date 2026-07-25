@@ -16,6 +16,7 @@ keywords:
     "includePaths",
     "searchIndex",
     "sitemap",
+    "llms",
     "nav",
   ]
 ---
@@ -38,6 +39,7 @@ deep dive; everything else is documented in full on this page.
 | `markup`             | Templates → static site                           | [↓](#markup)             |
 | `markup.searchIndex` | JSON search index of every page                   | [↓](#markup-searchindex) |
 | `markup.sitemap`     | `sitemap.xml` generation                          | [↓](#markup-sitemap)     |
+| `markup.llms`        | `llms.txt` index for LLMs / GEO                    | [↓](#markup-llms)        |
 | `markup.nav`         | Navigation-tree data                              | [↓](#markup-nav)         |
 | `copy`               | Copy static assets into the output                | [↓](#copy)               |
 | `banner`             | Comment stamped on every output file              | [↓](#banner)             |
@@ -334,6 +336,27 @@ Writes a standard `sitemap.xml` with `<loc>` and `<lastmod>` (from front matter 
 `site.url` is set, it is prepended to all URLs. Collection index/pagination pages are included
 here but excluded from the search index. A string sets the filename; the object form takes
 `output`.
+
+## `markup.llms`
+
+Writes an [`llms.txt`](https://llmstxt.org) — a Markdown index of your pages that LLMs and
+generative engines (GEO) read to understand the site. An `# H1` title, a `> ` blockquote summary,
+then `- [title](url): description` links grouped by URL path: the first folder is a `## section`, a
+second folder nests as a `### subsection` (so `docs/quick-start/x.html` → `### Quick Start` under
+`## Docs`), and root-level pages fall under the lead section. Collection sections are ordered
+newest-first by `date`; other sections keep file order. `site.url` makes the links absolute;
+collection index/pagination pages are skipped. A string sets the filename; the object form takes options:
+
+| Option         | Meaning                                                                 |
+| -------------- | ----------------------------------------------------------------------- |
+| `output`       | Output filename, written to the markup output directory.                       |
+| `title`        | H1 title. Defaults to `site.title`.                                            |
+| `description`  | Blockquote summary. Defaults to `site.description`.                             |
+| `intro`        | Path (from project root) to a Markdown file inserted as free-form body context. |
+| `sectionTitle` | Heading for the lead (uncollected) section. Default `"Pages"`.                  |
+
+Point `intro` at a file authored for LLMs (e.g. `llms-intro.md`) — not a raw README, whose
+badges, install noise and `##` headings collide with the generated sections.
 
 ## `markup.nav`
 

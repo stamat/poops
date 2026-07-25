@@ -75,6 +75,10 @@
     "timeDateFormat": "MMM D, YYYY",
     "searchIndex": "search-index.json",
     "sitemap": "sitemap.xml",
+    "llms": {
+      "output": "llms.txt",
+      "intro": "example/src/llms-intro.md"
+    },
     "nav": {
       "output": "nav.json",
       "root": "docs",
