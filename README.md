@@ -703,7 +703,7 @@ sort: date
 - `url` - the item's output path relative to the site root (e.g. `changelog/my-post.html`)
 - `title` - falls back to the file name if not set in front matter
 - `date` - falls back to the file's modification time if not set, with a build warning. Set a real `date` in front matter — mtime is meaningless on CI checkouts (git clone resets it), so undated posts will reshuffle between deploys.
-- `wordcount`, `fileName`, `filePath`, `collection`
+- `wordcount`, `excerpt` (first paragraph, plain text — a meta-description fallback), `fileName`, `filePath`, `collection`
 
 An item with `published: false` in its front matter is excluded from the collection and its page is not built.
 
@@ -934,7 +934,7 @@ All filters are available in both engines. The only syntax difference is how arg
   - Nunjucks: `{{ page | og(site) }}`
   - Liquid: `{{ page | og: site }}`
 
-  Emits `og:title`, `og:description`, `og:type`, `og:url` (made absolute with `site.url`), `og:site_name` (from `site.title`), `og:locale` (`page.lang`/`site.lang`), `og:image` (`page.image`/`site.image`, made absolute), and `twitter:card` (`summary_large_image` when there's an image, else `summary`). For articles it adds `article:published_time`, `article:modified_time` and `article:author`. Attribute values are escaped. Set an `og` object in front matter to add or override any tag (e.g. `og:image:alt`, a fixed `twitter:card`):
+  Emits `og:title`, `og:description` (a missing `description` falls back to the page's auto-`excerpt`, then `site.description`), `og:type`, `og:url` (made absolute with `site.url`), `og:site_name` (from `site.title`), `og:locale` (`page.lang`/`site.lang`), `og:image` (`page.image`/`site.image`, made absolute), and `twitter:card` (`summary_large_image` when there's an image, else `summary`). For articles it adds `article:published_time`, `article:modified_time` and `article:author`. Attribute values are escaped. Set an `og` object in front matter to add or override any tag (e.g. `og:image:alt`, a fixed `twitter:card`):
 
   ```yaml
   ---
@@ -954,7 +954,7 @@ All filters are available in both engines. The only syntax difference is how arg
   - Nunjucks: `{{ page | jsonld(site) }}`
   - Liquid: `{{ page | jsonld: site }}`
 
-  It reads these front-matter fields when present: `title`, `description` (falls back to `site.description`), `url` (made absolute with `site.url`), `date` → `datePublished`, `updated` → `dateModified`, `author` (string or `{ name }`, falls back to `site.author`), `image`, `lang` → `inLanguage`, and `wordcount`. `publisher` comes from `site.title`; set `site.logo` to add a `publisher.logo` ImageObject (made absolute) — Google Article rich results require it. Front-matter values are escaped so they can't break out of the `<script>` tag.
+  It reads these front-matter fields when present: `title`, `description` (falls back to the page's auto-`excerpt`, then `site.description`), `url` (made absolute with `site.url`), `date` → `datePublished`, `updated` → `dateModified`, `author` (string or `{ name }`, falls back to `site.author`), `image`, `lang` → `inLanguage`, and `wordcount`. `publisher` comes from `site.title`; set `site.logo` to add a `publisher.logo` ImageObject (made absolute) — Google Article rich results require it. Front-matter values are escaped so they can't break out of the `<script>` tag.
 
   On the homepage (a page with no `url`) it also emits a site-level `WebSite` block with `name` + `url`, which declares the site name for search results.
 

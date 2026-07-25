@@ -34,6 +34,11 @@ We build things with Poops.
 Common fields: `title`, `description`, `layout`, `date`, `order`, `published`, `nav`, `navTitle`.
 Any custom field you add is yours to use in templates and it flows into the search index.
 
+Poops also computes read-only fields on `page`: `content` (the rendered body), `url`, `wordcount`,
+and `excerpt` — the first prose paragraph as plain text (headings and comments skipped, capped at
+160 chars). Use `page.excerpt` as the fallback for a missing `description`, e.g. in the meta tag
+below or the `og`/`jsonld` filters.
+
 ## Layouts
 
 Put base templates in `_layouts/` (a directory ignored for output, but on your `includePaths`). A
@@ -45,7 +50,7 @@ Nunjucks layout defines a `content` block:
 <head>
   <meta charset="UTF-8">
   <title>{{ page.title or site.title }}</title>
-  <meta name="description" content="{{ page.description or site.description }}">
+  <meta name="description" content="{{ page.description or page.excerpt or site.description }}">
   <link rel="stylesheet" href="{{ relativePathPrefix }}css/styles.min.css">
 </head>
 <body>

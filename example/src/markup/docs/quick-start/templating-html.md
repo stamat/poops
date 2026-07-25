@@ -237,7 +237,8 @@ homepage canonicals to the site root.
 `og` emits Open Graph + Twitter-card `<meta>` tags for link previews. `og:type` is `article` when
 the page has a `date`, else `website`; it pulls `title`, `description`, `url`, `image` and
 `site_name`, adds `article:*` timestamps for posts, and picks `summary_large_image` when an image is
-set. Set an `og` object in front matter to add or override any tag (e.g. `og:image:alt`).
+set. A missing `description` falls back to the page's auto-`excerpt` (first paragraph), then
+`site.description`. Set an `og` object in front matter to add or override any tag (e.g. `og:image:alt`).
 
 `jsonld` turns a page's front matter into a schema.org
 `{% raw %}<script type="application/ld+json">{% endraw %}` block — the structured data search and
@@ -249,8 +250,9 @@ generative engines (GEO) read. Drop it in your layout `<head>`:
 
 Liquid: `{% raw %}{{ page | jsonld: site }}{% endraw %}`. The `@type` auto-detects — `BlogPosting`
 when the page has a `date`, otherwise `WebPage` — pulling `title`, `description`, `url` (made
-absolute via `site.url`), `date`, `author`, `image` and more from front matter. Values are escaped so
-they can't break out of the `<script>`.
+absolute via `site.url`), `date`, `author`, `image` and more from front matter. `description` shares
+the same `page.excerpt` → `site.description` fallback as `og`. Values are escaped so they can't break
+out of the `<script>`.
 
 Set `site.logo` and the publisher gains a `logo` ImageObject (made absolute) — Google Article rich
 results require it. On the homepage (a page with no `url`) a second `WebSite` block is emitted,
