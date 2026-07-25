@@ -956,7 +956,7 @@ All filters are available in both engines. The only syntax difference is how arg
 
   It reads these front-matter fields when present: `title`, `description` (falls back to the page's auto-`excerpt`, then `site.description`), `url` (made absolute with `site.url`), `date` → `datePublished`, `updated` → `dateModified`, `author` (string or `{ name }`, falls back to `site.author`), `image`, `lang` → `inLanguage`, and `wordcount`. `publisher` comes from `site.title`; set `site.logo` to add a `publisher.logo` ImageObject (made absolute) — Google Article rich results require it. Front-matter values are escaped so they can't break out of the `<script>` tag.
 
-  On the homepage (a page with no `url`) it also emits a site-level `WebSite` block with `name` + `url`, which declares the site name for search results.
+  On the homepage (a page with no `url`) it also emits a site-level `WebSite` block with `name` + `url`, which declares the site name for search results. On nested pages (a `url` with at least one folder) it auto-appends a `BreadcrumbList` block derived from URL depth — a Google breadcrumb rich result, no extra markup (needs `site.url` for the absolute item URLs). See the `breadcrumb` filter below for a visible trail from the same data.
 
   For full control, set a `jsonld` object in front matter — its keys are merged over (and override) the generated defaults, including `@type`:
 
@@ -971,6 +971,12 @@ All filters are available in both engines. The only syntax difference is how arg
   ```
 
   poops auto-picks `BlogPosting` (page has a `date`) or `WebPage`. Override `@type` with the `jsonld` object for any schema.org type — common ones search/generative engines act on: `Article`, `NewsArticle`, `HowTo`, `FAQPage`, `QAPage`, `Product`, `Recipe`, `Event`, `Course`, `VideoObject`, `SoftwareApplication`, `Organization`, `Person`, `BreadcrumbList`, `WebSite`. Full list at [schema.org/docs/full](https://schema.org/docs/full.html); validate with the [Rich Results Test](https://search.google.com/test/rich-results). A per-`@type` table with the notable fields is in the [Templating docs](example/src/markup/docs/quick-start/templating-html.md).
+
+- `breadcrumb` — generates a visible breadcrumb `<nav class="breadcrumb"><ol>…</ol></nav>` trail for the page body (blog posts, nested pages), from the same URL-depth data the `jsonld` `BreadcrumbList` uses: the site root, each ancestor folder (humanized, e.g. `docs/static-site` → *Static Site*), then the current page as `aria-current` text. Pass `relativePathPrefix` so links resolve against the current output location (localhost in dev, your deployed subpath in prod) — not the absolute domain.
+  - Nunjucks: `{{ page | breadcrumb(site, relativePathPrefix) }}`
+  - Liquid: `{{ page | breadcrumb: site, relativePathPrefix }}`
+
+  The home crumb is optional: set `breadcrumb: { home: false }` (or `{ homeLabel: "Start" }` to rename it) under `site` or in a page's front matter — front matter wins. With the home crumb off, top-level pages fall to a single crumb and render nothing, while nested pages still show their folder trail. `breadcrumb: false` on a page or on `site` disables both the visible trail and the auto `BreadcrumbList` JSON-LD. Returns nothing on the homepage or any single-crumb page.
 
 - `groupby` — groups an array of objects by a field value. Returns an array of `{ key, items }` objects. Supports an optional second argument for date part extraction (`year`, `month`, `day`). Groups preserve insertion order, so if items are sorted by date descending, groups will be too.
   - Nunjucks: `{{ changelog.items | groupby("author") }}` or `{{ changelog.items | groupby("date", "year") }}`

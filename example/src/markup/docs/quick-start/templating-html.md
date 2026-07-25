@@ -214,6 +214,7 @@ passed: Nunjucks uses parentheses `{% raw %}{{ x | filter("arg") }}{% endraw %}`
 | `og` | Open Graph + Twitter card `<meta>` | `{% raw %}{{ page \| og(site) }}{% endraw %}` |
 | `canonical` | `<link rel="canonical">` dedup tag | `{% raw %}{{ page \| canonical(site) }}{% endraw %}` |
 | `jsonld` | schema.org JSON-LD for GEO | `{% raw %}{{ page \| jsonld(site) }}{% endraw %}` |
+| `breadcrumb` | visible breadcrumb `<nav>` trail | `{% raw %}{{ page \| breadcrumb(site, relativePathPrefix) }}{% endraw %}` |
 
 `srcset`, `exif` and `images` need the [poops-images](https://github.com/stamat/poops-images)
 compile cache — see [Images & galleries](../static-site/images-gallery).
@@ -256,7 +257,8 @@ out of the `<script>`.
 
 Set `site.logo` and the publisher gains a `logo` ImageObject (made absolute) — Google Article rich
 results require it. On the homepage (a page with no `url`) a second `WebSite` block is emitted,
-declaring the site name for search results.
+declaring the site name for search results; on nested pages a `BreadcrumbList` block is auto-appended
+(see [Breadcrumbs](#breadcrumbs)).
 
 `site.lang` (a page's front-matter `lang` overrides it) sets the JSON-LD `inLanguage` on every
 block. Reuse it for the language attribute too — `{% raw %}<html lang="{{ page.lang or site.lang or 'en' }}">{% endraw %}` —
@@ -296,13 +298,48 @@ via the `jsonld` object for anything else. The types search and generative engin
 | `SoftwareApplication` | apps / tools | `applicationCategory`, `operatingSystem`, `offers` |
 | `Organization` | the site's company/brand entity | `logo`, `sameAs[]`, `contactPoint` |
 | `Person` | author / profile pages | `jobTitle`, `sameAs[]` |
-| `BreadcrumbList` | breadcrumb trails | `itemListElement[]` (`ListItem`) |
+| `BreadcrumbList` | breadcrumb trails | `itemListElement[]` (`ListItem`); auto-emitted on nested pages |
 | `WebSite` | one site-level block (homepage) | declares the site name; auto-emitted on the homepage |
 
 Full vocabulary at [schema.org/docs/full](https://schema.org/docs/full.html); check what
 [Google supports](https://developers.google.com/search/docs/appearance/structured-data/search-gallery)
 for rich results. Validate a page with the [Rich Results Test](https://search.google.com/test/rich-results)
 or the [Schema Markup Validator](https://validator.schema.org/).
+
+### Breadcrumbs
+
+`jsonld` already gives you the SEO half for free: on any **nested** page (its `url` has at least one
+folder) it auto-appends a `BreadcrumbList` block — a Google rich result — with no extra markup. The
+trail is derived from the page's URL depth: the site root, each ancestor folder (humanized, e.g.
+`docs/static-site` → *Static Site*), then the page itself. Item URLs are absolute, so it needs
+`site.url`.
+
+For a **visible** trail in the page body, add the `breadcrumb` filter — same crumbs, rendered as a
+`{% raw %}<nav class="breadcrumb"><ol>{% endraw %}`:
+
+```nunjucks
+{% raw %}{{ page | breadcrumb(site, relativePathPrefix) }}{% endraw %}
+```
+
+Liquid: `{% raw %}{{ page | breadcrumb: site, relativePathPrefix }}{% endraw %}`. Pass
+`relativePathPrefix` so the links resolve against the current page (localhost in dev, your deployed
+path in prod) instead of the absolute domain — the same convention the nav uses. The last crumb is
+the current page, rendered as `aria-current` text rather than a link. Both outputs return nothing on
+the homepage or a single-crumb page.
+
+The **home crumb** is optional. Turn it off (or rename it) site-wide via `site.breadcrumb`, or
+per-page in front matter — front matter wins:
+
+```yaml
+# poops.json → markup.site
+breadcrumb:
+  home: false        # drop the leading "Home" crumb
+  homeLabel: Start   # or just rename it
+```
+
+With `home: false`, top-level pages (only one crumb left) render nothing; nested pages still show
+their folder trail. Set `breadcrumb: false` on a page (or on `site`) to disable both the visible
+trail and the JSON-LD entirely.
 
 ## Custom engines
 
