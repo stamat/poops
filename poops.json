@@ -79,6 +79,7 @@
       "output": "llms.txt",
       "intro": "example/src/llms-intro.md"
     },
+    "robots": "robots.txt",
     "nav": {
       "output": "nav.json",
       "root": "docs",

@@ -17,6 +17,7 @@ keywords:
     "searchIndex",
     "sitemap",
     "llms",
+    "robots",
     "nav",
   ]
 ---
@@ -40,6 +41,7 @@ deep dive; everything else is documented in full on this page.
 | `markup.searchIndex` | JSON search index of every page                   | [↓](#markup-searchindex) |
 | `markup.sitemap`     | `sitemap.xml` generation                          | [↓](#markup-sitemap)     |
 | `markup.llms`        | `llms.txt` index for LLMs / GEO                    | [↓](#markup-llms)        |
+| `markup.robots`      | `robots.txt` generation                           | [↓](#markup-robots)      |
 | `markup.nav`         | Navigation-tree data                              | [↓](#markup-nav)         |
 | `copy`               | Copy static assets into the output                | [↓](#copy)               |
 | `banner`             | Comment stamped on every output file              | [↓](#banner)             |
@@ -337,6 +339,11 @@ Writes a standard `sitemap.xml` with `<loc>` and `<lastmod>` (from front matter 
 here but excluded from the search index. A string sets the filename; the object form takes
 `output`.
 
+A page's front matter `robots: noindex` (or `none`) drops it from the sitemap **and** `llms.txt`
+— for drafts, thin or utility pages. Emit `{% raw %}{% if page.robots %}<meta name="robots"
+content="{{ page.robots }}">{% endif %}{% endraw %}` in your layout `<head>` so the page carries
+the directive itself.
+
 ## `markup.llms`
 
 Writes an [`llms.txt`](https://llmstxt.org) — a Markdown index of your pages that LLMs and
@@ -357,6 +364,20 @@ collection index/pagination pages are skipped. A string sets the filename; the o
 
 Point `intro` at a file authored for LLMs (e.g. `llms-intro.md`) — not a raw README, whose
 badges, install noise and `##` headings collide with the generated sections.
+
+## `markup.robots`
+
+Writes a `robots.txt`. A string writes an allow-all file (`User-agent: *`, empty `Disallow:`) with
+a `Sitemap:` line pointing at your generated sitemap — absolute when `site.url` is set. The object
+form takes options:
+
+| Option      | Meaning                                                                         |
+| ----------- | ------------------------------------------------------------------------------- |
+| `output`    | Output filename, written to the markup output directory.                        |
+| `userAgent` | The `User-agent` line. Default `"*"`.                                            |
+| `disallow`  | A path or array of paths to disallow.                                           |
+| `allow`     | A path or array of paths to explicitly allow.                                   |
+| `sitemap`   | An explicit `Sitemap:` URL, or `false` to omit the line. Auto-derived by default. |
 
 ## `markup.nav`
 

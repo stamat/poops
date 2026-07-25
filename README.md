@@ -45,7 +45,7 @@ It uses a simple config file where you define your input and output paths and it
       - [googleFonts](#googlefonts)
       - [highlight](#highlight)
     - [Custom Filters](#custom-filters)
-    - [Search Index, Sitemap, llms.txt & Navigation](#search-index-sitemap-llmstxt--navigation)
+    - [Search Index, Sitemap, llms.txt, robots.txt & Navigation](#search-index-sitemap-llmstxt-robotstxt--navigation)
   - [Images (optional)](#images-optional)
   - [Copy](#copy)
   - [Banner (optional)](#banner-optional)
@@ -1062,11 +1062,11 @@ Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo
   {% endfor %}
   ```
 
-#### Search Index, Sitemap, llms.txt & Navigation
+#### Search Index, Sitemap, llms.txt, robots.txt & Navigation
 
-Poops can automatically generate a JSON search index, an XML sitemap, an `llms.txt` and a navigation tree from your compiled pages. All are generated in a single pass during the markup compilation phase.
+Poops can automatically generate a JSON search index, an XML sitemap, an `llms.txt`, a `robots.txt` and a navigation tree from your compiled pages. All are generated in a single pass during the markup compilation phase.
 
-To enable, add `searchIndex`, `sitemap`, `llms` and/or `nav` to your markup config:
+To enable, add `searchIndex`, `sitemap`, `llms`, `robots` and/or `nav` to your markup config:
 
 ```json
 {
@@ -1076,7 +1076,8 @@ To enable, add `searchIndex`, `sitemap`, `llms` and/or `nav` to your markup conf
     "options": {
       "searchIndex": "search-index.json",
       "sitemap": "sitemap.xml",
-      "llms": "llms.txt"
+      "llms": "llms.txt",
+      "robots": "robots.txt"
     }
   }
 }
@@ -1139,7 +1140,25 @@ All front matter fields are passed through to the index automatically. Internal 
 
 **llms.txt** generates an [`llms.txt`](https://llmstxt.org) — a Markdown index of your pages that LLMs and generative engines (GEO) read to understand your site. It has an `# H1` title, a `> ` blockquote summary, then `- [title](url): description` links grouped by URL path: the first folder is a `## section`, a second folder nests as a `### subsection` under it, and root-level pages fall under a lead "Pages" section. So `docs/config-reference.html` lands directly under `## Docs` while `docs/quick-start/x.html` lands under `### Quick Start` inside it. Collection items (which live under `collection/…`) group the same way and are ordered newest-first by their `date`; other sections keep file order. Set `intro` to a Markdown file path (relative to the project root) to insert free-form context between the blockquote and the link sections — a file authored for LLMs, e.g. `llms-intro.md`. Avoid `##` headings in it; they read as sections. (A raw README is a poor fit — badges, install noise and its own headings collide.) `title` and `description` default to your `site.title`/`site.description`; override them (and the lead section name via `sectionTitle`) with the object form. `site.url` makes the links absolute. Collection index/pagination pages are skipped, like the search index.
 
+**robots.txt** generates a `robots.txt`. The string shorthand writes an allow-all file (`User-agent: *`, empty `Disallow:`) with a `Sitemap:` line pointing at your generated sitemap — absolute when `site.url` is set. The object form takes `output`, `userAgent`, `allow`/`disallow` (a path or array of paths), and `sitemap` (an explicit URL, or `false` to omit the line):
+
+```json
+{
+  "robots": {
+    "output": "robots.txt",
+    "disallow": ["/admin", "/drafts"],
+    "sitemap": false
+  }
+}
+```
+
 Pages with `published: false` in their front matter are excluded from all outputs.
+
+A page's front matter `robots: noindex` (or `none`) drops it from the **sitemap and llms.txt** — for drafts, thin or utility pages (a 404, say) you don't want crawled or fed to LLMs. It stays in the search index (that's your own on-site search). Emit the matching crawler directive in your layout `<head>` so the page itself carries it:
+
+```html
+{% if page.robots %}<meta name="robots" content="{{ page.robots }}">{% endif %}
+```
 
 **Navigation tree** builds your page hierarchy as sidebar-ready data, exposed two ways: as the `nav` template global (loaded automatically, always reflecting the current build) and as a nested JSON file for client-side rendering. Subpages nest automatically from URL structure: `guide/index.md` becomes a parent node and `guide/getting-started.md`, `guide/advanced/config.md` become its (and its subsections') children. Add `nav` to your markup config:
 
