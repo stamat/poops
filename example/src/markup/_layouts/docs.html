@@ -1,5 +1,5 @@
 {% import "navtree.html" as navigation %}<!DOCTYPE html>
-<html lang="en">
+<html lang="{{ page.lang or site.lang or 'en' }}">
 <head>
   <meta charset="UTF-8">
   <title>{% if page.title %}{{ page.title }} · {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>

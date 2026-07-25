@@ -41,7 +41,7 @@ Nunjucks layout defines a `content` block:
 
 ```nunjucks
 {% raw %}<!DOCTYPE html>
-<html lang="en">
+<html lang="{{ page.lang or site.lang or 'en' }}">
 <head>
   <meta charset="UTF-8">
   <title>{{ page.title or site.title }}</title>

@@ -62,7 +62,8 @@
       "title": "💩 Poops",
       "description": "A niche bundler for design-driven micro-sites and blogs.",
       "url": "https://stamat.info/poops",
-      "logo": "poop.png"
+      "logo": "poop.png",
+      "lang": "en"
     },
     "data": [
       "_data/features.yaml",
