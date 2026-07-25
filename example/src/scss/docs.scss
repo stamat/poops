@@ -200,6 +200,25 @@ a:hover { text-decoration: underline; }
 }
 .prose { width: 100%; max-width: var(--content-max); }
 
+// ---- Breadcrumb trail ----
+.breadcrumb { width: 100%; max-width: var(--content-max); margin: 0 0 1.5rem; }
+.breadcrumb ol {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  font-size: 0.85rem;
+  color: var(--fg-muted);
+}
+.breadcrumb li { display: flex; align-items: center; gap: 0.4rem; margin: 0; }
+.breadcrumb li:not(:first-child)::before { content: "/"; color: var(--border); }
+.breadcrumb a { color: var(--fg-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); text-decoration: underline; }
+.breadcrumb [aria-current="page"] { color: var(--fg); font-weight: 500; }
+
 .prose a { text-decoration: underline; }
 .prose a:hover { text-decoration: none; }
 
