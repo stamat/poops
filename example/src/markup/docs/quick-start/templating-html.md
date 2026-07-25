@@ -4,7 +4,7 @@ title: Templating HTML
 navTitle: Templating HTML
 description: Generate HTML with swappable template engines — Nunjucks or Liquid — plus front matter, data, includes and the image tag.
 order: 4
-keywords: ["templating", "nunjucks", "liquid", "html", "markdown", "front matter", "includes", "image", "filters", "jsonld", "json-ld", "structured data", "geo", "seo", "schema.org"]
+keywords: ["templating", "nunjucks", "liquid", "html", "markdown", "front matter", "includes", "image", "filters", "jsonld", "json-ld", "structured data", "geo", "seo", "schema.org", "canonical", "open graph"]
 ---
 
 # Templating HTML
@@ -212,6 +212,7 @@ passed: Nunjucks uses parentheses `{% raw %}{{ x | filter("arg") }}{% endraw %}`
 | `exif` | EXIF object for an image | `{% raw %}{{ 'photo.jpg' \| exif }}{% endraw %}` |
 | `images` | list images in a directory | `{% raw %}{{ 'static/img' \| images }}{% endraw %}` |
 | `og` | Open Graph + Twitter card `<meta>` | `{% raw %}{{ page \| og(site) }}{% endraw %}` |
+| `canonical` | `<link rel="canonical">` dedup tag | `{% raw %}{{ page \| canonical(site) }}{% endraw %}` |
 | `jsonld` | schema.org JSON-LD for GEO | `{% raw %}{{ page \| jsonld(site) }}{% endraw %}` |
 
 `srcset`, `exif` and `images` need the [poops-images](https://github.com/stamat/poops-images)
@@ -223,9 +224,15 @@ Two filters turn a page's front matter into the metadata search engines, generat
 and social platforms read. Drop both in your layout `<head>`:
 
 ```nunjucks
-{% raw %}{{ page | og(site) }}
+{% raw %}{{ page | canonical(site) }}
+{{ page | og(site) }}
 {{ page | jsonld(site) }}{% endraw %}
 ```
+
+`canonical` emits a `<link rel="canonical">` with the page's authoritative absolute URL (`site.url` +
+its `url`) — the dedup signal that stops query-string and duplicate URLs splitting your ranking.
+Front matter `canonical` overrides it (absolute URL, or a path resolved against `site.url`); the
+homepage canonicals to the site root.
 
 `og` emits Open Graph + Twitter-card `<meta>` tags for link previews. `og:type` is `article` when
 the page has a `date`, else `website`; it pulls `title`, `description`, `url`, `image` and

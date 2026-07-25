@@ -946,6 +946,10 @@ All filters are available in both engines. The only syntax difference is how arg
   ---
   ```
 
+- `canonical` — generates a `<link rel="canonical">` tag pointing at a page's authoritative absolute URL (`site.url` + the page's `url`), the dedup signal that stops query-string and duplicate URLs splitting your ranking. Put it in your layout `<head>`. Front matter `canonical` overrides the target — an absolute URL as-is, or a path resolved against `site.url` (for cross-domain or hand-picked canonicals). The homepage canonicals to the site root. Returns nothing without `site.url`.
+  - Nunjucks: `{{ page | canonical(site) }}`
+  - Liquid: `{{ page | canonical: site }}`
+
 - `jsonld` — generates a schema.org JSON-LD `<script type="application/ld+json">` block from a page's front matter and your `site` data, for GEO (Generative Engine Optimization) and structured data. Put it in your layout `<head>`. The `@type` auto-detects: `BlogPosting` when the page has a `date`, otherwise `WebPage`.
   - Nunjucks: `{{ page | jsonld(site) }}`
   - Liquid: `{{ page | jsonld: site }}`
