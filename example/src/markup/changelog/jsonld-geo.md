@@ -52,6 +52,8 @@ The `@type` auto-detects: `BlogPosting` when the page has a `date`, otherwise `W
 
 Article-only fields (`headline`, dates, `author`, `wordCount`) are added only for the `BlogPosting` case. Front-matter values are escaped so a stray `</script>` in a title can't break out of the tag.
 
+The same `lang` that drives `inLanguage` also declares the document language — wire `{% raw %}<html lang="{{ page.lang or site.lang or 'en' }}">{% endraw %}` in your layout so the markup and the structured data agree. `site.lang` sets the default; a page's front-matter `lang` overrides it.
+
 ## Full control
 
 Set a `jsonld` object in front matter — its keys merge over (and override) the generated defaults, including `@type`. Everything from a `HowTo` to an `FAQPage` to a `Product`:

@@ -256,6 +256,10 @@ Set `site.logo` and the publisher gains a `logo` ImageObject (made absolute) —
 results require it. On the homepage (a page with no `url`) a second `WebSite` block is emitted,
 declaring the site name for search results.
 
+`site.lang` (a page's front-matter `lang` overrides it) sets the JSON-LD `inLanguage` on every
+block. Reuse it for the language attribute too — `{% raw %}<html lang="{{ page.lang or site.lang or 'en' }}">{% endraw %}` —
+so the declared language and the markup stay in sync.
+
 For full control, set a `jsonld` object in front matter; its keys merge over (and override) the
 defaults, including `@type`:
 
