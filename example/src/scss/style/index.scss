@@ -109,6 +109,25 @@ $prose-border: rgba(130, 79, 45, 0.25); // brand brown, faded
   line-height: 1.65;
 }
 
+// ---- Breadcrumb trail (brand brown) — mirrors docs.scss `.breadcrumb` ----
+.breadcrumb { margin: 0 0 1.5rem; }
+.breadcrumb ol {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  font-size: 0.85rem;
+  color: rgba(130, 79, 45, 0.7);
+}
+.breadcrumb li { display: flex; align-items: center; gap: 0.4rem; margin: 0; }
+.breadcrumb li:not(:first-child)::before { content: "/"; color: $prose-border; }
+.breadcrumb a { color: rgba(130, 79, 45, 0.7); text-decoration: none; }
+.breadcrumb a:hover { color: #824F2D; text-decoration: underline; }
+.breadcrumb [aria-current="page"] { color: #824F2D; font-weight: 600; }
+
 .prose h1, .prose .h1,
 .prose h2, .prose .h2,
 .prose h3, .prose .h3,
