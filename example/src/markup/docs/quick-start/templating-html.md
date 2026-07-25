@@ -256,6 +256,35 @@ jsonld:
 ---
 ```
 
+#### Common `@type` values
+
+poops picks `BlogPosting` or `WebPage` for you; override `@type` (and add the type's own fields)
+via the `jsonld` object for anything else. The types search and generative engines act on most:
+
+| `@type` | Use for | Notable extra fields |
+| --- | --- | --- |
+| `WebPage` | generic page (poops default) | — |
+| `BlogPosting` / `Article` | blog posts, articles (auto when `date` is set) | `headline`, `datePublished`, `author` |
+| `NewsArticle` | news / press | `dateline`, `datePublished` |
+| `HowTo` | step-by-step guides | `step[]`, `totalTime`, `supply`, `tool` |
+| `FAQPage` | a page of Q&As | `mainEntity[]` (`Question` → `acceptedAnswer`) |
+| `QAPage` | a single question thread | `mainEntity` (`Question`) |
+| `Product` | product pages | `offers` (`Offer`), `aggregateRating`, `brand` |
+| `Recipe` | recipes | `recipeIngredient[]`, `cookTime`, `nutrition` |
+| `Event` | events | `startDate`, `location`, `offers` |
+| `Course` | courses / lessons | `provider`, `hasCourseInstance` |
+| `VideoObject` | pages built around a video | `thumbnailUrl`, `uploadDate`, `duration` |
+| `SoftwareApplication` | apps / tools | `applicationCategory`, `operatingSystem`, `offers` |
+| `Organization` | the site's company/brand entity | `logo`, `sameAs[]`, `contactPoint` |
+| `Person` | author / profile pages | `jobTitle`, `sameAs[]` |
+| `BreadcrumbList` | breadcrumb trails | `itemListElement[]` (`ListItem`) |
+| `WebSite` | one site-level block (homepage) | `potentialAction` (`SearchAction`) for a sitelinks searchbox |
+
+Full vocabulary at [schema.org/docs/full](https://schema.org/docs/full.html); check what
+[Google supports](https://developers.google.com/search/docs/appearance/structured-data/search-gallery)
+for rich results. Validate a page with the [Rich Results Test](https://search.google.com/test/rich-results)
+or the [Schema Markup Validator](https://validator.schema.org/).
+
 ## Custom engines
 
 `engine` also accepts a **module specifier** — an npm package name or a path relative to your

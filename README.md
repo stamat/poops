@@ -964,6 +964,8 @@ All filters are available in both engines. The only syntax difference is how arg
   ---
   ```
 
+  poops auto-picks `BlogPosting` (page has a `date`) or `WebPage`. Override `@type` with the `jsonld` object for any schema.org type — common ones search/generative engines act on: `Article`, `NewsArticle`, `HowTo`, `FAQPage`, `QAPage`, `Product`, `Recipe`, `Event`, `Course`, `VideoObject`, `SoftwareApplication`, `Organization`, `Person`, `BreadcrumbList`, `WebSite` (+ `SearchAction`). Full list at [schema.org/docs/full](https://schema.org/docs/full.html); validate with the [Rich Results Test](https://search.google.com/test/rich-results). A per-`@type` table with the notable fields is in the [Templating docs](example/src/markup/docs/quick-start/templating-html.md).
+
 - `groupby` — groups an array of objects by a field value. Returns an array of `{ key, items }` objects. Supports an optional second argument for date part extraction (`year`, `month`, `day`). Groups preserve insertion order, so if items are sorted by date descending, groups will be too.
   - Nunjucks: `{{ changelog.items | groupby("author") }}` or `{{ changelog.items | groupby("date", "year") }}`
   - Liquid: `{{ changelog.items | groupby: "author" }}` or `{{ changelog.items | groupby: "date", "year" }}`
