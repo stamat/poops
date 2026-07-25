@@ -954,7 +954,9 @@ All filters are available in both engines. The only syntax difference is how arg
   - Nunjucks: `{{ page | jsonld(site) }}`
   - Liquid: `{{ page | jsonld: site }}`
 
-  It reads these front-matter fields when present: `title`, `description` (falls back to `site.description`), `url` (made absolute with `site.url`), `date` → `datePublished`, `updated` → `dateModified`, `author` (string or `{ name }`, falls back to `site.author`), `image`, `lang` → `inLanguage`, and `wordcount`. `publisher` comes from `site.title`. Front-matter values are escaped so they can't break out of the `<script>` tag.
+  It reads these front-matter fields when present: `title`, `description` (falls back to `site.description`), `url` (made absolute with `site.url`), `date` → `datePublished`, `updated` → `dateModified`, `author` (string or `{ name }`, falls back to `site.author`), `image`, `lang` → `inLanguage`, and `wordcount`. `publisher` comes from `site.title`; set `site.logo` to add a `publisher.logo` ImageObject (made absolute) — Google Article rich results require it. Front-matter values are escaped so they can't break out of the `<script>` tag.
+
+  On the homepage (a page with no `url`) it also emits a site-level `WebSite` block with `name` + `url`, which declares the site name for search results.
 
   For full control, set a `jsonld` object in front matter — its keys are merged over (and override) the generated defaults, including `@type`:
 
@@ -968,7 +970,7 @@ All filters are available in both engines. The only syntax difference is how arg
   ---
   ```
 
-  poops auto-picks `BlogPosting` (page has a `date`) or `WebPage`. Override `@type` with the `jsonld` object for any schema.org type — common ones search/generative engines act on: `Article`, `NewsArticle`, `HowTo`, `FAQPage`, `QAPage`, `Product`, `Recipe`, `Event`, `Course`, `VideoObject`, `SoftwareApplication`, `Organization`, `Person`, `BreadcrumbList`, `WebSite` (+ `SearchAction`). Full list at [schema.org/docs/full](https://schema.org/docs/full.html); validate with the [Rich Results Test](https://search.google.com/test/rich-results). A per-`@type` table with the notable fields is in the [Templating docs](example/src/markup/docs/quick-start/templating-html.md).
+  poops auto-picks `BlogPosting` (page has a `date`) or `WebPage`. Override `@type` with the `jsonld` object for any schema.org type — common ones search/generative engines act on: `Article`, `NewsArticle`, `HowTo`, `FAQPage`, `QAPage`, `Product`, `Recipe`, `Event`, `Course`, `VideoObject`, `SoftwareApplication`, `Organization`, `Person`, `BreadcrumbList`, `WebSite`. Full list at [schema.org/docs/full](https://schema.org/docs/full.html); validate with the [Rich Results Test](https://search.google.com/test/rich-results). A per-`@type` table with the notable fields is in the [Templating docs](example/src/markup/docs/quick-start/templating-html.md).
 
 - `groupby` — groups an array of objects by a field value. Returns an array of `{ key, items }` objects. Supports an optional second argument for date part extraction (`year`, `month`, `day`). Groups preserve insertion order, so if items are sorted by date descending, groups will be too.
   - Nunjucks: `{{ changelog.items | groupby("author") }}` or `{{ changelog.items | groupby("date", "year") }}`

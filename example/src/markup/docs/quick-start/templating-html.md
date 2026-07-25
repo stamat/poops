@@ -250,8 +250,14 @@ generative engines (GEO) read. Drop it in your layout `<head>`:
 Liquid: `{% raw %}{{ page | jsonld: site }}{% endraw %}`. The `@type` auto-detects — `BlogPosting`
 when the page has a `date`, otherwise `WebPage` — pulling `title`, `description`, `url` (made
 absolute via `site.url`), `date`, `author`, `image` and more from front matter. Values are escaped so
-they can't break out of the `<script>`. For full control, set a `jsonld` object in front matter; its
-keys merge over (and override) the defaults, including `@type`:
+they can't break out of the `<script>`.
+
+Set `site.logo` and the publisher gains a `logo` ImageObject (made absolute) — Google Article rich
+results require it. On the homepage (a page with no `url`) a second `WebSite` block is emitted,
+declaring the site name for search results.
+
+For full control, set a `jsonld` object in front matter; its keys merge over (and override) the
+defaults, including `@type`:
 
 ```yaml
 ---
@@ -285,7 +291,7 @@ via the `jsonld` object for anything else. The types search and generative engin
 | `Organization` | the site's company/brand entity | `logo`, `sameAs[]`, `contactPoint` |
 | `Person` | author / profile pages | `jobTitle`, `sameAs[]` |
 | `BreadcrumbList` | breadcrumb trails | `itemListElement[]` (`ListItem`) |
-| `WebSite` | one site-level block (homepage) | `potentialAction` (`SearchAction`) for a sitelinks searchbox |
+| `WebSite` | one site-level block (homepage) | declares the site name; auto-emitted on the homepage |
 
 Full vocabulary at [schema.org/docs/full](https://schema.org/docs/full.html); check what
 [Google supports](https://developers.google.com/search/docs/appearance/structured-data/search-gallery)
