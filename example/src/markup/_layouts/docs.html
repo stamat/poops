@@ -40,7 +40,7 @@
     <div class="sidebar-scrim" data-nav-close></div>
 
     <main class="content">
-      {{ page | breadcrumb(site) }}
+      {{ page | breadcrumb(site, relativePathPrefix) }}
       <article class="prose">
         {{ pageBody }}
       </article>
