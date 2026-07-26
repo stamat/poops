@@ -118,6 +118,21 @@ without it, there is only one page and the pagination globals stay at their sing
 Pages 2..N automatically get a distinct `<title>` — `Blog — Page 2` — so the paginated pages don't
 all share the landing page's title (and its `og`/`jsonld` metadata). Page 1 keeps its own title.
 
+### Localizing the labels
+
+The `— Page N` title suffix and the `{% raw %}{% pagination %}{% endraw %}` tag's wording default to
+English. Override them site-wide under `site.pagination` (the same term-page titles and breadcrumbs
+localize too — see [Tags & categories](#tags-categories-taxonomies)):
+
+```yaml
+site:
+  pagination:
+    title: "{title} — Seite {n}"   # {title}, {n}, {total} tokens; used on pages 2..N
+    prev: Zurück
+    next: Weiter
+    of: von                        # the "{n} von {total}" separator
+```
+
 ## Grouping posts by year
 
 The `groupby` filter groups any array of objects by a field, with optional date-part extraction.
