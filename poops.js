@@ -4,8 +4,9 @@ import chokidar from 'chokidar'
 import connect from 'connect'
 import Copy from './lib/copy.js'
 import runExec, { validateExec } from './lib/exec.js'
-import { pathExists, doesFileBelongToPath, pathContainsPathSegment, deriveWatchDirs } from './lib/utils/helpers.js'
+import { pathExists, doesFileBelongToPath, pathContainsPathSegment, deriveWatchDirs, toPosix } from './lib/utils/helpers.js'
 import http from 'node:http'
+import net from 'node:net'
 import os from 'node:os'
 import fs from 'node:fs'
 import livereload from 'livereload'
@@ -19,7 +20,6 @@ import log, { styledLog, hasLoggedErrors } from './lib/utils/log.js'
 import Styles from './lib/styles.js'
 import PostCSS from './lib/postcss.js'
 import Argoyle from 'argoyle'
-import portscanner from 'portscanner'
 
 const cwd = process.cwd() // Current Working Directory
 const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), 'utf-8'))
@@ -47,7 +47,7 @@ const overrideLivereloadPort = flags['livereload-port']
 const overrideBaseURL = flags['base-url']
 
 let configPath = path.join(cwd, defaultConfigPath)
-if (!pathExists(configPath)) configPath = path.join(cwd, '💩.json') // TODO: Ok dude, I know it's late, but you can do better than this.
+if (!pathExists(configPath)) configPath = path.join(cwd, '💩.json') // the canonical alternative config name
 
 async function resolveLiveReloadPort(config) {
   if (!config.livereload) return null
@@ -91,10 +91,12 @@ function reload(file) {
 // The css output paths of the styles entries — what the styles chain reports
 // to reload() so style edits hot-swap. A directory `out` maps to the entry
 // point's basename, mirroring how the styles compiler names its output file.
+// toPosix: the livereload client matches these against URL paths, so Windows
+// backslashes would silently break the CSS hot-swap.
 function styleOutputs(config) {
   return [config.styles].flat()
     .filter((entry) => entry && entry.in && entry.out)
-    .map((entry) => (path.extname(entry.out)
+    .map((entry) => toPosix(path.extname(entry.out)
       ? entry.out
       : path.join(entry.out, path.basename(entry.in).replace(/\.(sass|scss)$/i, '.css'))))
 }
@@ -126,6 +128,10 @@ function setupWatchers(config, modules) {
   // compiler, or watch loops forever. Zones are the dirs the compilers write
   // into; only their own extensions are skipped there, so e.g. a hand-edited
   // .liquid asset in the same dir still rebuilds markup.
+  // markup/images outs are deliberately NOT zoned: markup sources legitimately
+  // live beside markup output (Shopify theme dirs), so zoning them would stop
+  // hand-edits from rebuilding. Constraint: keep markup.out/images.out outside
+  // the watch list, or every compile retriggers itself.
   const outputZones = [config.scripts, config.styles].flat()
     .filter((entry) => entry && entry.out)
     .map((entry) => (path.extname(entry.out) ? path.dirname(entry.out) : entry.out))
@@ -230,6 +236,10 @@ function setupWatchers(config, modules) {
 
   chokidar.watch(config.watch, {
     ignoreInitial: true,
+    // Reactor's temp wrapper/bundle files are written next to the component
+    // source (a watched dir) — without this they'd retrigger the script/
+    // reactor rebuild that created them, looping the watcher.
+    ignored: /\.reactor-(tmp|bundle)-/,
     awaitWriteFinish: { stabilityThreshold: 150, pollInterval: 50 }
   }).on('change', compileChanged)
     .on('add', (file) => {
@@ -302,6 +312,17 @@ if (!pathExists(configPath)) {
 // Load poops.json
 const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
 
+// A typo'd top-level key ("stlyes") is otherwise silently ignored — warn, same
+// idea as validateExec for exec stages. `ssg` is the reactor alias; `pkg` feeds
+// banner templates; livereload_port/reactorData are set internally but tolerated
+// here in case a config hardcodes them.
+const KNOWN_CONFIG_KEYS = new Set(['watch', 'includePaths', 'scripts', 'styles', 'postcss', 'reactor', 'ssg', 'markup', 'copy', 'images', 'serve', 'livereload', 'exec', 'banner', 'pkg', 'livereload_port', 'reactorData'])
+for (const key of Object.keys(config)) {
+  if (!KNOWN_CONFIG_KEYS.has(key)) {
+    log({ tag: 'info', warn: true, text: `Unknown config key "${key}" — ignored. Valid: ${[...KNOWN_CONFIG_KEYS].join(', ')}` })
+  }
+}
+
 if (config.watch === true) {
   config.watch = deriveWatchDirs(config)
 } else if (config.watch) {
@@ -329,16 +350,23 @@ if (config.images && typeof config.images === 'object' && config.images.configDi
   config.images.configDir = path.dirname(configPath)
 }
 
+// Bind probe on 0.0.0.0 — the same interface the servers listen on, so a
+// "free" answer here can't be beaten to the port by a localhost-only check.
+function isPortFree(port) {
+  return new Promise((resolve) => {
+    const probe = net.createServer()
+    probe.once('error', () => resolve(false))
+    probe.once('listening', () => probe.close(() => resolve(true)))
+    probe.listen(port, '0.0.0.0')
+  })
+}
+
 async function getAvailablePort(port, max) {
-  while (port < max) {
-    const status = await portscanner.checkPortStatus(port, 'localhost')
-    if (status === 'closed') {
-      return port
-    } else {
-      port++
-    }
+  for (; port <= max; port++) {
+    if (await isPortFree(port)) return port
   }
-  return port
+  log({ tag: 'error', text: `No free port found in range ${max - 10}-${max}.` })
+  process.exit(1)
 }
 
 function getLocalIP() {
@@ -385,14 +413,22 @@ async function startServer() {
   })
 }
 
+// A rejection here is a startup failure (port scan, initial compile) — exit
+// loudly instead of dying as an unhandled rejection.
+const die = (err) => {
+  console.error(err)
+  process.exit(1)
+}
+
 // Start the webserver
 if (!build && config.serve) {
-  startServer()
+  startServer().catch(die)
 } else if (!build && config.livereload) {
   // livereload without serve: still needs the livereload server
   resolveLiveReloadPort(config)
     .then(poops)
     .then(() => setupLiveReloadServer(config))
+    .catch(die)
 } else {
-  poops()
+  poops().catch(die)
 }

@@ -48,7 +48,10 @@
   "scripts": {
     "build": "node ./poops.js -b",
     "lint": "eslint .",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
     "argoyle": "^1.0.0",
@@ -66,7 +69,6 @@
     "marked-github-emoji": "^1.0.2",
     "marked-github-footnote": "^1.0.0",
     "nunjucks": "^3.2.4",
-    "portscanner": "^2.2.0",
     "printstyle": "^1.0.0",
     "sass": "^1.63.4",
     "sass-path-resolver": "^1.0.2",

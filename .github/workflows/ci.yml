@@ -12,6 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        node-version: [20, 22, 24]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -21,7 +22,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: ${{ matrix.node-version }}
           cache: "npm"
 
       - name: Install dependencies
@@ -30,19 +31,16 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # NODE_OPTIONS is set via env instead of the npm test script because the
-      # script's POSIX `VAR=value` syntax does not work in the Windows shell.
       - name: Test
-        run: npx jest
-        env:
-          NODE_OPTIONS: --experimental-vm-modules
+        run: npm test
 
       - name: Build example site
         run: npm run build
 
-      # Assert artifacts rather than exit code: poops -b currently exits 0
-      # even when compiles fail (IMPROVEMENT-PLAN.md #15). On Windows a
-      # path-handling regression compiles zero files, so these checks catch it.
+      # poops -b exits non-zero on compile failure, so the step above already
+      # gates. These artifact checks add a Windows-specific guard: a path
+      # regression can compile zero files while still exiting 0-ish, and the
+      # separator greps catch backslashes leaking into emitted URLs.
       - name: Verify build output
         shell: bash
         run: |
