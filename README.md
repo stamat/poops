@@ -72,6 +72,7 @@ It uses a simple config file where you define your input and output paths and it
 - Resolves node modules
 - Can add a templatable banner to output files (optional)
 - Static site generation with swappable template engines: [Nunjucks](https://mozilla.github.io/nunjucks/) (default) or [Liquid](https://liquidjs.com/) — with blogging option (optional)
+- Collections with pagination, and taxonomies — tags/categories as paginated, crawlable landing pages (with localizable labels)
 - Has a configurable local server (optional)
 - Rebuilds on file changes (optional)
 - Live reloads on file changes (optional)
@@ -1046,7 +1047,7 @@ All filters are available in both engines. The only syntax difference is how arg
 
   The home crumb is optional: set `breadcrumb: { home: false }` (or `{ homeLabel: "Start" }` to rename it) under `site` or in a page's front matter — front matter wins. With the home crumb off, top-level pages fall to a single crumb and render nothing, while nested pages still show their folder trail. `breadcrumb: false` on a page or on `site` disables both the visible trail and the auto `BreadcrumbList` JSON-LD. Returns nothing on the homepage or any single-crumb page.
 
-- `groupby` — groups an array of objects by a field value. Returns an array of `{ key, items }` objects. Supports an optional second argument for date part extraction (`year`, `month`, `day`). Groups preserve insertion order, so if items are sorted by date descending, groups will be too.
+- `groupby` — groups an array of objects by a field value. Returns an array of `{ key, items }` objects. Supports an optional second argument for date part extraction (`year`, `month`, `day`). Groups preserve insertion order, so if items are sorted by date descending, groups will be too. Array-valued fields split per element — an item with `tags: [js, css]` appears in **both** the `js` and `css` groups (the mechanism behind [taxonomies](#taxonomies-tags--categories)).
   - Nunjucks: `{{ changelog.items | groupby("author") }}` or `{{ changelog.items | groupby("date", "year") }}`
   - Liquid: `{{ changelog.items | groupby: "author" }}` or `{{ changelog.items | groupby: "date", "year" }}`
 
@@ -1217,7 +1218,7 @@ All front matter fields are passed through to the index automatically. Internal 
 ]
 ```
 
-**Sitemap** generates a standard `sitemap.xml` with `<loc>` and `<lastmod>` (from front matter `date`). If `site.url` is set in your markup config, it is prepended to all URLs. Collection index/pagination pages are included in the sitemap but excluded from the search index.
+**Sitemap** generates a standard `sitemap.xml` with `<loc>` and `<lastmod>` (from front matter `date`). If `site.url` is set in your markup config, it is prepended to all URLs. Collection index/pagination and taxonomy term pages are included in the sitemap but excluded from the search index.
 
 **llms.txt** generates an [`llms.txt`](https://llmstxt.org) — a Markdown index of your pages that LLMs and generative engines (GEO) read to understand your site. It has an `# H1` title, a `> ` blockquote summary, then `- [title](url): description` links grouped by URL path: the first folder is a `## section`, a second folder nests as a `### subsection` under it, and root-level pages fall under a lead "Pages" section. So `docs/config-reference.html` lands directly under `## Docs` while `docs/quick-start/x.html` lands under `### Quick Start` inside it. Collection items (which live under `collection/…`) group the same way and are ordered newest-first by their `date`; other sections keep file order. Set `intro` to a Markdown file path (relative to the project root) to insert free-form context between the blockquote and the link sections — a file authored for LLMs, e.g. `llms-intro.md`. Avoid `##` headings in it; they read as sections. (A raw README is a poor fit — badges, install noise and its own headings collide.) `title` and `description` default to your `site.title`/`site.description`; override them (and the lead section name via `sectionTitle`) with the object form. `site.url` makes the links absolute. Collection index/pagination pages are skipped, like the search index.
 
