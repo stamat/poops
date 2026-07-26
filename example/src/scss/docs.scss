@@ -110,9 +110,17 @@ a:hover { text-decoration: underline; }
 
 // ---- Search ----
 .search { position: relative; margin-left: auto; width: min(22rem, 40vw); }
+.search-icon {
+  position: absolute;
+  left: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--fg-muted);
+  pointer-events: none;
+}
 #search-input {
   width: 100%;
-  padding: 0.4rem 0.75rem;
+  padding: 0.4rem 0.75rem 0.4rem 2rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg-alt);
@@ -290,7 +298,7 @@ a:hover { text-decoration: underline; }
   background: var(--bg-code);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1rem 1.1rem;
+  padding: 1rem 3.7rem 1rem 1.1rem;
   overflow-x: auto;
   font-size: 0.85rem;
   line-height: 1.6;
@@ -298,21 +306,42 @@ a:hover { text-decoration: underline; }
 .prose pre code { font-family: var(--font-mono); background: none; border: 0; padding: 0; }
 .copy-btn {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  padding: 0.25rem 0.55rem;
-  font-size: 0.72rem;
-  font-family: var(--font-body);
+  top: 0.7rem;
+  right: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
   border: 1px solid var(--border);
   border-radius: 0.35rem;
   background: var(--bg);
   color: var(--fg-muted);
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.12s;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
 }
-.code-wrap:hover .copy-btn, .copy-btn:focus { opacity: 1; }
+.copy-btn:hover { background: var(--bg-alt); color: var(--fg); }
+.copy-btn .icon-check { display: none; }
 .copy-btn.copied { color: #2f9e44; border-color: #2f9e44; }
+.copy-btn.copied .icon-copy { display: none; }
+.copy-btn.copied .icon-check { display: inline; }
+// Tooltip shown while in copied state.
+.copy-btn.copied::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 0.4rem);
+  transform: translateY(-50%);
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.3rem;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 0.7rem;
+  font-family: var(--font-body);
+  white-space: nowrap;
+  pointer-events: none;
+}
 
 // ---- Admonitions ----
 .admonition,
@@ -361,6 +390,18 @@ a:hover { text-decoration: underline; }
 .marked-github-alert-note { --adm: #7048e8; }
 
 // ---- Footer ----
+.edit-link {
+  display: inline-block;
+  margin-top: 3rem;
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+  text-decoration: none;
+
+  &:hover { color: var(--link); text-decoration: underline; }
+}
+
+.edit-link + .page-footer { margin-top: 1.5rem; }
+
 .page-footer {
   width: 100%;
   max-width: var(--content-max);
