@@ -3,6 +3,7 @@
 import chokidar from 'chokidar'
 import connect from 'connect'
 import Copy from './lib/copy.js'
+import runExec from './lib/exec.js'
 import { pathExists, doesFileBelongToPath, pathContainsPathSegment, deriveWatchDirs } from './lib/utils/helpers.js'
 import http from 'node:http'
 import os from 'node:os'
@@ -98,6 +99,10 @@ function styleOutputs(config) {
       : path.join(entry.out, path.basename(entry.in).replace(/\.(sass|scss)$/i, '.css'))))
 }
 
+// Per-stage shell hooks (config.exec). Runs after a stage compiles in both
+// build and watch; see lib/exec.js. `hook(stage)` binds config + cwd here.
+const hook = (stage) => runExec(config, cwd, stage)
+
 function setupLiveReloadServer(config) {
   if (!config.livereload) return
   liveReloadServer = livereload.createServer({ port: config.livereload_port })
@@ -132,33 +137,33 @@ function setupWatchers(config, modules) {
     // exactly this file's entries; shared by change/add/unlink via rebuild.
     modules.markups.invalidate(file)
     if (/(\.m?jsx?|\.tsx?)$/i.test(file) && !isBuildOutput(file)) {
-      modules.scripts.compile().then(() => reload()).catch(err => console.error(err))
+      modules.scripts.compile().then(() => { hook('scripts'); reload() }).catch(err => console.error(err))
 
       if (modules.reactor.belongsToReactor(file)) {
         modules.reactor.compile().then(() => {
           if (modules.reactor.renderedChanged) {
             config.reactorData = modules.reactor.getRendered()
-            modules.markups.compile().then(() => modules.postcss.compile()).then(() => reload()).catch(err => console.error(err))
+            modules.markups.compile().then(() => modules.postcss.compile()).then(() => { hook('markup'); reload() }).catch(err => console.error(err))
           }
         }).catch(err => console.error(err))
       }
     }
     if (/(\.sass|\.scss|\.css)$/i.test(file) && !isBuildOutput(file)) {
       modules.styles.compile().then(() => modules.postcss.compile())
-        .then(() => styleOutputs(config).forEach((out) => reload(out)))
+        .then(() => { hook('styles'); styleOutputs(config).forEach((out) => reload(out)) })
         .catch(err => console.error(err))
     }
     if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.liquid|\.md)$/i.test(file)) {
       // Incremental: re-render only the pages whose last render touched this
       // file; falls back to a full compile for anything it can't prove safe
       // (deletions, new files, collection members, engines without dep info).
-      modules.markups.compileIncremental(file).then(() => modules.postcss.compile()).then(() => reload()).catch(err => console.error(err))
+      modules.markups.compileIncremental(file).then(() => modules.postcss.compile()).then(() => { hook('markup'); reload() }).catch(err => console.error(err))
     }
 
     if (/(\.json|\.ya?ml)$/i.test(file)) {
       // Engine-owned markup with a data extension (Shopify templates/*.json)
       // goes incremental; real data files reload globals + full compile.
-      modules.markups.compileDataChange(file).then(() => reload()).catch(err => console.error(err))
+      modules.markups.compileDataChange(file).then(() => { hook('markup'); reload() }).catch(err => console.error(err))
     }
   }
 
@@ -174,13 +179,13 @@ function setupWatchers(config, modules) {
       modules.images.compile()
         .then(() => modules.markups.compile())
         .then(() => modules.postcss.compile())
-        .then(() => reload())
+        .then(() => { hook('images'); hook('markup'); reload() })
         .catch(err => console.error(err))
     }
     // A copied .css (e.g. the styles compiler's own output landing in a copy
     // source) stays a hot-swap; any other copied file needs a full reload.
     doesFileBelongToPath(file, config.copy) && modules.copy.execute()
-      .then(() => reload(/\.css$/i.test(file) ? file : undefined))
+      .then(() => { hook('copy'); reload(/\.css$/i.test(file) ? file : undefined) })
       .catch(err => console.error(err))
   }
 
@@ -207,7 +212,7 @@ function setupWatchers(config, modules) {
       modules.images.remove(file)
         .then(() => modules.markups.compile())
         .then(() => modules.postcss.compile())
-        .then(() => reload())
+        .then(() => { hook('images'); hook('markup'); reload() })
         .catch(err => console.error(err))
     }
     rebuild(file)
@@ -218,7 +223,7 @@ function setupWatchers(config, modules) {
     modules.markups.invalidate(dirPath) // prefix match drops every template under it
     modules.markups.removeOutput(dirPath)
     if (doesFileBelongToPath(dirPath, config.markup)) {
-      modules.markups.compile().then(() => modules.postcss.compile()).then(() => reload()).catch(err => console.error(err))
+      modules.markups.compile().then(() => modules.postcss.compile()).then(() => { hook('markup'); reload() }).catch(err => console.error(err))
     }
     modules.copy.unlink(dirPath, doesFileBelongToPath(dirPath, config.copy))
   }
@@ -259,12 +264,19 @@ async function poops() {
 
   await step(() => styles.compile())
   await step(() => reactor.compile())
+  failed = hook('reactor') || failed
   config.reactorData = reactor.getRendered()
   await step(() => scripts.compile())
+  failed = hook('scripts') || failed
   await step(() => images.compile()) // before markups: engines read the poops-images cache
+  failed = hook('images') || failed
   await step(() => markups.compile())
+  failed = hook('markup') || failed
   await step(() => postcss.compile())
+  failed = hook('styles') || failed // after PostCSS so the CSS is final
   await step(() => copy.execute())
+  failed = hook('copy') || failed
+  failed = hook('build') || failed
 
   if (build || (!config.watch && !config.livereload && !config.serve)) {
     process.exit(failed || hasLoggedErrors() ? 1 : 0)

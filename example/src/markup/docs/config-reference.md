@@ -219,6 +219,41 @@ like `[[:alpha:]]`):
 }
 ```
 
+## `exec`
+
+Shell commands to run after a pipeline stage compiles — a post-processor that needs the built
+output, like stripping comments from the unminified CSS or regenerating a reference page. Keyed
+by stage, each value a command string or an array run in order:
+
+```json
+{
+  "exec": {
+    "styles": [
+      "node script/strip-css-comments.mjs dist/styles.css",
+      "node script/gen-reference.mjs"
+    ],
+    "build": "node script/deploy.mjs"
+  }
+}
+```
+
+Unlike chaining `poops -b && cmd` in an npm script, the hook runs on **every** rebuild — in
+watch/dev too — so the post-processed output never drifts while you work. Commands run from the
+project root; a failing command fails a `-b` build's exit code but is logged and swallowed in
+watch so the watcher survives.
+
+Stages:
+
+| Stage     | Runs after                                                              |
+| --------- | ----------------------------------------------------------------------- |
+| `styles`  | CSS is final (after PostCSS) — use this for anything reading the built CSS |
+| `scripts` | scripts compile                                                         |
+| `reactor` | reactor components render (build only)                                  |
+| `images`  | images process                                                         |
+| `markup`  | markup renders                                                         |
+| `copy`    | files copy                                                             |
+| `build`   | once, after the full initial pipeline (not per watch rebuild)          |
+
 ## `banner`
 
 A comment stamped on top of every output file. Templatable via mustache from your project's
