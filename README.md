@@ -1,4 +1,4 @@
-# 💩 Poops [![npm version](https://img.shields.io/npm/v/poops)](https://www.npmjs.com/package/poops)[![build status](https://github.com/stamat/poops/actions/workflows/ci.yml/badge.svg)](https://github.com/stamat/poops/actions/workflows/ci.yml)[![license](https://img.shields.io/github/license/stamat/poops.svg)](https://github.com/stamat/poops/blob/main/LICENSE)
+# 💩 Poops [![npm version](https://img.shields.io/npm/v/poops)](https://www.npmjs.com/package/poops) [![build status](https://github.com/stamat/poops/actions/workflows/ci.yml/badge.svg)](https://github.com/stamat/poops/actions/workflows/ci.yml) [![license](https://img.shields.io/github/license/stamat/poops.svg)](https://github.com/stamat/poops/blob/main/LICENSE)
 
 Straightforward, no-bullshit bundler for the web.
 
