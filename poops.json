@@ -90,7 +90,8 @@
     },
     "feed": {
       "collection": "changelog",
-      "output": "changelog/feed.rss"
+      "output": "changelog/feed.rss",
+      "content": true
     }
   },
   "copy": [

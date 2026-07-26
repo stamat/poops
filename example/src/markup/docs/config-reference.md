@@ -479,6 +479,7 @@ and links / `guid`s are made absolute with `site.url`. The object form:
 | `description` | Channel description. Default `site.description`.                                                                  |
 | `author`      | Feed author. Default `site.author`.                                                                               |
 | `lang`        | Feed language. Default `site.lang`.                                                                               |
+| `content`     | `true` adds each post's full article HTML (RSS `<content:encoded>`, Atom `<content type="html">`). Default off.   |
 
 Shorthand: `true` (or a filename string) emits an RSS feed for every collection; an array of these
 objects generates several feeds at once (e.g. an RSS and an Atom for one collection). Item
@@ -488,3 +489,8 @@ readers to it from your layout `<head>`:
 ```html
 {% raw %}<link rel="alternate" type="application/rss+xml" href="{{ site.url }}/changelog/feed.rss">{% endraw %}
 ```
+
+`content: true` renders each post's Markdown **source** to article-body HTML (not the whole page —
+no layout/nav chrome), so only `.md`/`.markdown` posts get a `<content:encoded>`; others fall back
+to `<description>` alone. Unrendered `{% raw %}{% … %}{% endraw %}` tags or shortcodes in a body
+pass through verbatim.
