@@ -1,5 +1,8 @@
 # 💩 Poops [![npm version](https://img.shields.io/npm/v/poops)](https://www.npmjs.com/package/poops)
 
+[![build status](https://github.com/stamat/poops/actions/workflows/ci.yml/badge.svg)](https://github.com/stamat/poops/actions/workflows/ci.yml)
+[![license](https://img.shields.io/github/license/stamat/poops.svg)](https://github.com/stamat/poops/blob/main/LICENSE)
+
 Straightforward, no-bullshit bundler for the web.
 
 > When your day is long
@@ -784,9 +787,9 @@ title: Changelog
 collection: true
 paginate: 10
 taxonomies:
-  - name: tags      # front-matter field to group on
-    path: tag       # URL segment (defaults to name); "tag" for a singular URL
-    paginate: 5     # per-term page size (defaults to the collection's paginate)
+  - name: tags # front-matter field to group on
+    path: tag # URL segment (defaults to name); "tag" for a singular URL
+    paginate: 5 # per-term page size (defaults to the collection's paginate)
 ---
 ```
 
@@ -871,9 +874,15 @@ Output:
 ```
 
 ```html
-<img src="static/photo-thumb-480w.webp"
-     srcset="static/photo-thumb-480w.webp 480w, static/photo-thumb.webp 960w"
-     width="480" height="480" sizes="240px" alt="" loading="lazy">
+<img
+  src="static/photo-thumb-480w.webp"
+  srcset="static/photo-thumb-480w.webp 480w, static/photo-thumb.webp 960w"
+  width="480"
+  height="480"
+  sizes="240px"
+  alt=""
+  loading="lazy"
+/>
 ```
 
 This requires the [poops-images](https://github.com/stamat/poops-images) compile cache (named-size widths are read from it). The `size` name matches a named entry in your `images.sizes` config. The largest member of the group is written without a width suffix (`photo-thumb.webp`) — poops still srcsets it at its real width from the cache.
@@ -1041,7 +1050,7 @@ All filters are available in both engines. The only syntax difference is how arg
 
   poops auto-picks `BlogPosting` (page has a `date`) or `WebPage`. Override `@type` with the `jsonld` object for any schema.org type — common ones search/generative engines act on: `Article`, `NewsArticle`, `HowTo`, `FAQPage`, `QAPage`, `Product`, `Recipe`, `Event`, `Course`, `VideoObject`, `SoftwareApplication`, `Organization`, `Person`, `BreadcrumbList`, `WebSite`. Full list at [schema.org/docs/full](https://schema.org/docs/full.html); validate with the [Rich Results Test](https://search.google.com/test/rich-results). A per-`@type` table with the notable fields is in the [Templating docs](example/src/markup/docs/quick-start/templating-html.md).
 
-- `breadcrumb` — generates a visible breadcrumb `<nav class="breadcrumb"><ol>…</ol></nav>` trail for the page body (blog posts, nested pages), from the same URL-depth data the `jsonld` `BreadcrumbList` uses: the site root, each ancestor folder (humanized, e.g. `docs/static-site` → *Static Site*), then the current page as `aria-current` text. Pass `relativePathPrefix` so links resolve against the current output location (localhost in dev, your deployed subpath in prod) — not the absolute domain.
+- `breadcrumb` — generates a visible breadcrumb `<nav class="breadcrumb"><ol>…</ol></nav>` trail for the page body (blog posts, nested pages), from the same URL-depth data the `jsonld` `BreadcrumbList` uses: the site root, each ancestor folder (humanized, e.g. `docs/static-site` → _Static Site_), then the current page as `aria-current` text. Pass `relativePathPrefix` so links resolve against the current output location (localhost in dev, your deployed subpath in prod) — not the absolute domain.
   - Nunjucks: `{{ page | breadcrumb(site, relativePathPrefix) }}`
   - Liquid: `{{ page | breadcrumb: site, relativePathPrefix }}`
 
@@ -1076,7 +1085,7 @@ All filters are available in both engines. The only syntax difference is how arg
 
 Returns: `static/photo-320w.webp 320w, static/photo-640w.webp 640w, static/photo-960w.webp 960w`
 
-  Pass a named crop/resize group as the second argument to get that group's srcset instead of the default widths: `{{ 'static/photo.jpg' | srcset: 'thumb' }}` → `static/photo-thumb-480w.webp 480w, static/photo-thumb.webp 960w`.
+Pass a named crop/resize group as the second argument to get that group's srcset instead of the default widths: `{{ 'static/photo.jpg' | srcset: 'thumb' }}` → `static/photo-thumb-480w.webp 480w, static/photo-thumb.webp 960w`.
 
 - `exif` — returns the EXIF metadata object for an image from the [poops-images](https://github.com/stamat/poops-images) compile cache (`.poops-images-cache.json` in the output directory), or `null` if there is no cache or no EXIF data. The object includes camera (`make`, `model`, `lensModel`), exposure (`fNumber`, `exposure.formatted`, `iso`, `focalLength35mm`), `dateTime`, and `gps` (`latitude.formatted`, `longitude.formatted`, `altitude`, and a ready-made `googleMapsUrl`).
 
@@ -1241,7 +1250,8 @@ Pages with `published: false` in their front matter are excluded from all output
 A page's front matter `robots: noindex` (or `none`) drops it from the **sitemap and llms.txt** — for drafts, thin or utility pages (a 404, say) you don't want crawled or fed to LLMs. It stays in the search index (that's your own on-site search). Emit the matching crawler directive in your layout `<head>` so the page itself carries it:
 
 ```html
-{% if page.robots %}<meta name="robots" content="{{ page.robots }}">{% endif %}
+{% if page.robots %}<meta name="robots" content="{{ page.robots }}" />{% endif
+%}
 ```
 
 **Navigation tree** builds your page hierarchy as sidebar-ready data, exposed two ways: as the `nav` template global (loaded automatically, always reflecting the current build) and as a nested JSON file for client-side rendering. Subpages nest automatically from URL structure: `guide/index.md` becomes a parent node and `guide/getting-started.md`, `guide/advanced/config.md` become its (and its subsections') children. Add `nav` to your markup config:
@@ -1385,7 +1395,11 @@ Shorthand forms: `"feed": true` (or a filename string) emits an RSS feed for eve
 Point browsers and readers at it from your layout `<head>`:
 
 ```html
-<link rel="alternate" type="application/rss+xml" href="{{ site.url }}/blog/feed.rss">
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  href="{{ site.url }}/blog/feed.rss"
+/>
 ```
 
 ### Images (optional)
