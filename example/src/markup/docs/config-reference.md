@@ -405,9 +405,17 @@ collection index/pagination pages are skipped. A string sets the filename; the o
 | `description`  | Blockquote summary. Defaults to `site.description`.                             |
 | `intro`        | Path (from project root) to a Markdown file inserted as free-form body context. |
 | `sectionTitle` | Heading for the lead (uncollected) section. Default `"Pages"`.                  |
+| `full`         | Also write an `llms-full.txt` (below). `true` uses that filename; a string sets it. |
 
 Point `intro` at a file authored for LLMs (e.g. `llms-intro.md`) — not a raw README, whose
 badges, install noise and `##` headings collide with the generated sections.
+
+`full` writes the companion **`llms-full.txt`** — every page's full content concatenated into one
+file (llms.txt is the link index; this is the whole corpus). Content is each page's Markdown
+**source**, so only `.md`/`.markdown` pages are included (an `.njk`/`.liquid` source is template
+code, not prose); `noindex` and collection index pages are dropped. Each page becomes an `# title`
++ `URL:` line + body, joined by `---`. Unrendered `{% raw %}{% … %}{% endraw %}` tags or shortcodes
+in a Markdown body pass through verbatim.
 
 ## `markup.robots`
 

@@ -79,7 +79,8 @@
     "sitemap": "sitemap.xml",
     "llms": {
       "output": "llms.txt",
-      "intro": "example/src/llms-intro.md"
+      "intro": "example/src/llms-intro.md",
+      "full": true
     },
     "robots": "robots.txt",
     "nav": {
