@@ -40,6 +40,7 @@ It uses a simple config file where you define your input and output paths and it
     - [Nunjucks vs Liquid](#nunjucks-vs-liquid)
     - [Custom Engines](#custom-engines)
     - [Collections & Pagination](#collections--pagination)
+    - [Taxonomies (Tags & Categories)](#taxonomies-tags--categories)
     - [Custom Tags](#custom-tags)
       - [image](#image)
       - [googleFonts](#googlefonts)
@@ -749,7 +750,72 @@ Or use the `{% pagination %}` shorthand tag (available in both engines), which r
 {% pagination changelog %}
 ```
 
+Pages 2..N automatically get a distinct `<title>` — `Changelog — Page 2` — so paginated pages don't all share the landing page's title (and its `og`/`jsonld` metadata). Page 1 keeps its own title.
+
+**Localizing the labels.** The `— Page N` title suffix and the `{% pagination %}` tag's `Previous`/`Next`/`of` wording default to English. Override them site-wide under `site.pagination`:
+
+```json
+{
+  "markup": {
+    "site": {
+      "pagination": {
+        "title": "{title} — Seite {n}",
+        "prev": "Zurück",
+        "next": "Weiter",
+        "of": "von"
+      }
+    }
+  }
+}
+```
+
+`title` accepts `{title}`, `{n}` and `{total}` tokens and applies to pages 2..N (and taxonomy term pages); `prev`/`next`/`of` localize the `{% pagination %}` tag (`{n} of {total}` → `{n} von {total}`).
+
 Item pages themselves are compiled like any other markup file, preserving the directory structure: `src/markup/changelog/my-post.md` → `dist/changelog/my-post.html`. A collection directory without an index file still builds its items and exposes the collection to templates — only the paginated listing pages are skipped.
+
+#### Taxonomies (Tags & Categories)
+
+A **taxonomy** turns a front-matter field (tags, categories, authors) into its own paginated, crawlable landing page per term — `changelog/tag/feature/`, `blog/category/release/`. Declare which fields become taxonomies on the collection, alongside `paginate`/`sort` — either in the index front matter or the config entry:
+
+```yaml
+---
+title: Changelog
+collection: true
+paginate: 10
+taxonomies:
+  - name: tags      # front-matter field to group on
+    path: tag       # URL segment (defaults to name); "tag" for a singular URL
+    paginate: 5     # per-term page size (defaults to the collection's paginate)
+---
+```
+
+Shorthand: a bare string list (`taxonomies: [tags, category]`) uses each field name as the URL segment and inherits the collection's `paginate`. Array-valued fields split per element — a post with `tags: [js, css]` lands under **both** `tag/js/` and `tag/css/`. Terms are slugified for the URL (`Static Site` → `static-site`).
+
+Term pages render with the **collection's own index template** — no extra file. On a term page the collection object carries the term context; branch on `activeTerm` to render a term view:
+
+```nunjucks
+{% if changelog.activeTerm %}
+  <h1>Tagged {{ changelog.activeTerm | humanize }}</h1>
+  {% for post in changelog.pageItems %}
+    <a href="{{ relativePathPrefix }}{{ post.url }}">{{ post.title }}</a>
+  {% endfor %}
+  {% pagination changelog %}
+{% endif %}
+```
+
+On a term page `items`/`pageItems` are scoped to that term (so `pagination` and `groupby` narrow to it too); `activeTaxonomy` holds the URL segment and `activeTermSlug` the slug. Build tag links anywhere from `collection.taxonomies`:
+
+```nunjucks
+{% for tax in changelog.taxonomies %}
+  {% for term in tax.terms %}
+    <a href="{{ relativePathPrefix }}{{ term.url }}">{{ term.term | humanize }} ({{ term.count }})</a>
+  {% endfor %}
+{% endfor %}
+```
+
+Each term exposes `term`, `slug`, `url`, `count` and `totalPages`.
+
+Term pages get a distinct `<title>` and `og`/`jsonld` metadata (`Tag: Feature`, paged `Tag: Feature — Page 2`), and the `breadcrumb`/`jsonld` filters resolve them to a **Home › Collection › Tag: Term** trail automatically (skipping the non-page `tag`/`category` URL segment). The `Tag:`/`Category:` label comes from `path`, so it localizes by naming the path in your language (`path: etiqueta` → `Etiqueta: …`). Term pages are listed in the sitemap but kept out of the search index and nav.
 
 #### Custom Tags
 
@@ -907,6 +973,8 @@ Registered languages: `javascript`/`js`, `typescript`/`ts`, `css`, `scss`, `html
 All filters are available in both engines. The only syntax difference is how arguments are passed: Nunjucks uses parentheses `| filter("arg")`, Liquid uses a colon `| filter: "arg"`.
 
 - `slugify` — slugifies a string. Usage: `{{ "My Awesome Title" | slugify }}` will output `my-awesome-title`
+
+- `humanize` — the inverse of `slugify`: turns a slug or raw term into a display label. Usage: `{{ "static-site" | humanize }}` will output `Static Site`
 
 - `jsonify` — serializes a value to JSON. Usage: `{{ myObject | jsonify }}`
 
