@@ -48,11 +48,11 @@
       <article class="prose">
         {{ pageBody }}
       </article>
-      {% if page.inputPath %}
-      <a class="edit-link" href="https://github.com/stamat/poops/edit/main/example/src/markup/{{ page.inputPath }}" target="_blank" rel="noopener">✏️ Edit this page on GitHub</a>
+      {% if page.inputPath and package.homepage %}
+      <a class="edit-link" href="{{ package.homepage }}/edit/main/{{ page.inputPath }}" target="_blank" rel="noopener">✏️ Edit this page on GitHub</a>
       {% endif %}
       <footer class="page-footer">
-        <a href="https://github.com/stamat/poops" target="_blank" rel="noopener">Poops</a> v{{ package.version }} —
+        <a href="{{ package.homepage }}" target="_blank" rel="noopener">Poops</a> v{{ package.version }} —
         MIT licensed. Built with Poops. 💩
       </footer>
     </main>
