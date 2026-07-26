@@ -4,7 +4,7 @@ title: Building a blog with collections
 navTitle: A blog & collections
 description: Turn a directory of posts into a sorted, paginated collection — with front matter, grouping and an RSS feed.
 order: 4
-keywords: ["blog", "collections", "pagination", "posts", "rss", "sort", "groupby"]
+keywords: ["blog", "collections", "pagination", "posts", "rss", "sort", "groupby", "tags", "categories", "taxonomies"]
 ---
 
 # Building a blog with collections
@@ -128,6 +128,64 @@ Groups keep insertion order, so sort descending and years come out newest-first:
   {% endfor %}
 {% endfor %}{% endraw %}
 ```
+
+## Tags & categories (taxonomies)
+
+Grouping lists terms on one page. A **taxonomy** goes further: it gives every term its own
+paginated landing page — `changelog/tag/feature/`, `changelog/category/release/` — crawlable and
+shareable. Declare which front-matter fields become taxonomies on the collection, alongside
+`paginate`/`sort`:
+
+```yaml
+---
+title: Changelog
+collection: true
+paginate: 10
+taxonomies:
+  - name: tags      # front-matter field to group on
+    path: tag       # URL segment (defaults to name); use "tag" for a singular URL
+    paginate: 5     # per-term page size (defaults to the collection's paginate)
+---
+```
+
+Shorthand: a bare string (`taxonomies: [tags, category]`) uses the field name as the URL segment
+and inherits the collection's `paginate`. Array-valued fields split per element — a post with
+`tags: [js, css]` lands under **both** `tag/js/` and `tag/css/`. Terms are slugified for the URL
+(`Static Site` → `static-site`).
+
+Pages render with the **collection's own index template** — no extra file. On a term page the
+collection object carries the term context; branch on `activeTerm` to render a term view:
+
+```nunjucks
+{% raw %}{% if changelog.activeTerm %}
+  <h1>Tagged {{ changelog.activeTerm | humanize }}</h1>
+  {% for post in changelog.pageItems %}
+    <p><a href="{{ relativePathPrefix }}{{ post.url }}">{{ post.title }}</a></p>
+  {% endfor %}
+  {% pagination changelog %}
+{% endif %}{% endraw %}
+```
+
+On a term page `items`/`pageItems` are scoped to that term (so `pagination` and `groupby` narrow to
+it too); `activeTaxonomy` holds the URL segment and `activeTermSlug` the slug. Build tag links
+anywhere from `collection.taxonomies`:
+
+```nunjucks
+{% raw %}{% for tax in changelog.taxonomies %}
+  {% for term in tax.terms %}
+    <a href="{{ relativePathPrefix }}{{ term.url }}">{{ term.term | humanize }} ({{ term.count }})</a>
+  {% endfor %}
+{% endfor %}{% endraw %}
+```
+
+Each term exposes `term`, `slug`, `url`, `count` and `totalPages`. The `slugify` and `humanize`
+filters (inverses of each other) are handy for building and displaying terms. The `breadcrumb` and
+`jsonld` filters resolve term pages to a **Home › Collection › Term** trail automatically (skipping
+the non-page `tag`/`category` segment), so nothing extra is needed there.
+
+> [!NOTE]
+> Term pages are treated like pagination pages: listed in the **sitemap** (crawlable) but kept out
+> of the **search index**, **llms.txt** and **nav**, so those point at posts, not term listings.
 
 ## Sorting
 
