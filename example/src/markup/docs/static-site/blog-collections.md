@@ -135,9 +135,30 @@ Groups keep insertion order, so sort descending and years come out newest-first:
 Sorting by `date` compares dates (default `desc`); any other field compares alphabetically
 (default `asc`).
 
-> [!TIP]
-> An RSS feed is just a collection rendered into an XML template. Create `blog/feed.rss` that
-> loops `blog.items` and emits `<item>` elements — Poops treats it like any other page.
+## RSS / Atom feed
+
+Point the `feed` option at the collection and Poops writes a subscription feed — no hand-authored
+XML template. Items are the posts newest-first by `date`, channel metadata comes from your `site`
+data:
+
+```json
+{
+  "markup": {
+    "options": {
+      "feed": { "collection": "blog", "output": "blog/feed.rss" }
+    }
+  }
+}
+```
+
+`type: "atom"` switches format, `limit` caps the item count (default 20), and omitting `collection`
+emits a feed for every collection. Then advertise it in your layout `<head>`:
+
+```html
+{% raw %}<link rel="alternate" type="application/rss+xml" href="{{ site.url }}/blog/feed.rss">{% endraw %}
+```
+
+Full option table in the [config reference](../config-reference#markup-feed).
 
 > [!INFO]
 > Collection index and pagination pages are included in the **sitemap** but excluded from the

@@ -1282,6 +1282,40 @@ Liquid — a partial that recurses via `render` (save as `_partials/navtree.liqu
 {% render 'navtree', items: nav, relativePathPrefix: relativePathPrefix %}
 ```
 
+#### RSS / Atom feeds
+
+Generate a subscription feed for a [collection](#collections) — no hand-authored feed template. Each feed lists the collection's posts newest-first (by `date`), with the channel metadata taken from your `site` data.
+
+```json
+{
+  "markup": {
+    "in": "src/markup",
+    "out": "dist",
+    "options": {
+      "feed": { "collection": "blog", "output": "blog/feed.rss" }
+    }
+  }
+}
+```
+
+**Feed options:**
+
+- `collection` — the collection to build the feed from. Omit it to emit a feed for **every** collection.
+- `output` — the file to write. A bare filename (`feed.xml`, the default) is placed inside the collection's own folder (`blog/feed.xml`); a value with a slash is used as-is under the output directory.
+- `type` — `"rss"` (default) or `"atom"`.
+- `limit` — max items, newest first (default `20`).
+- `title` — channel title (default `"<Collection> | <site.title>"`).
+- `description` — channel description (default `site.description`).
+- `author`, `lang` — default to `site.author` / `site.lang`.
+
+Shorthand forms: `"feed": true` (or a filename string) emits an RSS feed for every collection; an array of the objects above generates several feeds at once (e.g. an RSS and an Atom for the same collection). Item `<description>` uses each post's `description`, falling back to its auto-`excerpt`; links, `guid`s and `<atom:link rel="self">` are made absolute with `site.url`. `robots: noindex` posts are excluded, matching the sitemap.
+
+Point browsers and readers at it from your layout `<head>`:
+
+```html
+<link rel="alternate" type="application/rss+xml" href="{{ site.url }}/blog/feed.rss">
+```
+
 ### Images (optional)
 
 Process and optimize images — compression, responsive size variants, format conversion (WebP/AVIF), crops and EXIF extraction — by running [poops-images](https://github.com/stamat/poops-images) as part of the build. This is what feeds the `{% image %}` tag, the `exif`/`images` filters and the `.poops-images-cache.json` compile cache described in [Custom Tags](#custom-tags) and [Custom Filters](#custom-filters).

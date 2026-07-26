@@ -19,6 +19,9 @@ keywords:
     "llms",
     "robots",
     "nav",
+    "feed",
+    "rss",
+    "atom",
   ]
 ---
 
@@ -43,6 +46,7 @@ deep dive; everything else is documented in full on this page.
 | `markup.llms`        | `llms.txt` index for LLMs / GEO                    | [↓](#markup-llms)        |
 | `markup.robots`      | `robots.txt` generation                           | [↓](#markup-robots)      |
 | `markup.nav`         | Navigation-tree data                              | [↓](#markup-nav)         |
+| `markup.feed`        | RSS / Atom feed from a collection                 | [↓](#markup-feed)        |
 | `copy`               | Copy static assets into the output                | [↓](#copy)               |
 | `banner`             | Comment stamped on every output file              | [↓](#banner)             |
 | `serve`              | Local dev server                                  | [↓](#serve)              |
@@ -414,3 +418,30 @@ Each node has `title`, `url` (omitted on synthesized section nodes), `order` whe
 
 Front matter shaping the tree: `order` (sort among siblings), `navTitle` (sidebar label),
 `nav: false` (hide from sidebar). If nothing survives filtering, an empty array is written.
+
+## `markup.feed`
+
+Generates an RSS or Atom subscription feed from a [collection](static-site/blog-collections) —
+no hand-authored feed template. Items are the collection's posts newest-first by `date` (capped at
+`limit`), with channel metadata pulled from your `site` data. `robots: noindex` posts are excluded,
+and links / `guid`s are made absolute with `site.url`. The object form:
+
+| Option        | Meaning                                                                                                          |
+| ------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `collection`  | Collection to feed from. Omit to emit a feed for **every** collection.                                            |
+| `output`      | File to write. A bare filename (default `feed.xml`) goes in the collection's folder; a slashed path is used as-is. |
+| `type`        | `"rss"` (default) or `"atom"`.                                                                                    |
+| `limit`       | Max items, newest first. Default `20`.                                                                            |
+| `title`       | Channel title. Default `"<Collection> \| <site.title>"`.                                                          |
+| `description` | Channel description. Default `site.description`.                                                                  |
+| `author`      | Feed author. Default `site.author`.                                                                               |
+| `lang`        | Feed language. Default `site.lang`.                                                                               |
+
+Shorthand: `true` (or a filename string) emits an RSS feed for every collection; an array of these
+objects generates several feeds at once (e.g. an RSS and an Atom for one collection). Item
+`<description>`/`<summary>` uses each post's `description`, falling back to its auto-`excerpt`. Link
+readers to it from your layout `<head>`:
+
+```html
+{% raw %}<link rel="alternate" type="application/rss+xml" href="{{ site.url }}/changelog/feed.rss">{% endraw %}
+```

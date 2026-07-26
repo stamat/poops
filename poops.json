@@ -86,6 +86,10 @@
       "output": "nav.json",
       "root": "docs",
       "collections": "index"
+    },
+    "feed": {
+      "collection": "changelog",
+      "output": "changelog/feed.rss"
     }
   },
   "copy": [
