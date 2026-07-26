@@ -63,7 +63,9 @@
       "description": "A niche bundler for design-driven micro-sites and blogs.",
       "url": "https://stamat.info/poops",
       "logo": "poop.png",
-      "lang": "en"
+      "lang": "en",
+      "repo": "https://github.com/stamat/poops",
+      "branch": "main"
     },
     "data": [
       "_data/features.yaml",

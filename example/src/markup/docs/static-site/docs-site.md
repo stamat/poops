@@ -121,6 +121,32 @@ That is the search box at the top of this page.
 > `maxKeywords` keywords. Provide your own `keywords` array in front matter to override the
 > auto-extracted ones.
 
+## "Edit this page on GitHub"
+
+Every page carries `page.filePath` — its source file path relative to your project root, with
+posix separators (e.g. `src/markup/docs/index.md`). That is exactly the path GitHub's editor
+expects, so an edit link is one line in your layout:
+
+```nunjucks
+{% raw %}{% set repoUrl = site.repo or package.homepage %}
+{% if page.filePath and repoUrl %}
+<a href="{{ repoUrl }}/edit/{{ site.branch or 'main' }}/{{ page.filePath }}">✏️ Edit this page on GitHub</a>
+{% endif %}{% endraw %}
+```
+
+Set the repo and branch in your `site` data (or let it fall back to `package.homepage` and `main`):
+
+```json
+{
+  "markup": {
+    "site": { "repo": "https://github.com/you/your-repo", "branch": "main" }
+  }
+}
+```
+
+Don't reconstruct the path from `page.url` — that is the output URL (`.html`, and `index.md`
+collapses to a directory), so it can't be reversed to the `.md` source. Use `page.filePath`.
+
 ## The result
 
 Three config keys (`nav`, `searchIndex`, `sitemap`), a recursive macro, and a sprinkle of

@@ -35,9 +35,11 @@ Common fields: `title`, `description`, `layout`, `date`, `order`, `published`, `
 Any custom field you add is yours to use in templates and it flows into the search index.
 
 Poops also computes read-only fields on `page`: `content` (the rendered body), `url`, `wordcount`,
-and `excerpt` — the first prose paragraph as plain text (headings and comments skipped, capped at
-160 chars). Use `page.excerpt` as the fallback for a missing `description`, e.g. in the meta tag
-below or the `og`/`jsonld` filters.
+`excerpt`, and `filePath`. `excerpt` is the first prose paragraph as plain text (headings and
+comments skipped, capped at 160 chars) — use it as the fallback for a missing `description`, e.g. in
+the meta tag below or the `og`/`jsonld` filters. `filePath` is the source file's path relative to
+your project root (posix separators), for building "Edit on GitHub" links — see
+[Building a documentation site](docs-site).
 
 ## Layouts
 

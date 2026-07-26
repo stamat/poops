@@ -551,6 +551,17 @@ Then use Tailwind utility classes directly in your markup templates. Tailwind v4
 
 **💡 NOTE:** If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the global variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
 
+**"Edit this page on GitHub" links.** Every page exposes `page.filePath` — its source file path relative to your project root, with posix separators (e.g. `src/markup/docs/index.md`). That is exactly the path GitHub's editor expects, so an edit link is one line in your layout:
+
+```nunjucks
+{% set repoUrl = site.repo or package.homepage %}
+{% if page.filePath and repoUrl %}
+<a href="{{ repoUrl }}/edit/{{ site.branch or 'main' }}/{{ page.filePath }}">✏️ Edit this page on GitHub</a>
+{% endif %}
+```
+
+Put `repo` and `branch` in your `site` data (they fall back to `package.homepage` and `main`). Don't rebuild the path from `page.url` — that is the output URL (`.html`, and `index.md` collapses to a directory), so it can't be reversed to the `.md` source.
+
 Here is a sample markup configuration using the default Nunjucks engine:
 
 ```json

@@ -48,8 +48,9 @@
       <article class="prose">
         {{ pageBody }}
       </article>
-      {% if page.inputPath and package.homepage %}
-      <a class="edit-link" href="{{ package.homepage }}/edit/main/{{ page.inputPath }}" target="_blank" rel="noopener">✏️ Edit this page on GitHub</a>
+      {% set repoUrl = site.repo or package.homepage %}
+      {% if page.filePath and repoUrl %}
+      <a class="edit-link" href="{{ repoUrl }}/edit/{{ site.branch or 'main' }}/{{ page.filePath }}" target="_blank" rel="noopener">✏️ Edit this page on GitHub</a>
       {% endif %}
       <footer class="page-footer">
         <a href="{{ package.homepage }}" target="_blank" rel="noopener">Poops</a> v{{ package.version }} —

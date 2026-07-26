@@ -138,7 +138,9 @@ Turns a directory of templates (Nunjucks or Liquid, plus Markdown) into a static
 The `site` object holds global data every template reads. The SEO filters pick up `title`,
 `description`, `url`, `logo`, `author` and `lang` — `lang` feeds both the `<html lang>` attribute
 (`{% raw %}<html lang="{{ page.lang or site.lang or 'en' }}">{% endraw %}`) and the JSON-LD
-`inLanguage`; a page's front-matter `lang` overrides it.
+`inLanguage`; a page's front-matter `lang` overrides it. Add anything else you want globally
+available — e.g. `repo` and `branch` to drive "Edit on GitHub" links (see
+[Building a documentation site](static-site/docs-site)).
 
 Full guide: [Templating HTML](quick-start/templating-html).
 
