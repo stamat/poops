@@ -1,12 +1,12 @@
 ---
 layout: post
-title: v1.6.0 — SEO metadata, breadcrumbs and auto feeds
+title: v1.6.0 — SEO metadata, breadcrumbs, feeds and llms.txt
 date: 2026-07-26
-description: Zero-config SEO in one release — og and jsonld filters emit page metadata and structured data from front matter, nested pages auto-get breadcrumbs (a BreadcrumbList rich result plus a visible trail), and a new feed option generates RSS/Atom straight from a collection.
+description: Zero-config SEO in one release — og and jsonld filters emit page metadata and structured data from front matter, nested pages auto-get breadcrumbs (a BreadcrumbList rich result plus a visible trail), a new feed option generates RSS/Atom straight from a collection (optionally with full post content), and llms.txt / llms-full.txt hand LLMs a map and the whole corpus.
 published: true
 ---
 
-One release, three ways to stop hand-authoring the boilerplate search engines, social platforms and readers consume — all driven from front matter you already write.
+One release, several ways to stop hand-authoring the boilerplate search engines, social platforms, feed readers and LLMs consume — all driven from front matter you already write.
 
 ## SEO metadata — `og` and `jsonld`
 
@@ -142,7 +142,40 @@ Advertise it in your layout `<head>` so browsers and readers discover it:
 - `type` — `"rss"` (default) or `"atom"`.
 - `limit` — item cap, newest first (default 20).
 - `title` / `description` / `author` / `lang` — override the `site` defaults.
+- `content` — set `true` to embed each post's full article in the feed (see below).
 
 Shorthand `"feed": true` (or a filename string) turns on RSS for every collection; an array of these objects generates several at once — say an RSS and an Atom for the same posts.
 
+### Full post content — `content: true`
+
+By default items carry a `<description>` only. Set `content: true` and each post's whole article rides along — RSS `<content:encoded>`, Atom `<content type="html">` — so readers show the full post without a round-trip to the site:
+
+```json
+{% raw %}{ "feed": { "collection": "changelog", "output": "changelog/feed.rss", "content": true } }{% endraw %}
+```
+
+The HTML is the post's Markdown **source** rendered to article-body HTML — no layout, nav or footer chrome, just the content. Only `.md`/`.markdown` posts get it (a `.njk`/`.liquid` post has no clean body to extract and falls back to `<description>` alone). This very feed ships it — subscribe and read the whole changelog in your reader.
+
 This changelog is a collection, so the feed you may already subscribe to at `/changelog/feed.rss` is now generated — the old hand-written template is gone.
+
+## An index for LLMs — `llms.txt`
+
+The same page data that drives your sitemap now writes an [`llms.txt`](https://llmstxt.org) — a Markdown index of your pages that LLMs and generative engines read to understand a site. Point the option at a filename and it lands in your output dir:
+
+```json
+{% raw %}{
+  "markup": {
+    "options": {
+      "llms": { "output": "llms.txt", "full": true }
+    }
+  }
+}{% endraw %}
+```
+
+You get an `# H1` title, a `> ` blockquote summary, then `- [title](url): description` links grouped by URL folder — the first folder becomes a `## section`, a second nests as a `### subsection`. Collection sections are ordered newest-first by `date`; `site.url` makes the links absolute. A string (`"llms": "llms.txt"`) is the shorthand; the object form also takes `title`, `description`, `sectionTitle` and an `intro` path — a Markdown file dropped in verbatim for free-form context you author for LLMs.
+
+### The whole corpus — `full: true`
+
+`llms.txt` is the *map*; `full` writes the *territory*. Set `"full": true` and Poops also emits a companion named after `output` with a `-full` suffix (`llms.txt` → **`llms-full.txt`**) — or pass a filename to set it yourself — every page concatenated into one file an LLM can ingest whole. The file opens with a `# Full Documentation Archive for {title}` header, a one-line intro naming the site and a `> ` blockquote of the `description` so a whole-file ingest starts with context, then each page becomes an `# title` (its own leading H1 if it has one) + `URL:` line + its body, joined by `---`. Set `fullIntro` to a Markdown file path for your own preamble after that header — the `full` counterpart to the index's `intro`.
+
+The body is each page's Markdown **source** — the same clean-content approach as the feed's `content: true` — so only `.md`/`.markdown` pages are included (a `.njk`/`.liquid` source is template code, not prose), and `noindex` and collection-index pages are dropped. This site ships one: read [`llms-full.txt`](../llms-full.txt).

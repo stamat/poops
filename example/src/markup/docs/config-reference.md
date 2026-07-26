@@ -405,17 +405,23 @@ collection index/pagination pages are skipped. A string sets the filename; the o
 | `description`  | Blockquote summary. Defaults to `site.description`.                             |
 | `intro`        | Path (from project root) to a Markdown file inserted as free-form body context. |
 | `sectionTitle` | Heading for the lead (uncollected) section. Default `"Pages"`.                  |
-| `full`         | Also write an `llms-full.txt` (below). `true` uses that filename; a string sets it. |
+| `full`         | Also write the full-content file (below). `true` derives its name from `output` (`llms.txt` → `llms-full.txt`); a string sets it explicitly. |
+| `fullIntro`    | Path (from project root) to a Markdown preamble inserted into the full-content file after its header. The `full` counterpart to `intro`. |
 
 Point `intro` at a file authored for LLMs (e.g. `llms-intro.md`) — not a raw README, whose
 badges, install noise and `##` headings collide with the generated sections.
 
-`full` writes the companion **`llms-full.txt`** — every page's full content concatenated into one
-file (llms.txt is the link index; this is the whole corpus). Content is each page's Markdown
+`full` writes the companion full-content file — every page's full content concatenated into one
+file (the index is the link map; this is the whole corpus). `true` names it after `output` with a
+`-full` suffix (`llms.txt` → **`llms-full.txt`**, `ai.txt` → `ai-full.txt`); pass a string to set the
+path yourself. Content is each page's Markdown
 **source**, so only `.md`/`.markdown` pages are included (an `.njk`/`.liquid` source is template
-code, not prose); `noindex` and collection index pages are dropped. Each page becomes an `# title`
-+ `URL:` line + body, joined by `---`. Unrendered `{% raw %}{% … %}{% endraw %}` tags or shortcodes
-in a Markdown body pass through verbatim.
+code, not prose); `noindex` and collection index pages are dropped. The file opens with a
+`# Full Documentation Archive for {title}` header, a one-line intro naming the site and a `> ` blockquote of the `description`, then each page
+becomes an `# title` + `URL:` line + body, joined by `---`. Set `fullIntro` to a Markdown file path
+(from the project root) to insert your own preamble after that header — the `full` counterpart to
+`intro`; inserted verbatim (a missing file warns and is skipped). Unrendered
+`{% raw %}{% … %}{% endraw %}` tags or shortcodes in a Markdown body pass through verbatim.
 
 ## `markup.robots`
 

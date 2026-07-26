@@ -1113,7 +1113,8 @@ The string shorthand sets the output filename with default options. For more con
     "output": "llms.txt",
     "title": "My Site",
     "description": "One-line summary of the site.",
-    "intro": "src/llms-intro.md"
+    "intro": "src/llms-intro.md",
+    "full": true
   }
 }
 ```
@@ -1151,6 +1152,8 @@ All front matter fields are passed through to the index automatically. Internal 
 **Sitemap** generates a standard `sitemap.xml` with `<loc>` and `<lastmod>` (from front matter `date`). If `site.url` is set in your markup config, it is prepended to all URLs. Collection index/pagination pages are included in the sitemap but excluded from the search index.
 
 **llms.txt** generates an [`llms.txt`](https://llmstxt.org) — a Markdown index of your pages that LLMs and generative engines (GEO) read to understand your site. It has an `# H1` title, a `> ` blockquote summary, then `- [title](url): description` links grouped by URL path: the first folder is a `## section`, a second folder nests as a `### subsection` under it, and root-level pages fall under a lead "Pages" section. So `docs/config-reference.html` lands directly under `## Docs` while `docs/quick-start/x.html` lands under `### Quick Start` inside it. Collection items (which live under `collection/…`) group the same way and are ordered newest-first by their `date`; other sections keep file order. Set `intro` to a Markdown file path (relative to the project root) to insert free-form context between the blockquote and the link sections — a file authored for LLMs, e.g. `llms-intro.md`. Avoid `##` headings in it; they read as sections. (A raw README is a poor fit — badges, install noise and its own headings collide.) `title` and `description` default to your `site.title`/`site.description`; override them (and the lead section name via `sectionTitle`) with the object form. `site.url` makes the links absolute. Collection index/pagination pages are skipped, like the search index.
+
+Set `full` to also write a companion full-content file — every page's Markdown body concatenated into one file an LLM can ingest whole (the index is the link map; this is the corpus). `true` names it after `output` with a `-full` suffix (`llms.txt` → `llms-full.txt`, `ai.txt` → `ai-full.txt`); pass a string to set the path yourself. The file opens with a `# Full Documentation Archive for {title}` header, a one-line intro naming the site and a `> ` blockquote of the `description` so a whole-file ingest starts with context, then each page becomes an `# title` (its own leading H1 if it has one) + `URL:` line + body, joined by `---`. Set `fullIntro` to a Markdown file path (from the project root) to insert your own preamble after that header — the `full` counterpart to `intro` (inserted verbatim; a missing file warns and is skipped). Only `.md`/`.markdown` sources qualify (a `.njk`/`.liquid` source is template code, not prose); `noindex` and collection-index pages are dropped. Content is the Markdown **source**, so unrendered `{% raw %}{% … %}{% endraw %}` tags or shortcodes in a body pass through verbatim.
 
 **robots.txt** generates a `robots.txt`. The string shorthand writes an allow-all file (`User-agent: *`, empty `Disallow:`) with a `Sitemap:` line pointing at your generated sitemap — absolute when `site.url` is set. The object form takes `output`, `userAgent`, `allow`/`disallow` (a path or array of paths), and `sitemap` (an explicit URL, or `false` to omit the line):
 

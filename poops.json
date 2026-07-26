@@ -80,7 +80,8 @@
     "llms": {
       "output": "llms.txt",
       "intro": "example/src/llms-intro.md",
-      "full": true
+      "full": true,
+      "fullIntro": "example/src/llms-intro-full.md"
     },
     "robots": "robots.txt",
     "nav": {
