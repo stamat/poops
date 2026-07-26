@@ -115,6 +115,9 @@ without it, there is only one page and the pagination globals stay at their sing
 {% endif %}{% endraw %}
 ```
 
+Pages 2..N automatically get a distinct `<title>` — `Blog — Page 2` — so the paginated pages don't
+all share the landing page's title (and its `og`/`jsonld` metadata). Page 1 keeps its own title.
+
 ## Grouping posts by year
 
 The `groupby` filter groups any array of objects by a field, with optional date-part extraction.
@@ -179,9 +182,12 @@ anywhere from `collection.taxonomies`:
 ```
 
 Each term exposes `term`, `slug`, `url`, `count` and `totalPages`. The `slugify` and `humanize`
-filters (inverses of each other) are handy for building and displaying terms. The `breadcrumb` and
-`jsonld` filters resolve term pages to a **Home › Collection › Term** trail automatically (skipping
-the non-page `tag`/`category` segment), so nothing extra is needed there.
+filters (inverses of each other) are handy for building and displaying terms. Each term page also
+gets a distinct `<title>` and `og`/`jsonld` metadata — `Tag: Feature` (paged: `Tag: Feature — Page
+2`) — instead of the shared landing title. The `breadcrumb` and `jsonld` filters resolve term pages
+to a **Home › Collection › Tag: Term** trail automatically (the last crumb carries the same
+taxonomy label, and the non-page `tag`/`category` URL segment is skipped), so nothing extra is
+needed there.
 
 > [!NOTE]
 > Term pages are treated like pagination pages: listed in the **sitemap** (crawlable) but kept out
