@@ -3,7 +3,7 @@
 import chokidar from 'chokidar'
 import connect from 'connect'
 import Copy from './lib/copy.js'
-import runExec from './lib/exec.js'
+import runExec, { validateExec } from './lib/exec.js'
 import { pathExists, doesFileBelongToPath, pathContainsPathSegment, deriveWatchDirs } from './lib/utils/helpers.js'
 import http from 'node:http'
 import os from 'node:os'
@@ -246,6 +246,7 @@ function setupWatchers(config, modules) {
 
 // Main function 💩
 async function poops() {
+  validateExec(config)
   const styles = new Styles(config)
   const postcss = new PostCSS(config)
   const reactor = new Reactor(config)
