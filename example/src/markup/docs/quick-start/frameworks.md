@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: Use with WordPress, Laravel, Rails, Django…
 navTitle: Use with frameworks
 description: Poops is just a bundler — point it at your framework's asset folders and use it as the front-end toolchain for WordPress, Laravel, Rails, Django and more.

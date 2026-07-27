@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: React
 navTitle: React
 description: Three ways to use React with Poops — a client bundle via scripts, build-time pre-rendering via Reactor, or both with hydration.

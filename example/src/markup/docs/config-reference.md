@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: Configuration reference
 navTitle: Config reference
 description: Every poops.json key that isn't a pipeline guide of its own — copy, banner, serve, livereload, watch, includePaths, search index, sitemap and nav options.

@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: Transpiling JavaScript
 navTitle: Transpiling JS
 description: Bundle and transpile JS, TS, JSX and TSX with esbuild — including maintaining a JS library across IIFE, ESM and CJS.

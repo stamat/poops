@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: A complete React static site
 navTitle: A complete React SSG
 description: Turn the React SPA into a pre-rendered, hydrated static site — three changes to the setup from Build a React App.

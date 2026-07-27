@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: Quick Start
 navTitle: Quick Start
 description: The initial idea behind Poops and the structure of the poops.json config file.

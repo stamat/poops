@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: Building pages
 navTitle: Building pages
 description: Layouts, partials, front matter and Markdown — the building blocks of every Poops page.

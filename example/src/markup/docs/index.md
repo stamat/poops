@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: Introduction
 navTitle: Introduction
 description: Poops is a Jekyll-inspired static site builder — and a no-bullshit bundler and transpiler for the web.

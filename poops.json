@@ -19,7 +19,7 @@
       "target": "es2019"
     }
   }, {
-    "in": "example/src/js/docs.ts",
+    "in": "node_modules/poops-docs-theme/src/docs.ts",
     "out": "example/dist/js/docs.js",
     "options": {
       "minify": true,
@@ -48,7 +48,7 @@
       "tokenPaths": ["example/src/tokens"]
     }
   }, {
-    "in": "example/src/scss/docs.scss",
+    "in": "node_modules/poops-docs-theme/scss/docs.scss",
     "out": "example/dist/css/docs.css",
     "options": {
       "minify": true,
@@ -60,6 +60,7 @@
     "out": "example/dist",
     "site": {
       "title": "💩 Poops",
+      "brand": "Poops",
       "description": "A niche bundler for design-driven micro-sites and blogs.",
       "url": "https://stamat.info/poops",
       "logo": "poop.png",

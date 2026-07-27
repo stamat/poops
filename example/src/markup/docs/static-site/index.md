@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: Build a Static Site
 navTitle: Build a Static Site
 description: Use Poops as a Jekyll-inspired static site generator — pages, images, docs, blogs and React, all from one config.

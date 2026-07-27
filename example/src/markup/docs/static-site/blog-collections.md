@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: Building a blog with collections
 navTitle: A blog & collections
 description: Turn a directory of posts into a sorted, paginated collection — with front matter, grouping and an RSS feed.

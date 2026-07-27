@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: Build a React App
 navTitle: Build a React App
 description: Build a plain client-rendered React SPA with Poops — one scripts entry, createRoot, done.

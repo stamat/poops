@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: Transpiling CSS
 navTitle: Transpiling CSS
 description: Compile SCSS/Sass with Dart Sass, and import JSON design tokens directly into your styles.

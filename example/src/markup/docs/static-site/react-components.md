@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: React components in a static site
 navTitle: React components
 description: Pre-render React components to HTML at build time with Reactor and inject them into your templates, with optional hydration.

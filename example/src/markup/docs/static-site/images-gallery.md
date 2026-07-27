@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: Using images & creating a gallery
 navTitle: Images & galleries
 description: Process images with poops-images, emit responsive markup with the image tag, and build a photo gallery from EXIF data.

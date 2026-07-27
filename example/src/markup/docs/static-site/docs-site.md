@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: Building a documentation site
 navTitle: A documentation site
 description: Build a docs site with a left sidebar nav tree, search, and admonitions — exactly how this site is built.

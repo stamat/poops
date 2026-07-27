@@ -98,7 +98,7 @@ hr {
 }
 
 // ---- Prose: docs typography (scale, rhythm, treatments) on brand palette ----
-// Mirrors example/src/scss/docs.scss `.prose`. Headings keep Poppins (bare
+// Mirrors poops-docs-theme `scss/docs.scss` `.prose`. Headings keep Poppins (bare
 // `h1..h6` font-family from sulphuris wins where `.prose` doesn't set it),
 // colors stay brownish. Used by _layouts/blog.html → changelog posts + index.
 $prose-border: rgba(130, 79, 45, 0.25); // brand brown, faded
@@ -109,7 +109,7 @@ $prose-border: rgba(130, 79, 45, 0.25); // brand brown, faded
   line-height: 1.65;
 }
 
-// ---- Breadcrumb trail (brand brown) — mirrors docs.scss `.breadcrumb` ----
+// ---- Breadcrumb trail (brand brown) — mirrors theme docs.scss `.breadcrumb` ----
 .breadcrumb { margin: 0 0 1.5rem; }
 .breadcrumb ol {
   list-style: none;

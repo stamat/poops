@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: poops-docs-theme/docs
 title: PostCSS & Tailwind
 navTitle: PostCSS & Tailwind
 description: Run any PostCSS plugin — including Tailwind CSS v4 and Autoprefixer — as a pipeline separate from Sass.
