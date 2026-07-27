@@ -283,6 +283,7 @@ a:hover { text-decoration: underline; }
 .prose table { width: 100%; border-collapse: collapse; margin: 0 0 1.25rem; font-size: 0.9rem; display: block; overflow-x: auto; }
 .prose th, .prose td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
 .prose thead th { background: var(--bg-alt); }
+.prose tbody tr:nth-child(even) { background: color-mix(in srgb, var(--fg) 4%, transparent); }
 
 .prose blockquote {
   margin: 0 0 1rem;
