@@ -4,7 +4,8 @@ title: Introduction
 navTitle: Introduction
 description: Poops is a Jekyll-inspired static site builder — and a no-bullshit bundler and transpiler for the web.
 order: 0
-keywords: ["poops", "bundler", "static site generator", "transpiler", "esbuild", "sass"]
+keywords:
+  ["poops", "bundler", "static site generator", "transpiler", "esbuild", "sass"]
 ---
 
 # 💩 Poops
@@ -40,16 +41,16 @@ JS and CSS, it runs on Node, and it uses modern transpilers under the hood.
 You configure everything in a single `poops.json` (or `💩.json`) file. Each top-level key is a
 pipeline you can opt into or ignore:
 
-| Key | What it does |
-| --- | --- |
-| `scripts` | Bundle & transpile JS/TS/JSX/TSX with esbuild |
-| `styles` | Compile SCSS/Sass with Dart Sass |
-| `postcss` | Run a PostCSS pipeline (Tailwind, Autoprefixer, …) |
-| `markup` | Generate HTML from Nunjucks/Liquid/Markdown templates |
-| `reactor` | Pre-render React components to HTML at build time |
-| `images` | Optimize & generate responsive image variants |
-| `copy` | Copy static files into the output |
-| `serve` / `livereload` / `watch` | Local dev server with live reload |
+| Key                              | What it does                                          |
+| -------------------------------- | ----------------------------------------------------- |
+| `scripts`                        | Bundle & transpile JS/TS/JSX/TSX with esbuild         |
+| `styles`                         | Compile SCSS/Sass with Dart Sass                      |
+| `postcss`                        | Run a PostCSS pipeline (Tailwind, Autoprefixer, …)    |
+| `markup`                         | Generate HTML from Nunjucks/Liquid/Markdown templates |
+| `reactor`                        | Pre-render React components to HTML at build time     |
+| `images`                         | Optimize & generate responsive image variants         |
+| `copy`                           | Copy static files into the output                     |
+| `serve` / `livereload` / `watch` | Local dev server with live reload                     |
 
 > [!NOTE]
 > Everything is optional except that you need at least one of `scripts`, `styles`, `postcss` or

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import chokidar from 'chokidar'
-import connect from 'connect'
 import Copy from './lib/copy.js'
 import runExec, { validateExec } from './lib/exec.js'
 import { pathExists, doesFileBelongToPath, pathContainsPathSegment, deriveWatchDirs, toPosix } from './lib/utils/helpers.js'
@@ -13,8 +12,8 @@ import livereload from 'livereload'
 import Markups from './lib/markups.js'
 import Images from './lib/images.js'
 import path from 'node:path'
-import serveStatic from 'serve-static'
 import Reactor from './lib/reactor.js'
+import { createStaticHandler } from './lib/server.js'
 import Scripts from './lib/scripts.js'
 import log, { styledLog, hasLoggedErrors } from './lib/utils/log.js'
 import Styles from './lib/styles.js'
@@ -382,30 +381,16 @@ function getLocalIP() {
 async function startServer() {
   await resolveLiveReloadPort(config)
   await poops() // Initial compilation before starting the server
-  const app = connect()
 
   const base = config.serve.base && pathExists(cwd, config.serve.base)
     ? path.join(cwd, config.serve.base)
     : cwd
 
-  app.use(serveStatic(base))
-
-  // Serve 404.html for unmatched routes
-  const notFoundPage = path.join(base, '404.html')
-  app.use((req, res) => {
-    res.statusCode = 404
-    if (pathExists(notFoundPage)) {
-      fs.createReadStream(notFoundPage).pipe(res)
-    } else {
-      res.end('Not Found')
-    }
-  })
-
   let port = overridePort || config.serve.port || 4040
   if (!overridePort) port = await getAvailablePort(port, port + 10)
 
   // eslint-disable-next-line @stylistic/space-before-function-paren
-  http.createServer(app).listen(parseInt(port), '0.0.0.0', async () => {
+  http.createServer(createStaticHandler(base)).listen(parseInt(port), '0.0.0.0', async () => {
     console.log()
     styledLog(`🏠 {dim}Local server:{/} {underline|http://localhost:${port}}`)
     styledLog(`🛜 {dim} Network     :{/} {underline|http://${getLocalIP()}:${port}}`)
