@@ -165,6 +165,50 @@ A page extends it:
 {% endblock %}{% endraw %}
 ```
 
+### Templates from an npm package
+
+Layouts and partials can also live in an installed package, so a shared theme
+ships as a dependency instead of copied files. Reference it by package name —
+anything with a `/` is resolved from `node_modules`:
+
+```nunjucks
+{% raw %}{% extends "my-theme/layout.html" %}
+{% block content %}
+  <h1>{{ page.title }}</h1>
+{% endblock %}{% endraw %}
+```
+
+Or from front matter, so a page carries no template syntax at all:
+
+```yaml
+---
+layout: my-theme/layout
+---
+```
+
+A theme package must:
+
+- **Not restrict subpaths with `exports`** — or map its templates explicitly,
+  e.g. `"exports": { "./*": "./*" }`. Otherwise Node blocks resolving the
+  `.html` files by path.
+- **Reference its own partials relatively** — `{% raw %}{% import "./nav.html" as nav %}{% endraw %}`,
+  not the bare name. A bare name (no `/`) is always searched in the consumer's
+  project only, never the package.
+
+Bundled filters (`toc`, `breadcrumb`, `og`, `canonical`, …) are engine-global,
+so package templates can use them without any extra wiring.
+
+Liquid resolves package templates the same way — `node_modules` is on its
+include roots, so a Liquid theme's layouts and partials resolve by package name
+too (with the theme shipping `.liquid` files):
+
+```liquid
+{% raw %}{% layout "my-theme/layout.liquid" %}
+{% block content %}
+  <h1>{{ page.title }}</h1>
+{% endblock %}{% endraw %}
+```
+
 ## Liquid
 
 Prefer Shopify-flavoured [Liquid](https://liquidjs.com/)? Set `"engine": "liquid"`. Same feature

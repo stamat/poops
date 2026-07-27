@@ -615,6 +615,34 @@ Both engines support the same feature set (collections, pagination, search index
 
 Both engines process `.html` and `.md` files in addition to their native extension.
 
+#### Templates from an npm package
+
+Layouts and partials can live in an installed package, so a shared theme ships as a dependency instead of copied files. Reference it by package name — any include/extend name containing a `/` is resolved from `node_modules`:
+
+```nunjucks
+{% extends "my-theme/layout.html" %}
+{% block content %}
+  <h1>{{ page.title }}</h1>
+{% endblock %}
+```
+
+Or from front matter, so the page carries no template syntax:
+
+```yaml
+---
+layout: my-theme/layout
+---
+```
+
+A theme package must:
+
+- **Not restrict subpaths with `exports`** — or map its templates explicitly, e.g. `"exports": { "./*": "./*" }`. Otherwise Node blocks resolving the `.html` files by path.
+- **Reference its own partials relatively** — `{% import "./nav.html" as nav %}`, not the bare name. A bare name (no `/`) is always searched in the consumer's project only, never the package.
+
+Bundled filters (`toc`, `breadcrumb`, `og`, `canonical`, …) are engine-global, so package templates use them with no extra wiring.
+
+Liquid resolves package templates the same way — `node_modules` is on its include roots, so `{% layout "my-theme/layout.liquid" %}` and `{% render "my-theme/partial.liquid" %}` resolve by package name too (a Liquid theme ships `.liquid` files). The `exports`/relative-partial rules above apply the same, except containment is by include root rather than the `/` name gate.
+
 #### Custom Engines
 
 The `engine` option also accepts a module specifier — an npm package name or a path relative to your project root. The module's default export must be an engine class:
