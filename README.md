@@ -110,12 +110,21 @@ or pass a custom config. This is useful when you have multiple environments:
 | `--port <number>`            | `-p`  | Specify the server port, overrides config            |
 | `--livereload-port <number>` | `-l`  | Specify the livereload port, overrides config        |
 | `--base-url <path>`          | `-u`  | Set the base URL prefix for markup, overrides config |
+| `--quiet`                    | `-q`  | Hide the header and the server/livereload info lines |
 
 The `--base-url` flag is particularly useful for CI/CD pipelines where the deploy path may differ per environment:
 
 ```bash
 poops --build --base-url /blog
 ```
+
+The `--quiet` flag drops the `💩 Poops — vX.Y.Z` header (and its terminal bell) plus the `Local server` / `Network` / `LiveReload` lines. Handy when you run several Poops instances side by side and only want to see which one is compiling:
+
+```bash
+poops -q & poops -q -c site/poops.json
+```
+
+Build logs, warnings and errors are unaffected — `--quiet` only removes the banner.
 
 If you have installed Poops locally you can run it with `npx poops` or `npx 💩` or add a script to your `package.json`:
 

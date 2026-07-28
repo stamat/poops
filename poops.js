@@ -30,6 +30,7 @@ const cli = new Argoyle(pkg.version)
   .option('port', { short: 'p', value: '<number>', description: 'Specify the port for the server, overrides the config file' })
   .option('livereload-port', { short: 'l', value: '<number>', description: 'Specify the port for the livereload server, overrides the config file' })
   .option('base-url', { short: 'u', value: '<path>', description: 'Set the base URL prefix for markup, overrides the config file' })
+  .option('quiet', { short: 'q', description: 'Hide the header and the server/livereload info lines' })
 
 let flags, positionals
 try {
@@ -44,6 +45,7 @@ const defaultConfigPath = flags.config || positionals[0] || 'poops.json'
 const overridePort = flags.port
 const overrideLivereloadPort = flags['livereload-port']
 const overrideBaseURL = flags['base-url']
+const quiet = flags.quiet // hides the header and the address lines only — build logs, warnings and errors still print
 
 let configPath = path.join(cwd, defaultConfigPath)
 if (!pathExists(configPath)) configPath = path.join(cwd, '💩.json') // the canonical alternative config name
@@ -107,7 +109,7 @@ const hook = (stage) => runExec(config, cwd, stage)
 function setupLiveReloadServer(config) {
   if (!config.livereload) return
   liveReloadServer = livereload.createServer({ port: config.livereload_port })
-  styledLog(`🔃 {dim}LiveReload  :{/} ${liveReloadServer.config.port}`)
+  if (!quiet) styledLog(`🔃 {dim}LiveReload  :{/} ${liveReloadServer.config.port}`)
   console.log()
 }
 
@@ -296,8 +298,10 @@ async function poops() {
 }
 
 // CLI Header
-const title = `💩 Poops — v${pkg.version}`
-styledLog(`\n{#8b4513}${title}\n${title.replace(/./g, '-')}{/}{bell}\n`)
+if (!quiet) {
+  const title = `💩 Poops — v${pkg.version}`
+  styledLog(`\n{#8b4513}${title}\n${title.replace(/./g, '-')}{/}{bell}\n`)
+}
 
 // Check if poops.json exists
 if (!pathExists(configPath)) {
@@ -391,9 +395,11 @@ async function startServer() {
 
   // eslint-disable-next-line @stylistic/space-before-function-paren
   http.createServer(createStaticHandler(base)).listen(parseInt(port), '0.0.0.0', async () => {
-    console.log()
-    styledLog(`🏠 {dim}Local server:{/} {underline|http://localhost:${port}}`)
-    styledLog(`🛜 {dim} Network     :{/} {underline|http://${getLocalIP()}:${port}}`)
+    if (!quiet) {
+      console.log()
+      styledLog(`🏠 {dim}Local server:{/} {underline|http://localhost:${port}}`)
+      styledLog(`🛜 {dim} Network     :{/} {underline|http://${getLocalIP()}:${port}}`)
+    }
     setupLiveReloadServer(config)
   })
 }
