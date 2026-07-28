@@ -139,6 +139,44 @@ function setupWatchers(config, modules) {
     .filter((zone) => zone && zone !== '.')
   const isBuildOutput = (file) => outputZones.some((zone) => pathContainsPathSegment(file, zone))
 
+  // One chokidar event fires per written file, so a single build that writes
+  // several outputs into a watched dir (css + map + min.css) triggers the same
+  // rebuild branch once per file. The trailing debounce folds such a burst
+  // into one run; the window collects the paths so the handler can still
+  // reason per-file (the copy branch's css hot-swap vs full reload). 300ms:
+  // outlives the 150ms awaitWriteFinish settle between files of one burst.
+  const coalesce = (fn, ms = 300) => {
+    let timer
+    const files = new Set()
+    return (file) => {
+      files.add(file)
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        const batch = [...files]
+        files.clear()
+        fn(batch)
+      }, ms)
+    }
+  }
+
+  const recompileStyles = coalesce(() => {
+    modules.styles.compile().then(() => modules.postcss.compile())
+      .then(() => { hook('styles'); styleOutputs(config).forEach((out) => reload(out)) })
+      .catch(err => console.error(err))
+  })
+
+  // A copied .css (e.g. the styles compiler's own output landing in a copy
+  // source) stays a hot-swap; any other copied file escalates to a full
+  // reload — reload() itself folds the batch into one refresh.
+  const recopy = coalesce((batch) => {
+    modules.copy.execute()
+      .then(() => {
+        hook('copy')
+        batch.forEach((file) => reload(/\.css$/i.test(file) ? file : undefined))
+      })
+      .catch(err => console.error(err))
+  })
+
   const rebuild = (file) => {
     // Engines that keep compiled templates across compiles (nunjucks) drop
     // exactly this file's entries; shared by change/add/unlink via rebuild.
@@ -156,9 +194,7 @@ function setupWatchers(config, modules) {
       }
     }
     if (/(\.sass|\.scss|\.css)$/i.test(file) && !isBuildOutput(file)) {
-      modules.styles.compile().then(() => modules.postcss.compile())
-        .then(() => { hook('styles'); styleOutputs(config).forEach((out) => reload(out)) })
-        .catch(err => console.error(err))
+      recompileStyles(file)
     }
     if (/(\.html|\.xml|\.rss|\.atom|\.njk|\.liquid|\.md)$/i.test(file)) {
       // Incremental: re-render only the pages whose last render touched this
@@ -189,11 +225,7 @@ function setupWatchers(config, modules) {
         .then(() => { hook('images'); hook('markup'); reload() })
         .catch(err => console.error(err))
     }
-    // A copied .css (e.g. the styles compiler's own output landing in a copy
-    // source) stays a hot-swap; any other copied file needs a full reload.
-    doesFileBelongToPath(file, config.copy) && modules.copy.execute()
-      .then(() => { hook('copy'); reload(/\.css$/i.test(file) ? file : undefined) })
-      .catch(err => console.error(err))
+    doesFileBelongToPath(file, config.copy) && recopy(file)
   }
 
   // Atomic-save editors (rename-write) fire unlink+add for every save, so an
