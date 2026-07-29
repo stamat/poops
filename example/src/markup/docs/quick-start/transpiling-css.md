@@ -113,11 +113,24 @@ Add a component directory, get a stylesheet — no config change. The rename onl
 a glob matched: a literal `"in": "src/scss/index.scss"` still writes `index.css`, and an explicit
 `out` file path always wins.
 
-> [!WARNING]
-> Because the parent path is dropped, two directories with the same name in one glob —
-> `src/blocks/accordion/` and `src/elements/accordion/` — both compile to
-> `dist/css/accordion.css`, and the last one wins. Same overwrite rule as two same-named
-> `main.scss` files; give them separate entries with separate `out` directories if you need both.
+The name is placed relative to the glob's **static prefix** — everything before the first `*`, `{…}`
+or other magic segment. Above that prefix is `src/elements`, which every match shares, so nothing is
+left to nest under and the output is flat. Widen the glob and the part it no longer pins down is
+kept, so same-named components stay apart instead of overwriting each other:
+
+```json
+{ "in": "src/*/accordion/index.scss", "out": "dist/css/" }
+```
+
+```
+src/blocks/accordion/index.scss    →  dist/css/blocks/accordion.css
+src/elements/accordion/index.scss  →  dist/css/elements/accordion.css
+```
+
+> [!NOTE]
+> The prefix comes from the pattern, not from what matched, so the layout doesn't shift when you
+> add or remove a component. This is the one place styles nest — non-`index` entries still flatten
+> to their basename, per the rule above.
 
 ## Resolving imports
 

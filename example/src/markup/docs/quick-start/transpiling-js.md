@@ -121,11 +121,24 @@ Add a component directory, get a bundle — no config change. The rename only ap
 glob matched: a literal `"in": "src/index.ts"` still writes `index.js`, and an explicit `out` file
 path always wins.
 
-> [!WARNING]
-> Because the parent path is dropped, two directories with the same name in one glob —
-> `src/blocks/accordion/` and `src/elements/accordion/` — both want `dist/js/accordion.js`.
-> esbuild refuses to write two different outputs to one path and fails the build naming it. Give
-> them separate entries with separate `out` directories if you need both.
+The name is placed relative to the glob's **static prefix** — everything before the first `*`, `{…}`
+or other magic segment. Above that prefix is `src/elements`, which every match shares, so nothing is
+left to nest under and the output is flat. Widen the glob and the part it no longer pins down is
+kept, so same-named components stay apart:
+
+```json
+{ "in": "src/*/accordion/index.ts", "out": "dist/js/" }
+```
+
+```
+src/blocks/accordion/index.ts    →  dist/js/blocks/accordion.js
+src/elements/accordion/index.ts  →  dist/js/elements/accordion.js
+```
+
+> [!NOTE]
+> The prefix comes from the pattern, not from what matched, so the layout doesn't shift when you
+> add or remove a component. To place the bundles somewhere else, move the magic segment — a
+> narrower glob per group with its own `out` gives you full control.
 
 ## Maintaining a JS library
 

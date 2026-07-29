@@ -62,9 +62,9 @@ The remaining `markup` sub-keys — `in`, `out`, `engine`, `site`, `data`, `incl
 
 Bundles and transpiles JavaScript / TypeScript with [esbuild](https://esbuild.github.io/). A single
 `{ in, out }` object or an array of them; `in` accepts a path, an array of paths, or globs — a
-glob-matched `index.*` is named after its directory, so `src/elements/*/index.ts` builds one bundle
-per component. Per-entry `options` cover `sourcemap`, `minify`, `justMinified`, `format` and
-`target`.
+glob-matched `index.*` is named after its directory, relative to the glob's static prefix, so
+`src/elements/*/index.ts` builds one bundle per component. Per-entry `options` cover `sourcemap`,
+`minify`, `justMinified`, `format` and `target`.
 
 ```json
 {
