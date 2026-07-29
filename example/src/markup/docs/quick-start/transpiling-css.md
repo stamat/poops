@@ -82,10 +82,42 @@ skipped — they're imports, not entry points. Arrays and globs mix freely:
 { "in": ["src/scss/main.scss", "src/scss/pages/*.scss"], "out": "dist/css/" }
 ```
 
+Brace alternates count as a glob on their own, so a pattern needs no `*` to match "whichever
+extension this entry happens to use":
+
+```json
+{ "in": "src/scss/pages/*.{scss,sass,css}", "out": "dist/css/" }
+```
+
 > [!NOTE]
 > With more than one entry file, `out` must be a directory. Output names come from the input's
 > basename, so two entries named `main.scss` in different directories would overwrite each other.
 > Glob patterns always use `/` as the separator, even on Windows.
+
+### One stylesheet per component directory
+
+Libraries of components usually give each component a directory, which makes every entry point
+`index.*` — and by the basename rule above, every one of them would compile to `index.css` and
+overwrite the last. A **glob-matched** `index.*` is named after the directory holding it instead:
+
+```json
+{ "in": "src/elements/*/index.{scss,sass,css}", "out": "dist/css/" }
+```
+
+```
+src/elements/accordion/index.scss  →  dist/css/accordion.css
+src/elements/tabs/index.scss       →  dist/css/tabs.css
+```
+
+Add a component directory, get a stylesheet — no config change. The rename only applies to entries
+a glob matched: a literal `"in": "src/scss/index.scss"` still writes `index.css`, and an explicit
+`out` file path always wins.
+
+> [!WARNING]
+> Because the parent path is dropped, two directories with the same name in one glob —
+> `src/blocks/accordion/` and `src/elements/accordion/` — both compile to
+> `dist/css/accordion.css`, and the last one wins. Same overwrite rule as two same-named
+> `main.scss` files; give them separate entries with separate `out` directories if you need both.
 
 ## Resolving imports
 

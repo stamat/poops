@@ -89,11 +89,43 @@ Arrays and globs mix freely:
 { "in": ["src/js/main.ts", "src/js/pages/*.ts"], "out": "dist/js/" }
 ```
 
+Brace alternates count as a glob on their own, so a pattern needs no `*` to match "whichever
+extension this entry happens to use":
+
+```json
+{ "in": "src/js/pages/*.{js,ts,jsx,tsx}", "out": "dist/js/" }
+```
+
 > [!NOTE]
 > With more than one entry file, `out` must be a directory. Entry points from different
 > directories nest their output under their common ancestor — `src/js/a/main.js` and
 > `src/js/b/main.js` become `dist/js/a/main.js` and `dist/js/b/main.js`, so same-named
 > entries never collide. Glob patterns always use `/` as the separator, even on Windows.
+
+### One bundle per component directory
+
+Libraries of components usually give each component a directory, which makes every entry point
+`index.*` — and nesting under the common ancestor would bury each bundle a level deep. A
+**glob-matched** `index.*` is named after the directory holding it instead:
+
+```json
+{ "in": "src/elements/*/index.{js,mjs,cjs,jsx,ts,tsx}", "out": "dist/js/" }
+```
+
+```
+src/elements/accordion/index.ts  →  dist/js/accordion.js
+src/elements/tabs/index.ts       →  dist/js/tabs.js
+```
+
+Add a component directory, get a bundle — no config change. The rename only applies to entries a
+glob matched: a literal `"in": "src/index.ts"` still writes `index.js`, and an explicit `out` file
+path always wins.
+
+> [!WARNING]
+> Because the parent path is dropped, two directories with the same name in one glob —
+> `src/blocks/accordion/` and `src/elements/accordion/` — both want `dist/js/accordion.js`.
+> esbuild refuses to write two different outputs to one path and fails the build naming it. Give
+> them separate entries with separate `out` directories if you need both.
 
 ## Maintaining a JS library
 
