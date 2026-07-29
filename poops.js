@@ -3,7 +3,7 @@
 import chokidar from 'chokidar'
 import Copy from './lib/copy.js'
 import runExec, { validateExec } from './lib/exec.js'
-import { pathExists, doesFileBelongToPath, pathContainsPathSegment, deriveWatchDirs, toPosix } from './lib/utils/helpers.js'
+import { pathExists, doesFileBelongToPath, pathContainsPathSegment, deriveWatchDirs, toPosix, hasOutTemplate, outTemplateBase } from './lib/utils/helpers.js'
 import http from 'node:http'
 import net from 'node:net'
 import os from 'node:os'
@@ -89,17 +89,15 @@ function reload(file) {
   }, 500)
 }
 
-// The css output paths of the styles entries — what the styles chain reports
-// to reload() so style edits hot-swap. A directory `out` maps to the entry
-// point's basename, mirroring how the styles compiler names its output file.
+// The css files the last styles compile actually wrote — what the styles chain
+// reports to reload() so style edits hot-swap. Read off the compiler rather
+// than guessed from the config: a glob or a templated `out` names one output
+// per match, and a guessed path the browser has no stylesheet for silently
+// downgrades the hot-swap to a full page reload.
 // toPosix: the livereload client matches these against URL paths, so Windows
 // backslashes would silently break the CSS hot-swap.
-function styleOutputs(config) {
-  return [config.styles].flat()
-    .filter((entry) => entry && entry.in && entry.out)
-    .map((entry) => toPosix(path.extname(entry.out)
-      ? entry.out
-      : path.join(entry.out, path.basename(entry.in).replace(/\.(sass|scss)$/i, '.css'))))
+function styleOutputs(styles) {
+  return styles.outputs.map(toPosix)
 }
 
 // Per-stage shell hooks (config.exec). Runs after a stage compiles in both
@@ -135,7 +133,11 @@ function setupWatchers(config, modules) {
   // the watch list, or every compile retriggers itself.
   const outputZones = [config.scripts, config.styles].flat()
     .filter((entry) => entry && entry.out)
-    .map((entry) => (path.extname(entry.out) ? path.dirname(entry.out) : entry.out))
+    // A templated `out` is only static up to its first token, so zone on that
+    // prefix — `dist/{{dir}}/theme.css` writes into `dist`, not `dist/{{dir}}`
+    .map((entry) => (hasOutTemplate(entry.out)
+      ? outTemplateBase(entry.out)
+      : (path.extname(entry.out) ? path.dirname(entry.out) : entry.out)))
     .filter((zone) => zone && zone !== '.')
   const isBuildOutput = (file) => outputZones.some((zone) => pathContainsPathSegment(file, zone))
 
@@ -161,7 +163,7 @@ function setupWatchers(config, modules) {
 
   const recompileStyles = coalesce(() => {
     modules.styles.compile().then(() => modules.postcss.compile())
-      .then(() => { hook('styles'); styleOutputs(config).forEach((out) => reload(out)) })
+      .then(() => { hook('styles'); styleOutputs(modules.styles).forEach((out) => reload(out)) })
       .catch(err => console.error(err))
   })
 

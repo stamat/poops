@@ -31,7 +31,8 @@ fastest, most up-to-date Sass implementation.
 ```
 
 - **`in`** — a `.scss`/`.sass` entry file, an array of entry files, or a [glob pattern](#globs-and-multiple-entry-files).
-- **`out`** — the output CSS file, or a directory when `in` has multiple entries.
+- **`out`** — the output CSS file, a directory when `in` has multiple entries, or a
+  [template](#naming-outputs-yourself) naming one output per entry.
 
 ### Options
 
@@ -131,6 +132,49 @@ src/elements/accordion/index.scss  →  dist/css/elements/accordion.css
 > The prefix comes from the pattern, not from what matched, so the layout doesn't shift when you
 > add or remove a component. This is the one place styles nest — non-`index` entries still flatten
 > to their basename, per the rule above.
+
+### Naming outputs yourself
+
+The `index.*` rule only rescues entry points actually named `index`. Every other glob match still
+flattens to its own basename, so `src/elements/*/theme.scss` writes `theme.css` once per component
+and the last one wins. When you need a different name, `out` can be a **template**:
+
+- **`{% raw %}{{dir}}{% endraw %}`** — the match's directory, relative to the glob's static prefix
+  (the same name an `index.*` entry would get)
+- **`{% raw %}{{name}}{% endraw %}`** — the match's basename without extension
+
+```json
+{% raw %}{ "in": "src/elements/*/theme.scss", "out": "dist/css/{{dir}}-{{name}}.css" }{% endraw %}
+```
+
+```
+src/elements/accordion/theme.scss  →  dist/css/accordion-theme.css
+src/elements/tabs/theme.scss       →  dist/css/tabs-theme.css
+```
+
+One output per match instead of one shared output. Tokens may carry spaces (`{% raw %}{{ dir }}{% endraw %}`)
+and can appear in directory segments too, so `{% raw %}"out": "dist/css/{{dir}}/theme.css"{% endraw %}`
+writes `dist/css/accordion/theme.css`. A templated `out` is exempt from the "more than one entry file
+needs a directory" rule — it already resolves to a different file per entry.
+
+For a literal entry, `{% raw %}{{dir}}{% endraw %}` is that entry's own directory name, so mixed
+arrays keep working:
+
+```json
+{% raw %}{ "in": ["src/scss/main.scss", "src/elements/accordion/index.scss"], "out": "dist/css/{{dir}}.css" }{% endraw %}
+```
+
+```
+src/scss/main.scss                 →  dist/css/scss.css
+src/elements/accordion/index.scss  →  dist/css/accordion.css
+```
+
+> [!NOTE]
+> A template wins over the `index.*` rename — you named the outputs, so nothing renames them behind
+> your back. A template that can't tell two matches apart
+> (`{% raw %}"out": "dist/css/{{name}}.css"{% endraw %}` across component directories) collides just
+> like a plain directory `out` would — that's what `{% raw %}{{dir}}{% endraw %}` is for. Scripts
+> take the same templates — see [Transpiling JS](transpiling-js#naming-outputs-yourself).
 
 ## Resolving imports
 

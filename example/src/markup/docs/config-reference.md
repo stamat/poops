@@ -63,8 +63,11 @@ The remaining `markup` sub-keys — `in`, `out`, `engine`, `site`, `data`, `incl
 Bundles and transpiles JavaScript / TypeScript with [esbuild](https://esbuild.github.io/). A single
 `{ in, out }` object or an array of them; `in` accepts a path, an array of paths, or globs — a
 glob-matched `index.*` is named after its directory, relative to the glob's static prefix, so
-`src/elements/*/index.ts` builds one bundle per component. Per-entry `options` cover `sourcemap`,
-`minify`, `justMinified`, `format` and `target`.
+`src/elements/*/index.ts` builds one bundle per component. `out` also accepts a template —
+`{% raw %}{{dir}}{% endraw %}` (the match's directory relative to that static prefix) and
+`{% raw %}{{name}}{% endraw %}` (its basename without extension) — naming one output per matched
+entry, extension included. Per-entry `options` cover `sourcemap`, `minify`, `justMinified`, `format`
+and `target`.
 
 ```json
 {
@@ -86,8 +89,8 @@ Full guide: [Transpiling JS](quick-start/transpiling-js).
 ## `styles`
 
 Compiles Sass/SCSS (and plain CSS) to CSS. Same `{ in, out, options }` shape as `scripts`, including
-the `index.*` glob rule; `options` adds `tokenPaths` for design-token inputs. Pair it with
-[`postcss`](#postcss) for Autoprefixer or Tailwind.
+the `index.*` glob rule and the `out` templates; `options` adds `tokenPaths` for design-token inputs.
+Pair it with [`postcss`](#postcss) for Autoprefixer or Tailwind.
 
 ```json
 {

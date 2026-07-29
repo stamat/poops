@@ -36,7 +36,8 @@ setup.
 Each entry has `in`, `out` and `options`:
 
 - **`in`** — an entry file, an array of entry files, or a [glob pattern](#globs-and-multiple-entry-files).
-- **`out`** — the output file, or a directory when `in` has multiple entries.
+- **`out`** — the output file, a directory when `in` has multiple entries, or a
+  [template](#naming-outputs-yourself) naming one output per entry.
 - **`options`** — mostly passed straight through to esbuild.
 
 ### Options
@@ -139,6 +140,46 @@ src/elements/accordion/index.ts  →  dist/js/elements/accordion.js
 > The prefix comes from the pattern, not from what matched, so the layout doesn't shift when you
 > add or remove a component. To place the bundles somewhere else, move the magic segment — a
 > narrower glob per group with its own `out` gives you full control.
+
+### Naming outputs yourself
+
+The `index.*` rule only rescues entry points actually named `index`. Everything else keeps its own
+basename, nested under the common ancestor. When you want the bundles named something else, `out`
+can be a **template**:
+
+- **`{% raw %}{{dir}}{% endraw %}`** — the match's directory, relative to the glob's static prefix
+  (the same name an `index.*` entry would get)
+- **`{% raw %}{{name}}{% endraw %}`** — the match's basename without extension
+
+```json
+{% raw %}{ "in": "src/elements/*/widget.ts", "out": "dist/js/{{dir}}-{{name}}.js" }{% endraw %}
+```
+
+```
+src/elements/accordion/widget.ts  →  dist/js/accordion-widget.js
+src/elements/tabs/widget.ts       →  dist/js/tabs-widget.js
+```
+
+One bundle per match, named by you rather than by the common ancestor. Tokens may carry spaces
+(`{% raw %}{{ dir }}{% endraw %}`) and can sit in directory segments, so
+`{% raw %}"out": "dist/js/{{dir}}/widget.js"{% endraw %}` writes `dist/js/accordion/widget.js`. For a
+literal entry, `{% raw %}{{dir}}{% endraw %}` is that entry's own directory name, so arrays mixing
+globs and plain paths keep working.
+
+An extension in the template is honoured, which is the cheap way to ship one format per entry:
+
+```json
+{% raw %}{ "in": "src/elements/*/index.ts", "out": "dist/esm/{{dir}}.mjs",
+  "options": { "format": "esm" } }{% endraw %}
+```
+
+> [!NOTE]
+> A template wins over the `index.*` rename — you named the outputs, so nothing renames them behind
+> your back. A template that can't tell two matches apart
+> (`{% raw %}"out": "dist/js/{{name}}.js"{% endraw %}` across component directories) fails the build
+> with esbuild's *"Two output files share the same path"* rather than overwriting — that's what
+> `{% raw %}{{dir}}{% endraw %}` is for. Styles take the same templates — see
+> [Transpiling CSS](transpiling-css#naming-outputs-yourself).
 
 ## Maintaining a JS library
 
