@@ -216,8 +216,8 @@ You can freely remove the properties that you don't need. For example, if you do
 
 Scripts are bundled with [esbuild](https://esbuild.github.io/). Supports `.js`, `.ts`, `.jsx`, and `.tsx` files out of the box — including React and other JSX frameworks. You can specify multiple scripts to bundle. Each script has the following properties:
 
-- `in` - the input path, can be a file path, an array of file paths, or a glob pattern (e.g. `"src/js/*.js"`). Globs must use `/` separators (even on Windows)
-- `out` - the output path, can be a directory or a file path. With multiple inputs it must be a directory — entry points from different directories nest their output under the common ancestor (esbuild's `outbase`)
+- `in` - the input path, can be a file path, an array of file paths, or a glob pattern (e.g. `"src/js/*.js"`, `"src/elements/*/index.{js,mjs,cjs,jsx,ts,tsx}"`). Globs must use `/` separators (even on Windows)
+- `out` - the output path, can be a directory or a file path. With multiple inputs it must be a directory — entry points from different directories nest their output under the common ancestor (esbuild's `outbase`). A **glob-matched** `index.*` is named after its directory instead (`src/elements/accordion/index.js` → `<out>/accordion.js`), so directories sharing a name (`src/a/accordion/index.js` and `src/b/accordion/index.js`) collide — esbuild fails the build rather than overwrite. A literal `in: "src/index.js"` keeps its own basename
 - `options` - the options for the bundler. You can apply most of the esbuild options that are not in conflict with Poops. See [esbuild's options](https://esbuild.github.io/api/#build-api) for more info.
 
 **Options:**
@@ -350,8 +350,8 @@ Poops does not need `react` or `react-dom` as its own dependency — they are re
 
 Styles are bundled with [Dart Sass](https://sass-lang.com/dart-sass). You can specify multiple styles to bundle. Each style has the following properties:
 
-- `in` - the input path, can be a file path, an array of file paths, or a glob pattern (e.g. `"src/scss/*.scss"`). Globs must use `/` separators (even on Windows) and skip Sass partials (`_*.scss`). Each matched file is compiled separately
-- `out` - the output path, can be a directory or a file path. With multiple inputs it must be a directory — each input compiles to `<out>/<basename>.css`, so inputs sharing a basename (e.g. `a/main.scss` and `b/main.scss`) will overwrite each other
+- `in` - the input path, can be a file path, an array of file paths, or a glob pattern (e.g. `"src/scss/*.scss"`, `"src/elements/*/index.{scss,sass,css}"`). Globs must use `/` separators (even on Windows) and skip Sass partials (`_*.scss`). Each matched file is compiled separately
+- `out` - the output path, can be a directory or a file path. With multiple inputs it must be a directory — each input compiles to `<out>/<basename>.css`, so inputs sharing a basename (e.g. `a/main.scss` and `b/main.scss`) will overwrite each other. A **glob-matched** `index.*` is named after its directory instead (`src/elements/accordion/index.scss` → `<out>/accordion.css`), which shifts the same overwrite risk onto directories sharing a name. A literal `in: "src/scss/index.scss"` keeps its own basename
 - `options` - the options for the bundler.
 
 **Options:**
