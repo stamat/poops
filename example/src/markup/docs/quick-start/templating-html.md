@@ -321,6 +321,25 @@ jsonld:
 ---
 ```
 
+The same object works in your `site` data, as a site-wide default — worth it when every page is one
+type. A docs site is `TechArticle`, not `WebPage`:
+
+```json
+{
+  "markup": {
+    "site": {
+      "jsonld": { "@type": "TechArticle" }
+    }
+  }
+}
+```
+
+Precedence is defaults → `site.jsonld` → `page.jsonld`, so a single page still opts out (a `FAQPage`
+inside a `TechArticle` site). Note that `site.jsonld` also overrides the auto-detected `BlogPosting`
+on dated pages — on a site that mixes docs and a blog, set the type per page instead of site-wide.
+It merges into the page's own block only; the auto-emitted `WebSite` and `BreadcrumbList` blocks are
+untouched.
+
 #### Common `@type` values
 
 poops picks `BlogPosting` or `WebPage` for you; override `@type` (and add the type's own fields)

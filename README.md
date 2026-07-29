@@ -1093,6 +1093,18 @@ All filters are available in both engines. The only syntax difference is how arg
   ---
   ```
 
+  The same `jsonld` object works in your `site` data, as a site-wide default — useful when every page on the site is one type. A docs site is `TechArticle`, not `WebPage`:
+
+  ```json
+  "markup": {
+    "site": {
+      "jsonld": { "@type": "TechArticle" }
+    }
+  }
+  ```
+
+  Precedence is defaults → `site.jsonld` → `page.jsonld`, so a single page can still opt out (a `FAQPage` inside a `TechArticle` site). A site-wide `@type` also overrides the auto-detected `BlogPosting` on dated pages, so on a site mixing docs and a blog set the type per page instead. Both merge into the page's own block only — the auto-emitted `WebSite` and `BreadcrumbList` blocks are untouched.
+
   poops auto-picks `BlogPosting` (page has a `date`) or `WebPage`. Override `@type` with the `jsonld` object for any schema.org type — common ones search/generative engines act on: `Article`, `NewsArticle`, `HowTo`, `FAQPage`, `QAPage`, `Product`, `Recipe`, `Event`, `Course`, `VideoObject`, `SoftwareApplication`, `Organization`, `Person`, `BreadcrumbList`, `WebSite`. Full list at [schema.org/docs/full](https://schema.org/docs/full.html); validate with the [Rich Results Test](https://search.google.com/test/rich-results). A per-`@type` table with the notable fields is in the [Templating docs](example/src/markup/docs/quick-start/templating-html.md).
 
 - `breadcrumb` — generates a visible breadcrumb `<nav class="breadcrumb"><ol>…</ol></nav>` trail for the page body (blog posts, nested pages), from the same URL-depth data the `jsonld` `BreadcrumbList` uses: the site root, each ancestor folder (humanized, e.g. `docs/static-site` → _Static Site_), then the current page as `aria-current` text. Pass `relativePathPrefix` so links resolve against the current output location (localhost in dev, your deployed subpath in prod) — not the absolute domain.
