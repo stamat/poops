@@ -43,7 +43,6 @@ Installed locally, use `npx` or a `package.json` script:
 | `--build`                    | `-b`  | Build once and exit (no watch/serve)         |
 | `--config <path>`            | `-c`  | Use a specific config file                   |
 | `--port <number>`            | `-p`  | Server port, overrides config                |
-| `--livereload-port <number>` | `-l`  | LiveReload port, overrides config            |
 | `--base-url <path>`          | `-u`  | Base URL prefix for markup, overrides config |
 
 `--base-url` is the one you'll reach for in CI, where the deploy path differs per environment:

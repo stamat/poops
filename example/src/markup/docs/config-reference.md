@@ -288,39 +288,25 @@ A local dev server:
 
 ## `livereload`
 
-Reloads the browser on file changes. `true` runs on the default port `35729`, or pass options:
-
-| Option      | Meaning                                                                       |
-| ----------- | ----------------------------------------------------------------------------- |
-| `port`      | LiveReload port (CLI `--livereload-port`/`-l` overrides).                     |
-| `exclude`   | Glob patterns to ignore, e.g. `["vendor/**/*"]`.                              |
-| `extraExts` | Extra file extensions (no dot) that trigger a refresh, added to the defaults. |
-| `exts`      | Extension list that **replaces** the defaults entirely.                       |
-
-Default trigger extensions: `html`, `css`, `js`, `png`, `gif`, `jpg`, `php`, `php5`, `py`, `rb`,
-`erb`, `coffee`. Working with Nunjucks or Slim templates? Add them:
+Reloads the browser when a build finishes. A switch, not an object — there is
+nothing to configure:
 
 ```json
 {
-  "livereload": { "extraExts": ["njk", "slim"] }
+  "serve": { "base": "dist" },
+  "livereload": true
 }
 ```
 
-Your pages need the LiveReload snippet in development (mind the port if you changed it):
+It rides the `serve` port, so it needs `serve` to be on. Poops answers
+`/__poops_reload` as a server-sent events stream and appends the client script
+to every HTML page it serves — **your templates need no snippet**, and nothing
+is written into your build output.
 
-```html
-<script>
-  document.write(
-    '<script src="http://' +
-      (location.host || "localhost").split(":")[0] +
-      ':35729/livereload.js?snipver=1"></' +
-      "script>",
-  );
-</script>
-```
-
-A [browser extension](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei?hl=en)
-works instead of the snippet too.
+One save means one reload, after the build it triggered has settled. When
+everything a build wrote is CSS, stylesheets are swapped in place instead:
+no page reload, so scroll position and form state survive a style edit. The
+browser reconnects on its own after a Poops restart.
 
 ## `watch`
 
