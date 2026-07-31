@@ -415,8 +415,13 @@ function getLocalIP() {
 async function startServer() {
   await poops() // Initial compilation before starting the server
 
-  const base = config.serve.base && pathExists(cwd, config.serve.base)
-    ? path.join(cwd, config.serve.base)
+  // Almost every config sets serve.base to the markup `out` it just built, so
+  // that is the default when it's unset. Falls back to cwd for a project with
+  // no markup — and an explicit serve.base still wins, including one pointing
+  // somewhere else entirely.
+  const serveBase = config.serve.base || (config.markup && config.markup.out)
+  const base = serveBase && pathExists(cwd, serveBase)
+    ? path.join(cwd, serveBase)
     : cwd
 
   let port = overridePort || config.serve.port || 4040

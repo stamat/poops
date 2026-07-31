@@ -129,6 +129,13 @@ compat shims that survived the whole 1.x line finally go.
   naming its new home — and stops working in 3.0. Where both are set, `options`
   wins.
 
+### Added
+
+- **`serve.base` defaults to the markup `out` directory.** Nearly every config
+  set it to the path it had just built into. Set it only when the server should
+  serve somewhere else; an explicit value still wins, and a project with no
+  `markup` still serves the working directory.
+
 ### Removed
 
 - **The `ssg` config key.** It has been an alias for `reactor` since the rename,

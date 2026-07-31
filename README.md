@@ -1631,7 +1631,7 @@ Sets up a local server for your project.
 Server options:
 
 - `port` - the port on which the server will run
-- `base` - the base path of the server, where your HTML files are located
+- `base` - the base path of the server, where your HTML files are located. Defaults to the markup `out` directory, so most configs can leave it out
 
 If you don't want to run a local server, just remove the `serve` property from the config.
 

@@ -291,7 +291,7 @@ A local dev server:
 | Option | Meaning                                                                |
 | ------ | ---------------------------------------------------------------------- |
 | `port` | Port to serve on (CLI `--port`/`-p` overrides).                        |
-| `base` | Base path of the server — where your built HTML lives, e.g. `"/dist"`. |
+| `base` | Base path of the server — where your built HTML lives, e.g. `"/dist"`. Defaults to the markup `out` directory. |
 
 ## `livereload`
 
