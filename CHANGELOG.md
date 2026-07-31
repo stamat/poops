@@ -35,7 +35,9 @@ commit as the version bump. **A post you wrote by hand at that path is never
 overwritten** — that is the escape hatch for releases whose post is a live demo,
 which is most of them here. Write the post first, then the entry.
 
-## [Unreleased] — the dev loop, modernized
+## [Unreleased]
+
+## [2.0.0] - 2026-07-31 — the dev loop, modernized
 
 Poops 2.0 has no new features. It is the release where the core loop — watch,
 build, reload — stops carrying old dependencies and old spellings, and where the
