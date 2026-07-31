@@ -315,8 +315,6 @@ Each reactor entry has the following properties:
 }
 ```
 
-For backwards compatibility, `"ssg"` is also accepted as a config key — it is treated as an alias for `"reactor"`.
-
 In your templates, use the `inject` name to insert the rendered HTML:
 
 ```html

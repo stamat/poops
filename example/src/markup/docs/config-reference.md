@@ -56,7 +56,7 @@ deep dive; everything else is documented in full on this page.
 
 The remaining `markup` sub-keys — `in`, `out`, `engine`, `site`, `data`, `includePaths`,
 `timeDateFormat`, `collections`, `baseURL`, `autoescape` — are covered in
-[Templating HTML](quick-start/templating-html). `ssg` is a backwards-compatible alias for `reactor`.
+[Templating HTML](quick-start/templating-html).
 
 ## `scripts`
 

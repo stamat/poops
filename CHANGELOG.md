@@ -84,6 +84,16 @@ compat shims that survived the whole 1.x line finally go.
   that have shipped them since 2020 only made bundles bigger. Entries that set
   their own `target` are untouched.
 
+### Removed
+
+- **The `ssg` config key.** It has been an alias for `reactor` since the rename,
+  and it was the last compatibility shim in the codebase. A config still using
+  it now gets told what to call it instead:
+
+  ```
+  [info] Config key "ssg" is renamed to "reactor" in 2.0 — ignored.
+  ```
+
 ### Fixed
 
 - **A style edit hot-swaps the stylesheet the page actually links.** With

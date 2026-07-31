@@ -86,9 +86,6 @@ Server-only (no hydration)? Omit `in`/`out`:
 > Poops does **not** depend on `react`/`react-dom`. They are resolved from *your* project's
 > `node_modules`. Install them yourself: `npm i react react-dom`.
 
-> [!TIP]
-> For backwards compatibility the key `"ssg"` is accepted as an alias for `"reactor"`.
-
 ## Which should I use?
 
 | Goal | Use |

@@ -333,14 +333,21 @@ if (!pathExists(configPath)) {
 const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
 
 // A typo'd top-level key ("stlyes") is otherwise silently ignored — warn, same
-// idea as validateExec for exec stages. `ssg` is the reactor alias; `pkg` feeds
-// banner templates; reactorData is set internally but tolerated here in case a
-// config hardcodes it.
-const KNOWN_CONFIG_KEYS = new Set(['watch', 'includePaths', 'scripts', 'styles', 'postcss', 'reactor', 'ssg', 'markup', 'copy', 'images', 'serve', 'livereload', 'exec', 'banner', 'pkg', 'reactorData'])
+// idea as validateExec for exec stages. `pkg` feeds banner templates;
+// reactorData is set internally but tolerated here in case a config hardcodes it.
+const KNOWN_CONFIG_KEYS = new Set(['watch', 'includePaths', 'scripts', 'styles', 'postcss', 'reactor', 'markup', 'copy', 'images', 'serve', 'livereload', 'exec', 'banner', 'pkg', 'reactorData'])
+
+// Keys that meant something in 1.x. They fall through the check above, and
+// "unknown config key" would be accurate and useless — name the replacement.
+const REMOVED_CONFIG_KEYS = { ssg: 'renamed to "reactor" in 2.0' }
+
 for (const key of Object.keys(config)) {
-  if (!KNOWN_CONFIG_KEYS.has(key)) {
-    log({ tag: 'info', warn: true, text: `Unknown config key "${key}" — ignored. Valid: ${[...KNOWN_CONFIG_KEYS].join(', ')}` })
+  if (KNOWN_CONFIG_KEYS.has(key)) continue
+  if (REMOVED_CONFIG_KEYS[key]) {
+    log({ tag: 'info', warn: true, text: `Config key "${key}" is ${REMOVED_CONFIG_KEYS[key]} — ignored.` })
+    continue
   }
+  log({ tag: 'info', warn: true, text: `Unknown config key "${key}" — ignored. Valid: ${[...KNOWN_CONFIG_KEYS].join(', ')}` })
 }
 
 // The reload channel is an endpoint on the static server, so livereload has
@@ -361,11 +368,6 @@ if (config.includePaths) {
   config.includePaths = Array.isArray(config.includePaths) ? config.includePaths : [config.includePaths]
 } else {
   config.includePaths = ['node_modules']
-}
-
-// Backwards compatibility: support "ssg" as alias for "reactor"
-if (!config.reactor && config.ssg) {
-  config.reactor = config.ssg
 }
 
 if (overrideBaseURL && config.markup) {
