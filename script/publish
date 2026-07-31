@@ -102,6 +102,15 @@ async function publish(version) {
   fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2) + '\n')
 
   await run('git add package.json')
+
+  // repos keeping a CHANGELOG.md drop in a script/changelog to cut its
+  // [Unreleased] section into a release entry — it lands in the bump commit, so
+  // the tag contains it and no CI step has to push back to the default branch
+  if (fs.existsSync(path.join(process.cwd(), 'script/changelog'))) {
+    await runFile('script/changelog', [version])
+    await run('git add .')
+  }
+
   await commit(`Bump version to ${version}`)
 
   if (fs.existsSync(path.join(process.cwd(), 'script/build'))) {

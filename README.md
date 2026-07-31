@@ -54,6 +54,7 @@ It uses a simple config file where you define your input and output paths and it
   - [Live Reload (optional)](#live-reload-optional)
   - [Watch (optional)](#watch-optional)
   - [Include Paths (optional)](#include-paths-optional)
+- [Contributing](#contributing)
 - [Why?](#why)
 
 ## Features
@@ -1686,6 +1687,14 @@ Same as `watch` property, `includePaths` accepts an array of paths to include. I
   "includePaths": ["node_modules", "lib"]
 }
 ```
+
+## Contributing
+
+Issues and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md)
+for how to set up, what a PR needs, and how releases are cut.
+
+Released changes are in [CHANGELOG.md](CHANGELOG.md), written up in full on the
+[changelog site](https://stamat.info/poops/changelog/).
 
 ## Why?
 
