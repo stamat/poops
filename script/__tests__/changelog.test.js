@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, it, describe, expect } from '@jest/globals'
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -19,6 +20,8 @@ beforeEach(() => {
 
 afterEach(() => {
   fs.rmSync(TMP, { recursive: true, force: true })
+  // the release notes land outside the repo, where script/publish reads them
+  fs.rmSync(path.join(os.tmpdir(), '_tmp-changelog-release-notes-v1.2.3.md'), { force: true })
 })
 
 describe('script/changelog', () => {
@@ -134,6 +137,23 @@ A fence could say more: than its language.
     expect(fs.readFileSync(path.join(POSTS, 'v1.2.3.md'), 'utf8')).toBe('hand-written demo')
     // the version still rolls over, the post is the only thing left alone
     expect(fs.readFileSync(path.join(TMP, 'CHANGELOG.md'), 'utf8')).toContain('## [1.2.3] - ')
+  })
+
+  it('leaves the entry in the temp dir for gh release create --notes-file', () => {
+    fs.writeFileSync(path.join(TMP, 'CHANGELOG.md'), `## [Unreleased] — release notes
+
+An intro paragraph.
+
+### Added
+
+- The {{ page.title }} tag.
+`)
+
+    cut()
+
+    const notes = fs.readFileSync(path.join(os.tmpdir(), '_tmp-changelog-release-notes-v1.2.3.md'), 'utf8')
+    // the entry as written: no front matter, headings and template tags untouched
+    expect(notes).toBe('An intro paragraph.\n\n### Added\n\n- The {{ page.title }} tag.\n')
   })
 
   it('writes nothing when [Unreleased] is empty', () => {

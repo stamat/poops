@@ -31,7 +31,8 @@ which functions moved.
 
 On `script/publish`, `script/changelog` cuts this section into a released entry
 and writes `example/src/markup/changelog/v<version>.md` from it, in the same
-commit as the version bump. **A post you wrote by hand at that path is never
+commit as the version bump. The entry also becomes the body of the GitHub
+release, verbatim — no notes to paste in by hand. **A post you wrote by hand at that path is never
 overwritten** — that is the escape hatch for releases whose post is a live demo,
 which is most of them here. Write the post first, then the entry.
 

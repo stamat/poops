@@ -6,8 +6,7 @@
       "sourcemap": true,
       "minify": true,
       "justMinified": false,
-      "format": "iife",
-      "target": "es2019"
+      "format": "iife"
     }
   }, {
     "in": "example/src/js/react-app.jsx",
@@ -15,8 +14,7 @@
     "options": {
       "sourcemap": true,
       "minify": true,
-      "format": "iife",
-      "target": "es2019"
+      "format": "iife"
     }
   }, {
     "in": "node_modules/poops-docs-theme/src/docs.ts",
@@ -24,8 +22,7 @@
     "options": {
       "minify": true,
       "justMinified": true,
-      "format": "iife",
-      "target": "es2019"
+      "format": "iife"
     }
   }],
   "reactor": [{
@@ -34,8 +31,7 @@
     "in": "example/src/js/app-hydrate.jsx",
     "out": "example/dist/js/app-hydrate.js",
     "options": {
-      "minify": true,
-      "target": "es2019"
+      "minify": true
     }
   }],
   "styles": [{
@@ -108,8 +104,7 @@
   ],
   "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
   "serve" : {
-    "port": 4040,
-    "base": "/example/dist"
+    "port": 4040
   },
   "livereload": true,
   "watch": [

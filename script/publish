@@ -13,6 +13,7 @@
 import readline from 'node:readline'
 import { exec, execFile } from 'node:child_process'
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 
 const argVersion = process.argv[2]
@@ -103,10 +104,15 @@ async function publish(version) {
 
   await run('git add package.json')
 
+  // script/changelog leaves the entry it cut here for the GitHub release below
+  const notesPath = path.join(os.tmpdir(), `${path.basename(process.cwd())}-release-notes-v${version}.md`)
+
   // repos keeping a CHANGELOG.md drop in a script/changelog to cut its
   // [Unreleased] section into a release entry — it lands in the bump commit, so
   // the tag contains it and no CI step has to push back to the default branch
   if (fs.existsSync(path.join(process.cwd(), 'script/changelog'))) {
+    // a leftover from an earlier run of this version must not become the notes
+    fs.rmSync(notesPath, { force: true })
     await runFile('script/changelog', [version])
     await run('git add .')
   }
@@ -127,14 +133,24 @@ async function publish(version) {
 
   const answer = await question('Do you want to create a GitHub release? (y/n): ')
   if (answer === 'y') {
-    const notes = await question('Enter notes for the release (optional): ')
     const args = ['release', 'create', `v${version}`, '--title', `v${version}`, '--latest']
-    if (notes.trim() !== '') {
-      args.push('--notes', notes)
+    if (fs.existsSync(notesPath)) {
+      console.log(`Release notes from the CHANGELOG entry: ${notesPath}`)
+      // GitHub prepends the body to the generated notes, so the entry keeps the
+      // top and the compare link lands under it
+      args.push('--notes-file', notesPath, '--generate-notes')
     } else {
-      args.push('--generate-notes')
+      const notes = await question('Enter notes for the release (optional): ')
+      if (notes.trim() !== '') {
+        args.push('--notes', notes)
+      } else {
+        args.push('--generate-notes')
+      }
     }
     await runFile('gh', args)
+    // the release carries the notes now — a failing gh exits above, keeping the
+    // file around for a manual retry
+    fs.rmSync(notesPath, { force: true })
   }
 }
 

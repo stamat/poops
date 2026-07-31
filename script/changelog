@@ -19,9 +19,13 @@
  * The post directory is `<markup.in>/changelog` from poops.json, or pass it as
  * the second argument.
  *
+ * The entry is also left in the temp dir as `<repo>-release-notes-v<version>.md`
+ * so script/publish can hand it to `gh release create --notes-file`.
+ *
  * With love, @stamat
  */
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 
 const version = process.argv[2]
@@ -137,3 +141,10 @@ lines[start] = `## [Unreleased]\n\n## [${version}] - ${today}${title ? ` — ${t
 fs.writeFileSync(CHANGELOG, lines.join('\n'))
 
 console.log(`Cut [Unreleased] into ${version}`)
+
+// The GitHub release body is the entry as written, not the post — no front
+// matter, no promoted headings, template tags left alone. script/publish
+// computes this same path and passes it as `gh release create --notes-file`.
+const notesPath = path.join(os.tmpdir(), `${path.basename(process.cwd())}-release-notes-v${version}.md`)
+fs.writeFileSync(notesPath, `${section}\n`)
+console.log(`Wrote ${notesPath}`)
