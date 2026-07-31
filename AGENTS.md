@@ -33,6 +33,27 @@ The last two read `example/dist`, so they only mean anything after a build.
   feature Poops has, so `script/build` failing is a real signal.
 - `example/dist` is generated and gitignored.
 
+## Ecosystem
+
+Separate repos, separate releases. Poops does not vendor any of them, but a
+change here can break them:
+
+- **[poops-images](https://github.com/stamat/poops-images)** — optional peer
+  dependency, imported lazily by `lib/images.js`; the markup engines read the
+  `.poops-images-cache.json` it writes. It must stay optional — `sharp` never
+  becomes a hard dependency of Poops, and a missing install warns and skips.
+- **[poops-docs-theme](https://github.com/stamat/poops-docs-theme)** — devDep
+  supplying the layout, SCSS and TS the example docs site builds from
+  `node_modules/`. Renaming what it imports breaks `script/build`.
+- **[shitstorm](https://github.com/stamat/shitstorm)** (clean starter),
+  **[shitstorm-hat](https://github.com/stamat/shitstorm-hat)** (htmx, Alpine,
+  Tailwind) and
+  **[shitstorm-sulphuris](https://github.com/stamat/shitstorm-sulphuris)**
+  (sulphuris, book-of-spells) — project templates, cloned by
+  [create-poops](https://github.com/stamat/create-poops), which maps
+  `base`/`hat`/`sulphuris` to those repos. Each ships its own `poops.json`, so
+  a config shape change has to land in all three.
+
 ## Documentation
 
 Two places, and a change usually touches both:
