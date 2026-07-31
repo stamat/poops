@@ -72,6 +72,14 @@ compat shims that survived the whole 1.x line finally go.
   mode behaves as before — one rebuild per save, CSS still hot-swaps, deletions
   still remove their output.
 
+### Fixed
+
+- **A style edit hot-swaps the stylesheet the page actually links.** With
+  `minify` on, the reload chain was told about `site.css` while the page linked
+  `site.min.css` — no stylesheet matched, so every style edit reloaded the whole
+  page instead of swapping the CSS. Both spellings are now reported (and with
+  `justMinified`, only the minified one, since the other is deleted).
+
 ## [1.9.8] - 2026-07-31 — fence info strings carry through
 
 A fence could say more than its language, but only the language survived to the HTML — anything marking a fence for a later stage had to be an HTML comment next to it in the Markdown. The rest of the info string now lands on the code element as classes and data attributes, and all six places that render a code block finally agree on what one looks like.
