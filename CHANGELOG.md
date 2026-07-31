@@ -48,6 +48,13 @@ compat shims that survived the whole 1.x line finally go.
   esbuild — assume a modern runtime anyway. CI tests on Node 22 and 24, on both
   Ubuntu and Windows.
 
+- **The file watcher moved from chokidar 3 to chokidar 5.** Two majors of
+  watcher fixes, and one fewer legacy dependency tree under `node_modules`.
+  Nothing in your config changes: `watch` has always been a list of directories,
+  never globs, so chokidar 4 dropping glob support costs nothing here. Watch
+  mode behaves as before — one rebuild per save, CSS still hot-swaps, deletions
+  still remove their output.
+
 ## [1.9.8] - 2026-07-31 — fence info strings carry through
 
 A fence could say more than its language, but only the language survived to the HTML — anything marking a fence for a later stage had to be an HTML comment next to it in the Markdown. The rest of the info string now lands on the code element as classes and data attributes, and all six places that render a code block finally agree on what one looks like.
