@@ -226,7 +226,7 @@ data:
 {
   "markup": {
     "options": {
-      "feed": { "collection": "blog", "output": "blog/feed.rss" }
+      "feed": { "collection": "blog", "out": "blog/feed.rss" }
     }
   }
 }

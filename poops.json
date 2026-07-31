@@ -82,20 +82,20 @@
       "searchIndex": "search-index.json",
       "sitemap": "sitemap.xml",
       "llms": {
-        "output": "llms.txt",
+        "out": "llms.txt",
         "intro": "example/src/llms-intro.md",
         "full": true,
         "fullIntro": "example/src/llms-intro-full.md"
       },
       "robots": "robots.txt",
       "nav": {
-        "output": "nav.json",
+        "out": "nav.json",
         "root": "docs",
         "collections": "index"
       },
       "feed": {
         "collection": "changelog",
-        "output": "changelog/feed.rss",
+        "out": "changelog/feed.rss",
         "content": true
       }
     }

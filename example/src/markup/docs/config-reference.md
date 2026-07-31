@@ -357,7 +357,7 @@ object form takes options:
 
 | Option                   | Meaning                                                                                                 |
 | ------------------------ | ------------------------------------------------------------------------------------------------------- |
-| `output`                 | Output filename, written to the markup output directory.                                                |
+| `out`                 | Output filename, written to the markup output directory.                                                |
 | `minWordLength`          | Minimum word length considered a keyword. Default `3`.                                                  |
 | `maxKeywords`            | Maximum keywords per page. Default `20`.                                                                |
 | `globalFrequencyCeiling` | Drop words appearing in more than this fraction of pages. Default `0.8`.                                |
@@ -383,7 +383,7 @@ auto-extracted ones. Pages with `published: false` are excluded.
 Writes a standard `sitemap.xml` with `<loc>` and `<lastmod>` (from front matter `date`). If
 `site.url` is set, it is prepended to all URLs. Collection index/pagination pages are included
 here but excluded from the search index. A string sets the filename; the object form takes
-`output`.
+`out`.
 
 A page's front matter `robots: noindex` (or `none`) drops it from the sitemap **and** `llms.txt`
 — for drafts, thin or utility pages. Emit `{% raw %}{% if page.robots %}<meta name="robots"
@@ -402,19 +402,19 @@ collection index/pagination pages are skipped. A string sets the filename; the o
 
 | Option         | Meaning                                                                 |
 | -------------- | ----------------------------------------------------------------------- |
-| `output`       | Output filename, written to the markup output directory.                       |
+| `out`       | Output filename, written to the markup output directory.                       |
 | `title`        | H1 title. Defaults to `site.title`.                                            |
 | `description`  | Blockquote summary. Defaults to `site.description`.                             |
 | `intro`        | Path (from project root) to a Markdown file inserted as free-form body context. |
 | `sectionTitle` | Heading for the lead (uncollected) section. Default `"Pages"`.                  |
-| `full`         | Also write the full-content file (below). `true` derives its name from `output` (`llms.txt` → `llms-full.txt`); a string sets it explicitly. |
+| `full`         | Also write the full-content file (below). `true` derives its name from `out` (`llms.txt` → `llms-full.txt`); a string sets it explicitly. |
 | `fullIntro`    | Path (from project root) to a Markdown preamble inserted into the full-content file after its header. The `full` counterpart to `intro`. |
 
 Point `intro` at a file authored for LLMs (e.g. `llms-intro.md`) — not a raw README, whose
 badges, install noise and `##` headings collide with the generated sections.
 
 `full` writes the companion full-content file — every page's full content concatenated into one
-file (the index is the link map; this is the whole corpus). `true` names it after `output` with a
+file (the index is the link map; this is the whole corpus). `true` names it after `out` with a
 `-full` suffix (`llms.txt` → **`llms-full.txt`**, `ai.txt` → `ai-full.txt`); pass a string to set the
 path yourself. Content is each page's Markdown
 **source**, so only `.md`/`.markdown` pages are included (an `.njk`/`.liquid` source is template
@@ -433,7 +433,7 @@ form takes options:
 
 | Option      | Meaning                                                                         |
 | ----------- | ------------------------------------------------------------------------------- |
-| `output`    | Output filename, written to the markup output directory.                        |
+| `out`    | Output filename, written to the markup output directory.                        |
 | `userAgent` | The `User-agent` line. Default `"*"`.                                            |
 | `disallow`  | A path or array of paths to disallow.                                           |
 | `allow`     | A path or array of paths to explicitly allow.                                   |
@@ -446,7 +446,7 @@ file. See [Building a documentation site](static-site/docs-site) for the walkthr
 
 | Option        | Meaning                                                                                                                                                                                 |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `output`      | Output filename, written to the markup output directory.                                                                                                                                |
+| `out`      | Output filename, written to the markup output directory.                                                                                                                                |
 | `collections` | `true` = include every collection page nested under its collection (default); `false` = exclude all; `["docs"]` = allowlist; `"index"` = only each collection's landing page as a leaf. |
 | `home`        | `false` drops the site's root index page from the tree. Default `true`.                                                                                                                 |
 | `root`        | Scope the tree to a subdirectory (e.g. `"docs"`); its children are emitted at the top level with the section index pinned first.                                                        |
@@ -480,7 +480,7 @@ and links / `guid`s are made absolute with `site.url`. The object form:
 | Option        | Meaning                                                                                                          |
 | ------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `collection`  | Collection to feed from. Omit to emit a feed for **every** collection.                                            |
-| `output`      | File to write. A bare filename (default `feed.xml`) goes in the collection's folder; a slashed path is used as-is. |
+| `out`      | File to write. A bare filename (default `feed.xml`) goes in the collection's folder; a slashed path is used as-is. |
 | `type`        | `"rss"` (default) or `"atom"`.                                                                                    |
 | `limit`       | Max items, newest first. Default `20`.                                                                            |
 | `title`       | Channel title. Default `"<Collection> \| <site.title>"`.                                                          |

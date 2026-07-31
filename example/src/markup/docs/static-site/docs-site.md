@@ -25,7 +25,7 @@ becomes its child.
     "in": "src/markup",
     "out": "dist",
     "options": {
-      "nav": { "output": "nav.json", "collections": "index", "home": true },
+      "nav": { "out": "nav.json", "collections": "index", "home": true },
       "searchIndex": "search-index.json",
       "sitemap": "sitemap.xml"
     }

@@ -84,6 +84,18 @@ compat shims that survived the whole 1.x line finally go.
   that have shipped them since 2020 only made bundles bigger. Entries that set
   their own `target` are untouched.
 
+- **`output` is now `out` in the markup sub-features.** `llms`, `nav`, `feed`,
+  `searchIndex`, `sitemap` and `robots` name their output file with `out`, the
+  same word every entry in the config already uses:
+
+  ```json
+  { "nav": { "out": "nav.json", "root": "docs" } }
+  ```
+
+  `output` is **deprecated but still honoured** through 2.x, warning once per
+  feature, and stops working in 3.0. The string shorthand (`"nav": "nav.json"`)
+  is unaffected.
+
 - **Markup settings belong under `markup.options`.** `markup` now has the shape
   every other entry has — `in`, `out`, and everything else in `options`:
 
