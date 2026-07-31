@@ -72,6 +72,18 @@ compat shims that survived the whole 1.x line finally go.
   mode behaves as before — one rebuild per save, CSS still hot-swaps, deletions
   still remove their output.
 
+- **esbuild moved from 0.25 to 0.28, and the default `target` from `es2019` to
+  `es2020`.** esbuild is pre-1.0, so its minor bumps shift output by design;
+  absorbing that is what a major of ours is for. Expect small differences in
+  your bundles — the CommonJS interop helper is more careful around a throwing
+  module, and `Symbol.for` calls are annotated as side-effect free, which makes
+  minified output slightly *smaller*.
+
+  The new default target is the visible half: optional chaining (`?.`) and
+  nullish coalescing (`??`) are ES2020, and compiling them down for browsers
+  that have shipped them since 2020 only made bundles bigger. Entries that set
+  their own `target` are untouched.
+
 ### Fixed
 
 - **A style edit hot-swaps the stylesheet the page actually links.** With
