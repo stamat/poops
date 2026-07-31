@@ -1,0 +1,92 @@
+name: Bug report
+description: Something behaves differently than it says it does
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. The fastest fixes come from reports that
+        someone else can run — a few lines that reproduce it beat a paragraph
+        describing it.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you ran, and what you got.
+      placeholder: |
+        Ran `poops -b` and it exited 0 without writing anything to dist/.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: >
+        The smallest thing that shows the problem — a snippet, a config, a repo,
+        a sequence of commands. If it only reproduces in your project, say what
+        is different about it.
+      placeholder: |
+        1. …
+        2. …
+        3. …
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Your poops.json
+      description: >
+        The config that reproduces it, trimmed to the part that matters. Most
+        bugs here live in path handling, and a config is worth more than a
+        description of one.
+      render: json
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Poops version
+      description: A release, a tag, or `main` at a commit.
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Node version and OS. Paths behave differently on Windows, so both matter.
+      placeholder: "Node 24.2 / macOS 15.4 — or Node 22.11 / Windows 11"
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: Error message, stack trace, or log. Paste it whole — the interesting line is rarely the last one.
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you file
+      options:
+        - label: I searched the existing issues, open and closed
+          required: true
+        - label: I can reproduce this on the latest release
+          required: false
+        - label: I agree to follow this project's [Code of Conduct](https://github.com/stamat/poops/blob/main/CODE_OF_CONDUCT.md)
+          required: true

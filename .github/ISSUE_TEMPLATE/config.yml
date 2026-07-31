@@ -1,0 +1,8 @@
+# Blank issues are off so that "it doesn't work" arrives with a version and a
+# reproduction attached.
+blank_issues_enabled: false
+
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/stamat/poops/security/advisories/new
+    about: Report it privately. Do not open a public issue.

@@ -1,9 +1,31 @@
 version: 2
 updates:
-  # Maintain dependencies for npm
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "monthly"
-    allow:
-      - dependency-type: "production"
+    # One pull request per batch rather than one per package, with development
+    # and production kept apart — a toolchain bump reads differently from one
+    # that reaches consumers.
+    groups:
+      production:
+        dependency-type: "production"
+      development:
+        dependency-type: "development"
+    # Don't pick up a release that is hours old. A compromised or broken
+    # version is usually caught and pulled within a few days, and nothing here
+    # needs to be on the newest thing the same afternoon.
+    cooldown:
+      default-days: 7
+      semver-major-days: 14
+
+  # The workflows pin action majors, and those move too.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      actions:
+        patterns: ["*"]
+    cooldown:
+      default-days: 7
