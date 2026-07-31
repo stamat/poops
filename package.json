@@ -48,6 +48,8 @@
   "scripts": {
     "build": "node ./poops.js -b",
     "lint": "eslint .",
+    "lint:css": "stylelint --max-warnings 0 example/dist/css/styles.min.css",
+    "lint:es": "es-check es2020 \"example/dist/js/*.js\"",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "engines": {
@@ -76,6 +78,7 @@
   "devDependencies": {
     "@jest/globals": "^30.2.0",
     "@tailwindcss/postcss": "^4.2.1",
+    "es-check": "^9.6.4",
     "eslint": "^9.39.3",
     "jest": "^30.2.0",
     "neostandard": "^0.13.0",
@@ -83,6 +86,8 @@
     "postcss": "^8.5.25",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "stylelint": "^17.14.1",
+    "stylelint-no-unsupported-browser-features": "^8.1.1",
     "sulphuris": "^4.0.0",
     "tailwindcss": "^4.2.1"
   },

@@ -49,3 +49,13 @@ jobs:
           test -f example/dist/search-index.json
           ! grep -q '\\' example/dist/sitemap.xml
           ! grep -q '\\\\' example/dist/search-index.json
+
+      # Browser-support gates on the emitted bundles: stylelint checks the CSS
+      # against .browserslistrc, es-check confirms the JS parses at the esbuild
+      # target. Both read example/dist, which is gitignored, so they can only
+      # run after the build step.
+      - name: Check browser compatibility
+        shell: bash
+        run: |
+          npm run lint:css
+          npm run lint:es
