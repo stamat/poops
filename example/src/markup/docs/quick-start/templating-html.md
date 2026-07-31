@@ -465,7 +465,7 @@ export default class MyEngine {
   get fileExtension() { return '.liquid' }                 // native template extension
   get indexableExtensions() { return new Set(['.html']) }  // eligible for search index / nav
   get markupExtensions() { return 'html|liquid|md' }       // glob alternation of processed extensions
-  registerFilters({ timeDateFormat, markupOut }) {}
+  registerFilters({ dateFormat, markupOut }) {}
   registerTags(getOutputDir) {}
   setGlobal(key, value) {}
   removeGlobal(key) {}

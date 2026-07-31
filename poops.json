@@ -78,7 +78,7 @@
         "_layouts",
         "_partials"
       ],
-      "timeDateFormat": "MMM D, YYYY",
+      "dateFormat": "MMM D, YYYY",
       "searchIndex": "search-index.json",
       "sitemap": "sitemap.xml",
       "llms": {

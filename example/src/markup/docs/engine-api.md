@@ -71,7 +71,7 @@ new EngineClass(templatesDir, includePaths, { autoescape })
 
 Immediately after construction, Poops calls:
 
-1. `registerFilters({ timeDateFormat, markupOut })` — once. `timeDateFormat`
+1. `registerFilters({ dateFormat, markupOut })` — once. `dateFormat`
    is the configured date format string, `markupOut` the output directory
    (project-relative).
 2. `registerTags(getOutputDir)` — once. `getOutputDir` is a function returning
@@ -135,7 +135,7 @@ export default class MyEngine {
   get markupExtensions() { return 'html|md|mytpl' }
   get indexableExtensions() { return new Set(['.html', '.md', '.mytpl']) }
 
-  registerFilters({ timeDateFormat, markupOut }) { /* filters */ }
+  registerFilters({ dateFormat, markupOut }) { /* filters */ }
   registerTags(getOutputDir) { /* tags */ }
   setGlobal(key, value) { /* globals */ }
   removeGlobal(key) { /* globals */ }

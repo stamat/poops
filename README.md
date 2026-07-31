@@ -710,7 +710,7 @@ export default class MyEngine {
   get markupExtensions() {
     return "html|liquid|md";
   } // glob alternation of processed extensions
-  registerFilters({ timeDateFormat, markupOut }) {}
+  registerFilters({ dateFormat, markupOut }) {}
   registerTags(getOutputDir) {}
   setGlobal(key, value) {}
   removeGlobal(key) {}
@@ -1083,7 +1083,7 @@ All filters are available in both engines. The only syntax difference is how arg
 
 - `markdown` — renders a markdown string to HTML with GitHub Flavored Markdown extras: emoji shortcodes (e.g. `:rocket:` → 🚀), alert callouts (`> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`, `[!INFO]`) and footnotes (`[^1]`). Code fences are syntax-highlighted and headings get slug `id`s plus permalink anchors. Usage: `{{ "**bold** :rocket:" | markdown }}`
 
-- `date` — formats a date string. Uses [dayjs](https://day.js.org/) format tokens. A default format can be set via the `timeDateFormat` config option.
+- `date` — formats a date string. Uses [dayjs](https://day.js.org/) format tokens. A default format can be set via the `dateFormat` config option.
   - Nunjucks: `{{ "2024-01-15" | date("MMMM D, YYYY") }}`
   - Liquid: `{{ "2024-01-15" | date: "MMMM D, YYYY" }}`
 

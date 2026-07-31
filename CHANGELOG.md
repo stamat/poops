@@ -84,6 +84,15 @@ compat shims that survived the whole 1.x line finally go.
   that have shipped them since 2020 only made bundles bigger. Entries that set
   their own `target` are untouched.
 
+- **`timeDateFormat` is now `dateFormat`.** It sets the default format for the
+  `date` filter; the old name said the same thing twice. Deprecated and still
+  read through 2.x, gone in 3.0.
+
+  Engines see the rename too: `registerFilters({ timeDateFormat, markupOut })`
+  is now `registerFilters({ dateFormat, markupOut })`. This is a hard rename —
+  it lands before the engine interface becomes public API in this same release,
+  so a custom engine must update its parameter name for 2.0.
+
 - **`output` is now `out` in the markup sub-features.** `llms`, `nav`, `feed`,
   `searchIndex`, `sitemap` and `robots` name their output file with `out`, the
   same word every entry in the config already uses:

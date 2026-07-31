@@ -55,7 +55,7 @@ deep dive; everything else is documented in full on this page.
 | `includePaths`       | Import-resolution roots (Sass `@use`, JS imports) | [↓](#includepaths)       |
 
 The remaining `markup` sub-keys — `in`, `out`, `engine`, `site`, `data`, `includePaths`,
-`timeDateFormat`, `collections`, `baseURL`, `autoescape` — are covered in
+`dateFormat`, `collections`, `baseURL`, `autoescape` — are covered in
 [Templating HTML](quick-start/templating-html).
 
 ## `scripts`
@@ -126,7 +126,7 @@ Full guide: [PostCSS & Tailwind](quick-start/postcss-tailwind).
 
 Turns a directory of templates (Nunjucks or Liquid, plus Markdown) into a static site. Same shape as
 a `scripts` or `styles` entry: `in` and `out`, everything else under `options` — `engine`, `site`,
-`data`, `includePaths`, `timeDateFormat`, `collections`, `baseURL`, `autoescape`, plus
+`data`, `includePaths`, `dateFormat`, `collections`, `baseURL`, `autoescape`, plus
 [`searchIndex`](#markup-searchindex), [`sitemap`](#markup-sitemap) and [`nav`](#markup-nav) below.
 
 > [!WARNING]
