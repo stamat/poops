@@ -371,7 +371,10 @@ if (config.includePaths) {
 }
 
 if (overrideBaseURL && config.markup) {
-  config.markup.baseURL = overrideBaseURL
+  // options is the canonical home, and it also wins over a config that still
+  // carries the deprecated markup-level key — the flag must override both
+  config.markup.options = config.markup.options || {}
+  config.markup.options.baseURL = overrideBaseURL
 }
 
 // poops-images resolves custom handlers/composites relative to the config file;

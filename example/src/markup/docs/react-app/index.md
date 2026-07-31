@@ -81,8 +81,10 @@ export default function App() {
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "site": { "title": "My React App" },
-    "includePaths": ["_layouts", "_partials"]
+    "options": {
+      "site": { "title": "My React App" },
+      "includePaths": ["_layouts", "_partials"]
+    }
   },
   "copy": [{ "in": "src/static", "out": "dist" }],
   "serve": { "port": 4040, "base": "/dist" },

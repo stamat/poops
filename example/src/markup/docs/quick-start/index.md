@@ -75,8 +75,10 @@ treat it as a menu.
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "site": { "title": "My Site", "description": "A site built with Poops." },
-    "includePaths": ["_layouts", "_partials"]
+    "options": {
+      "site": { "title": "My Site", "description": "A site built with Poops." },
+      "includePaths": ["_layouts", "_partials"]
+    }
   },
   "copy": [{ "in": "src/static", "out": "dist" }],
   "serve": { "port": 4040, "base": "/dist" },

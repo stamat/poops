@@ -24,9 +24,11 @@ becomes its child.
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "nav": { "output": "nav.json", "collections": "index", "home": true },
-    "searchIndex": "search-index.json",
-    "sitemap": "sitemap.xml"
+    "options": {
+      "nav": { "output": "nav.json", "collections": "index", "home": true },
+      "searchIndex": "search-index.json",
+      "sitemap": "sitemap.xml"
+    }
   }
 }
 ```
@@ -139,7 +141,9 @@ Set the repo and branch in your `site` data (or let it fall back to `package.hom
 ```json
 {
   "markup": {
-    "site": { "repo": "https://github.com/you/your-repo", "branch": "main" }
+    "options": {
+      "site": { "repo": "https://github.com/you/your-repo", "branch": "main" }
+    }
   }
 }
 ```

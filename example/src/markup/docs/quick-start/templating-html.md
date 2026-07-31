@@ -16,12 +16,14 @@ as includes and not emitted.
 ```json
 {
   "markup": {
-    "engine": "nunjucks",
     "in": "src/markup",
     "out": "dist",
-    "site": { "title": "My Site", "description": "Built with Poops." },
-    "data": ["_data/links.json", "_data/nav.yaml"],
-    "includePaths": ["_layouts", "_partials"]
+    "options": {
+      "engine": "nunjucks",
+      "site": { "title": "My Site", "description": "Built with Poops." },
+      "data": ["_data/links.json", "_data/nav.yaml"],
+      "includePaths": ["_layouts", "_partials"]
+    }
   }
 }
 ```
@@ -360,8 +362,8 @@ type. A docs site is `TechArticle`, not `WebPage`:
 ```json
 {
   "markup": {
-    "site": {
-      "jsonld": { "@type": "TechArticle" }
+    "options": {
+      "site": { "jsonld": { "@type": "TechArticle" } }
     }
   }
 }
@@ -448,7 +450,7 @@ default export must be an engine class:
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "engine": "poops-shopify"
+    "options": { "engine": "poops-shopify" }
   }
 }
 ```

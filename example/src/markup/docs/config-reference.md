@@ -124,18 +124,25 @@ Full guide: [PostCSS & Tailwind](quick-start/postcss-tailwind).
 
 ## `markup`
 
-Turns a directory of templates (Nunjucks or Liquid, plus Markdown) into a static site. Sub-keys:
-`in`, `out`, `engine`, `site`, `data`, `includePaths`, `timeDateFormat`, `collections`, `baseURL`,
-`autoescape`, plus [`searchIndex`](#markup-searchindex), [`sitemap`](#markup-sitemap) and
-[`nav`](#markup-nav) below.
+Turns a directory of templates (Nunjucks or Liquid, plus Markdown) into a static site. Same shape as
+a `scripts` or `styles` entry: `in` and `out`, everything else under `options` — `engine`, `site`,
+`data`, `includePaths`, `timeDateFormat`, `collections`, `baseURL`, `autoescape`, plus
+[`searchIndex`](#markup-searchindex), [`sitemap`](#markup-sitemap) and [`nav`](#markup-nav) below.
+
+> [!WARNING]
+> **Deprecated placement.** Poops 1.x also read these keys directly on `markup`
+> (`{% raw %}"markup": { "site": … }{% endraw %}`). That still works in 2.x and logs a warning
+> naming the key; it stops working in 3.0. Move them into `options`.
 
 ```json
 {
   "markup": {
-    "engine": "nunjucks",
     "in": "src/markup",
     "out": "dist",
-    "site": { "title": "My Site", "description": "Built with Poops." }
+    "options": {
+      "engine": "nunjucks",
+      "site": { "title": "My Site", "description": "Built with Poops." }
+    }
   }
 }
 ```

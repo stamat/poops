@@ -68,7 +68,7 @@ Config:
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "includePaths": ["_layouts", "_partials"]
+    "options": { "includePaths": ["_layouts", "_partials"] }
   },
   "watch": ["src"]
 }

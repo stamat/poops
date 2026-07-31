@@ -84,6 +84,30 @@ compat shims that survived the whole 1.x line finally go.
   that have shipped them since 2020 only made bundles bigger. Entries that set
   their own `target` are untouched.
 
+- **Markup settings belong under `markup.options`.** `markup` now has the shape
+  every other entry has — `in`, `out`, and everything else in `options`:
+
+  ```json
+  {
+    "markup": {
+      "in": "src/markup",
+      "out": "dist",
+      "options": {
+        "engine": "nunjucks",
+        "site": { "title": "My Site" },
+        "searchIndex": "search-index.json"
+      }
+    }
+  }
+  ```
+
+  1.x read `engine`, `site`, `data`, `includePaths`, `timeDateFormat`,
+  `collections`, `searchIndex`, `sitemap`, `llms`, `robots`, `feed`, `nav`,
+  `baseURL` and `autoescape` at the `markup.` level as well. That placement is
+  **deprecated but still honoured** through 2.x — each stray key logs a warning
+  naming its new home — and stops working in 3.0. Where both are set, `options`
+  wins.
+
 ### Removed
 
 - **The `ssg` config key.** It has been an alias for `reactor` since the rename,

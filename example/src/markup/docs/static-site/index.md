@@ -55,15 +55,17 @@ A config that ties it together:
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "site": {
-      "title": "My Site",
-      "description": "Built with Poops.",
-      "url": "https://example.com"
-    },
-    "includePaths": ["_layouts", "_partials"],
-    "searchIndex": "search-index.json",
-    "sitemap": "sitemap.xml",
-    "nav": "nav.json"
+    "options": {
+      "site": {
+        "title": "My Site",
+        "description": "Built with Poops.",
+        "url": "https://example.com"
+      },
+      "includePaths": ["_layouts", "_partials"],
+      "searchIndex": "search-index.json",
+      "sitemap": "sitemap.xml",
+      "nav": "nav.json"
+    }
   },
   "copy": [{ "in": "src/static", "out": "dist" }],
   "serve": { "port": 4040, "base": "/dist" },

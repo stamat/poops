@@ -183,15 +183,17 @@ Just create a `poops.json` file in the root of your project and add the followin
     }
   ],
   "markup": {
-    "engine": "nunjucks",
     "in": "example/src/markup",
     "out": "/",
-    "site": {
-      "title": "Poops",
-      "description": "A super simple bundler for simple web projects."
-    },
-    "data": ["data/links.json", "data/poops.yaml"],
-    "includePaths": ["_layouts", "_partials"]
+    "options": {
+      "engine": "nunjucks",
+      "site": {
+        "title": "Poops",
+        "description": "A super simple bundler for simple web projects."
+      },
+      "data": ["data/links.json", "data/poops.yaml"],
+      "includePaths": ["_layouts", "_partials"]
+    }
   },
   "copy": [
     {
@@ -526,11 +528,13 @@ npm i -D postcss @tailwindcss/postcss tailwindcss
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "site": {
-      "title": "Poops + Tailwind",
-      "description": "A Tailwind CSS example for Poops"
-    },
-    "includePaths": ["_layouts", "_partials"]
+    "options": {
+      "site": {
+        "title": "Poops + Tailwind",
+        "description": "A Tailwind CSS example for Poops"
+      },
+      "includePaths": ["_layouts", "_partials"]
+    }
   },
   "serve": { "port": 4040, "base": "/dist" },
   "livereload": true,
@@ -550,9 +554,31 @@ Then use Tailwind utility classes directly in your markup templates. Tailwind v4
 
 ### Markups
 
+`markup` has the same shape as a `scripts` or `styles` entry: `in`, `out`, and
+everything else under `options`.
+
+```json
+{
+  "markup": {
+    "in": "src/markup",
+    "out": "dist",
+    "options": {
+      "engine": "nunjucks",
+      "site": { "title": "My Awesome Site" }
+    }
+  }
+}
+```
+
+> **Deprecated:** Poops 1.x also read these keys directly on `markup`
+> (`"markup": { "site": … }`). That still works in 2.x and warns; it stops
+> working in 3.0. Move them into `options`.
+
+**Options:**
+
 - `engine` (optional) - the template engine to use. Can be `"nunjucks"` (default) or `"liquid"`. [Nunjucks](https://mozilla.github.io/nunjucks/) is a Mozilla template engine inspired by Jinja2. [Liquid](https://liquidjs.com/) is a Shopify-compatible template engine. Both engines support the same tags, filters, collections, search index, sitemap, and navigation tree features documented below.
-- `in` - the input path, can be a directory or a file path, but please just use it as a directory path for now. All files in this directory will be processed and the structure of the directory will be preserved in the output directory with exception to directories that begin with an underscore `_` will be ignored.
-- `out` - the output path, can be only a directory path (for now)
+- `in` (entry, not an option) - the input path, can be a directory or a file path, but please just use it as a directory path for now. All files in this directory will be processed and the structure of the directory will be preserved in the output directory with exception to directories that begin with an underscore `_` will be ignored.
+- `out` (entry, not an option) - the output path, can be only a directory path (for now)
 - `site` (optional) - global data that will be available to all templates in the markup directory. Like site title, description, social media links, etc. You can then use this data in your templates `{{ site.title }}` for instance.
 - `data` (optional) - is an array of JSON or YAML data files, that once loaded will be available to all templates in the markup directory. If you provide a path to a file for instance `links.json` with a `facebook` property, you can then use this data in your templates `{{ links.facebook }}`. The base name of the file will be used as the variable name, with spaces, dashes and dots replaced with underscores. So `the awesome-links.json` will be available as `{{ the_awesome_links.facebook }}` in your templates. The root directory of the data files is `in` directory. So if you have a `data` directory in your `in` directory, you can specify the data files like this `data: ["data/links.json"]`. The same goes for the YAML files.
 - `includePaths` - an array of paths to directories that will be added to the template engine's include paths. Useful if you want to separate template partials and layouts. For instance, if you have a `_includes` directory with a `header.njk` (or `header.liquid`) partial that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the partial.
@@ -578,13 +604,15 @@ Here is a sample markup configuration using the default Nunjucks engine:
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "site": {
-      "title": "My Awesome Site",
-      "description": "This is my awesome site"
-    },
-    "data": ["data/links.json", "data/other.yaml"],
-    "includePaths": ["_includes"],
-    "baseURL": "/blog"
+    "options": {
+      "site": {
+        "title": "My Awesome Site",
+        "description": "This is my awesome site"
+      },
+      "data": ["data/links.json", "data/other.yaml"],
+      "includePaths": ["_includes"],
+      "baseURL": "/blog"
+    }
   }
 }
 ```
@@ -594,15 +622,17 @@ To use Liquid instead, set the `engine` property:
 ```json
 {
   "markup": {
-    "engine": "liquid",
     "in": "src/liquid",
     "out": "dist",
-    "site": {
-      "title": "My Awesome Site",
-      "description": "This is my awesome site"
-    },
-    "data": ["_data/links.json", "_data/other.yaml"],
-    "includePaths": ["_layouts", "_partials"]
+    "options": {
+      "engine": "liquid",
+      "site": {
+        "title": "My Awesome Site",
+        "description": "This is my awesome site"
+      },
+      "data": ["_data/links.json", "_data/other.yaml"],
+      "includePaths": ["_layouts", "_partials"]
+    }
   }
 }
 ```
@@ -661,7 +691,7 @@ The `engine` option also accepts a module specifier — an npm package name or a
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "engine": "poops-shopify"
+    "options": { "engine": "poops-shopify" }
   }
 }
 ```
@@ -734,14 +764,16 @@ sort: date
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "collections": [
-      "changelog",
-      {
-        "name": "blog",
-        "paginate": 5,
-        "sort": { "by": "title", "order": "asc" }
-      }
-    ]
+    "options": {
+      "collections": [
+        "changelog",
+        {
+          "name": "blog",
+          "paginate": 5,
+          "sort": { "by": "title", "order": "asc" }
+        }
+      ]
+    }
   }
 }
 ```
@@ -806,12 +838,14 @@ Pages 2..N automatically get a distinct `<title>` — `Changelog — Page 2` —
 ```json
 {
   "markup": {
-    "site": {
-      "pagination": {
-        "title": "{title} — Seite {n}",
-        "prev": "Zurück",
-        "next": "Weiter",
-        "of": "von"
+    "options": {
+      "site": {
+        "pagination": {
+          "title": "{title} — Seite {n}",
+          "prev": "Zurück",
+          "next": "Weiter",
+          "of": "von"
+        }
       }
     }
   }
@@ -1111,8 +1145,8 @@ All filters are available in both engines. The only syntax difference is how arg
 
   ```json
   "markup": {
-    "site": {
-      "jsonld": { "@type": "TechArticle" }
+    "options": {
+      "site": { "jsonld": { "@type": "TechArticle" } }
     }
   }
   ```

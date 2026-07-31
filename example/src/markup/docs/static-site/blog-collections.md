@@ -34,10 +34,12 @@ listing collections by name (must match a subdirectory of `in`):
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "collections": [
-      "changelog",
-      { "name": "blog", "paginate": 5, "sort": { "by": "date", "order": "desc" } }
-    ]
+    "options": {
+      "collections": [
+        "changelog",
+        { "name": "blog", "paginate": 5, "sort": { "by": "date", "order": "desc" } }
+      ]
+    }
   }
 }
 ```

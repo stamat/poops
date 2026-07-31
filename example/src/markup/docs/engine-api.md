@@ -39,7 +39,9 @@ breaking change to it means a major version of Poops.
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "engine": "nunjucks"
+    "options": {
+      "engine": "nunjucks"
+    }
   }
 }
 ```

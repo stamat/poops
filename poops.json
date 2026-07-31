@@ -58,44 +58,46 @@
   "markup": {
     "in": "example/src/markup",
     "out": "example/dist",
-    "site": {
-      "title": "💩 Poops",
-      "brand": "Poops",
-      "description": "A niche bundler for design-driven micro-sites and blogs.",
-      "url": "https://stamat.info/poops",
-      "logo": "poop.png",
-      "lang": "en",
-      "repo": "https://github.com/stamat/poops",
-      "branch": "main"
-    },
-    "data": [
-      "_data/features.yaml",
-      "_data/links.json",
-      "_data/poops.yaml"
-    ],
-    "includePaths": [
-      "_layouts",
-      "_partials"
-    ],
-    "timeDateFormat": "MMM D, YYYY",
-    "searchIndex": "search-index.json",
-    "sitemap": "sitemap.xml",
-    "llms": {
-      "output": "llms.txt",
-      "intro": "example/src/llms-intro.md",
-      "full": true,
-      "fullIntro": "example/src/llms-intro-full.md"
-    },
-    "robots": "robots.txt",
-    "nav": {
-      "output": "nav.json",
-      "root": "docs",
-      "collections": "index"
-    },
-    "feed": {
-      "collection": "changelog",
-      "output": "changelog/feed.rss",
-      "content": true
+    "options": {
+      "site": {
+        "title": "💩 Poops",
+        "brand": "Poops",
+        "description": "A niche bundler for design-driven micro-sites and blogs.",
+        "url": "https://stamat.info/poops",
+        "logo": "poop.png",
+        "lang": "en",
+        "repo": "https://github.com/stamat/poops",
+        "branch": "main"
+      },
+      "data": [
+        "_data/features.yaml",
+        "_data/links.json",
+        "_data/poops.yaml"
+      ],
+      "includePaths": [
+        "_layouts",
+        "_partials"
+      ],
+      "timeDateFormat": "MMM D, YYYY",
+      "searchIndex": "search-index.json",
+      "sitemap": "sitemap.xml",
+      "llms": {
+        "output": "llms.txt",
+        "intro": "example/src/llms-intro.md",
+        "full": true,
+        "fullIntro": "example/src/llms-intro-full.md"
+      },
+      "robots": "robots.txt",
+      "nav": {
+        "output": "nav.json",
+        "root": "docs",
+        "collections": "index"
+      },
+      "feed": {
+        "collection": "changelog",
+        "output": "changelog/feed.rss",
+        "content": true
+      }
     }
   },
   "copy": [

@@ -97,8 +97,10 @@ Three sources of data reach your templates:
   "markup": {
     "in": "src/markup",
     "out": "dist",
-    "site": { "title": "My Site" },
-    "data": ["_data/links.json", "_data/authors.yaml"]
+    "options": {
+      "site": { "title": "My Site" },
+      "data": ["_data/links.json", "_data/authors.yaml"]
+    }
   }
 }
 ```
