@@ -1,13 +1,14 @@
 // Browser-compatibility gate for the compiled example CSS, checked against
 // .browserslistrc. Not a style linter — the only rule here is the compat one,
 // so it never argues about formatting.
-//
-// It runs on styles.min.css rather than styles.css because sulphuris ships a
-// `/* stylelint-disable */` comment that survives into the unminified bundle,
-// and a second copy of it makes stylelint bail with a CssSyntaxError. The
-// minifier strips comments, so the same CSS parses clean.
 export default {
   plugins: ['stylelint-no-unsupported-browser-features'],
+  // sulphuris writes `/* stylelint-disable */` as a loud CSS comment in both
+  // _normalize.scss and _fixes.scss, and neither re-enables. Compiled together
+  // the second one is a CssSyntaxError: "All rules have already been disabled".
+  // Renaming the prefix demotes them to ordinary comments, which is what we
+  // want anyway — a dependency shouldn't get to mute this gate.
+  configurationComment: 'stylelint-poops',
   rules: {
     'plugin/no-unsupported-browser-features': [true, {
       // "Partial support" is mostly caniuse flagging a spec corner nobody
