@@ -155,6 +155,13 @@ compat shims that survived the whole 1.x line finally go.
   [info] Config key "ssg" is renamed to "reactor" in 2.0 — ignored.
   ```
 
+### Internal
+
+- **Dependency bumps.** `book-of-spells` 1.3 → 1.4 and a `postcss` patch, both
+  routine. Dev-only: `neostandard` 0.12 → 0.13, and `sulphuris` 2 → 4 for the
+  example site's styles. ESLint stays on 9 — neostandard 0.13 still declares a
+  peer of `eslint@^9`, so 10 has to wait for it.
+
 ### Fixed
 
 - **"Edit this page on GitHub" links work for collection items on Windows.** A
