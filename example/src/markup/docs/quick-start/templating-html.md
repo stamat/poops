@@ -140,6 +140,39 @@ export function greet(name) {
 }
 ```
 
+### Fence info strings
+
+Only the first word of a fence tags the language. Anything after it rides along onto the `<code>`
+element rather than being dropped — a bare word becomes a class, a `key=value` token becomes a
+`data-` attribute:
+
+````markdown
+```html preview tab=options widths=375,768
+<my-element></my-element>
+```
+````
+
+```html
+<pre><code class="hljs language-html preview" data-tab="options" data-widths="375,768">…</code></pre>
+```
+
+That is how a fence marks itself for a later stage — a post-`markup` `exec` script that upgrades
+`code.preview` blocks into live demos, say — without a marker comment in the Markdown. Values are
+single tokens: no quotes, no spaces. Anything longer belongs in the prose around the fence.
+
+A key with nothing after the `=` emits a valueless attribute, which is the way to write a boolean
+flag you would rather read with `hasAttribute` than off `classList`:
+
+````markdown
+```html preview expanded=
+<my-element></my-element>
+```
+````
+
+```html
+<pre><code class="hljs language-html preview" data-expanded="">…</code></pre>
+```
+
 ## Nunjucks (default)
 
 [Nunjucks](https://mozilla.github.io/nunjucks/) is Mozilla's Jinja2-inspired engine. A layout

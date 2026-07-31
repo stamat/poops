@@ -1023,6 +1023,20 @@ The language argument is optional. If omitted, highlight.js will attempt to auto
 
 Registered languages: `javascript`/`js`, `typescript`/`ts`, `css`, `scss`, `html`, `xml`, `json`, `bash`/`sh`, `shell`, `python`/`py`, `ruby`/`rb`, `php`, `java`, `c`, `cpp`, `csharp`/`cs`, `go`, `rust`/`rs`, `yaml`/`yml`, `markdown`/`md`, `sql`, `diff`.
 
+**Fence info strings.** Only the first word names the language. Anything after it is carried onto the `<code>` element instead of being dropped: a bare word becomes a class, a `key=value` token becomes a `data-` attribute. This is how a fence marks itself for a later stage — a post-`markup` `exec` script that turns `code.preview` blocks into live demos, for example — without a marker comment in the markdown.
+
+````md
+```html preview tab=options widths=375,768
+<my-element></my-element>
+```
+````
+
+```html
+<pre><code class="hljs language-html preview" data-tab="options" data-widths="375,768">…</code></pre>
+```
+
+Values are single tokens — no quotes, no spaces. A trailing `=` with nothing after it emits a valueless attribute (`expanded=` → `data-expanded=""`), for a flag you want to read with `hasAttribute` rather than as a class. The same applies to the `{% highlight %}` tag and the `highlight` filter.
+
 #### Custom Filters
 
 All filters are available in both engines. The only syntax difference is how arguments are passed: Nunjucks uses parentheses `| filter("arg")`, Liquid uses a colon `| filter: "arg"`.
