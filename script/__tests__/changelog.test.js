@@ -167,4 +167,15 @@ An intro paragraph.
     expect(cut()).toContain('No CHANGELOG.md')
     expect(fs.existsSync(path.join(POSTS, 'v1.2.3.md'))).toBe(false)
   })
+
+  // a repo whose site has no changelog section still has to get a release cut
+  it('cuts the entry when there is no posts directory', () => {
+    fs.writeFileSync(path.join(TMP, 'CHANGELOG.md'), '## [Unreleased] — no site\n\n### Added\n\n- A thing.\n')
+
+    const out = execFileSync('node', [SCRIPT, '1.2.3', 'nowhere'], { cwd: TMP, encoding: 'utf8' })
+
+    expect(out).toContain('writing no post')
+    expect(fs.readFileSync(path.join(TMP, 'CHANGELOG.md'), 'utf8')).toContain('## [1.2.3] - ')
+    expect(fs.existsSync(path.join(os.tmpdir(), '_tmp-changelog-release-notes-v1.2.3.md'))).toBe(true)
+  })
 })

@@ -17,7 +17,8 @@
  *   - ...
  *
  * The post directory is `<markup.in>/changelog` from poops.json, or pass it as
- * the second argument.
+ * the second argument. A repo without one still gets the cut and the notes, it
+ * just gets no post.
  *
  * The entry is also left in the temp dir as `<repo>-release-notes-v<version>.md`
  * so script/publish can hand it to `gh release create --notes-file`.
@@ -49,16 +50,18 @@ function defaultPostsDir() {
   return markupIn ? path.join(markupIn, 'changelog') : null
 }
 
+// Not every repo publishes a site with a changelog section — cutting the entry
+// and writing the release notes is the part that has to work everywhere, so a
+// missing post directory only means no post.
 const postsDir = process.argv[3] || defaultPostsDir()
+const writesPost = !!postsDir && fs.existsSync(postsDir)
 
-if (!postsDir || !fs.existsSync(postsDir)) {
-  console.error(`Changelog post directory not found: ${postsDir || 'no markup.in in poops.json'}`)
-  console.error('Pass it explicitly: script/changelog <version> <posts-dir>')
-  process.exit(1)
+if (!writesPost) {
+  console.log(`No changelog post directory (${postsDir || 'no markup.in in poops.json'}), writing no post`)
 }
 
 const today = new Date().toISOString().slice(0, 10)
-const postPath = path.join(postsDir, `v${version}.md`)
+const postPath = writesPost ? path.join(postsDir, `v${version}.md`) : null
 
 // CHANGELOG.md stays plain markdown so it reads on GitHub and npm — template
 // tags in it are prose, so they get fenced on the way into the post the way a
@@ -129,9 +132,9 @@ const frontMatter = [
 
 // A post written by hand always wins — in poops the changelog posts double as
 // live demos of the feature being released, which generated markdown can't be.
-if (fs.existsSync(postPath)) {
+if (writesPost && fs.existsSync(postPath)) {
   console.log(`${postPath} already exists, keeping it`)
-} else {
+} else if (writesPost) {
   fs.writeFileSync(postPath, `${frontMatter}\n\n${postBody}\n`)
   console.log(`Wrote ${postPath}`)
 }
