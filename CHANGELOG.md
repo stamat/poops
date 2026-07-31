@@ -131,6 +131,15 @@ compat shims that survived the whole 1.x line finally go.
 
 ### Added
 
+- **The markup engine interface is public API as of 2.0.** `markup.options.engine`
+  has always accepted any importable module, and
+  [poops-shopify](https://github.com/stamat/poops-shopify) ships a production
+  engine against it — but nothing said the interface was stable, so a rename in
+  a patch release could have broken it silently. It is documented in
+  [the engine API reference](docs/engine-api), semver applies to it from here on,
+  and a contract test asserts both builtin engines still expose the shape — a
+  failing test is a breaking change caught before it ships.
+
 - **`serve.base` defaults to the markup `out` directory.** Nearly every config
   set it to the path it had just built into. Set it only when the server should
   serve somewhere else; an explicit value still wins, and a project with no
