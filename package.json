@@ -48,9 +48,9 @@
   "scripts": {
     "build": "node ./poops.js -b",
     "lint": "eslint .",
-    "lint:css": "stylelint --max-warnings 0 example/dist/css/styles.css",
     "lint:es": "es-check es2020 \"example/dist/js/*.js\"",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "lint:browsers": "stylelint --max-warnings 0 example/dist/css/styles.css"
   },
   "engines": {
     "node": ">=22"

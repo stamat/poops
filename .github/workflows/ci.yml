@@ -57,5 +57,5 @@ jobs:
       - name: Check browser compatibility
         shell: bash
         run: |
-          npm run lint:css
+          npm run lint:browsers
           npm run lint:es
