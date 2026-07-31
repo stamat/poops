@@ -148,6 +148,18 @@ compat shims that survived the whole 1.x line finally go.
 
 ### Fixed
 
+- **"Edit this page on GitHub" links work for collection items on Windows.** A
+  collection item's `filePath` kept native separators while a regular page's was
+  posix, so on Windows the link for a post came out as
+  `…/edit/main/src/posts\hello.md`. Both are posix now.
+
+- **The image cache is read correctly across platforms.** Its lookups all key on
+  posix paths, so a cache written on Windows — committed next to the images it
+  describes, or built in CI — matched nothing and galleries came up empty. Keys
+  and variant paths are normalized on read. The output-directory containment
+  check also no longer accepts a sibling directory whose name merely starts with
+  the output dir's (`dist-old` for `dist`).
+
 - **A style edit hot-swaps the stylesheet the page actually links.** With
   `minify` on, the reload chain was told about `site.css` while the page linked
   `site.min.css` — no stylesheet matched, so every style edit reloaded the whole
