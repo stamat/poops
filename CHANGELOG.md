@@ -35,7 +35,18 @@ commit as the version bump. **A post you wrote by hand at that path is never
 overwritten** — that is the escape hatch for releases whose post is a live demo,
 which is most of them here. Write the post first, then the entry.
 
-## [Unreleased]
+## [Unreleased] — the dev loop, modernized
+
+Poops 2.0 has no new features. It is the release where the core loop — watch,
+build, reload — stops carrying old dependencies and old spellings, and where the
+compat shims that survived the whole 1.x line finally go.
+
+### Changed
+
+- **Poops now requires Node.js 22 or newer.** Node 20 reached end of life in
+  April 2026, and the dependencies the dev loop is built on — the file watcher,
+  esbuild — assume a modern runtime anyway. CI tests on Node 22 and 24, on both
+  Ubuntu and Windows.
 
 ## [1.9.8] - 2026-07-31 — fence info strings carry through
 

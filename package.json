@@ -51,7 +51,7 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
     "argoyle": "^1.0.0",

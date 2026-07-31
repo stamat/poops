@@ -82,6 +82,8 @@ It uses a simple config file where you define your input and output paths and it
 
 > For a superfast start, you can use the Poops template repository: [💩🌪️Shitstorm](https://github.com/stamat/shitstorm)
 
+Poops requires **Node.js 22 or newer**.
+
 You can install Poops globally:
 
 ```bash
