@@ -48,6 +48,23 @@ compat shims that survived the whole 1.x line finally go.
   esbuild — assume a modern runtime anyway. CI tests on Node 22 and 24, on both
   Ubuntu and Windows.
 
+- **Live reload is now served by Poops itself, on the server port.** The
+  `livereload` package is gone, and with it a second port, an old websocket
+  stack, and the snippet you had to paste into your templates.
+
+  `"livereload": true` alongside `"serve"` is all it takes. Poops answers
+  `/__poops_reload` as a server-sent events stream and appends a small client
+  script to each HTML page it serves — appends it to the *response*, so nothing
+  lands in your build output. Behaviour is unchanged otherwise: one reload per
+  save once the build settles, CSS-only builds swap stylesheets in place
+  instead of reloading, and the browser reconnects by itself after a restart.
+
+  Migrating: delete the `livereload.js` snippet from your templates (a leftover
+  one is harmless — it will 404 quietly), and drop `livereload.port`,
+  `livereload.exclude`, `livereload.extraExts` and `livereload.exts` from your
+  config. The last three had already stopped doing anything when the reload
+  server stopped watching files in 1.5.1.
+
 - **The file watcher moved from chokidar 3 to chokidar 5.** Two majors of
   watcher fixes, and one fewer legacy dependency tree under `node_modules`.
   Nothing in your config changes: `watch` has always been a list of directories,

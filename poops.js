@@ -8,12 +8,11 @@ import http from 'node:http'
 import net from 'node:net'
 import os from 'node:os'
 import fs from 'node:fs'
-import livereload from 'livereload'
 import Markups from './lib/markups.js'
 import Images from './lib/images.js'
 import path from 'node:path'
 import Reactor from './lib/reactor.js'
-import { createStaticHandler } from './lib/server.js'
+import { createStaticHandler, createReloadHub } from './lib/server.js'
 import Scripts from './lib/scripts.js'
 import log, { styledLog, hasLoggedErrors } from './lib/utils/log.js'
 import Styles from './lib/styles.js'
@@ -28,7 +27,6 @@ const cli = new Argoyle(pkg.version)
   .option('build', { short: 'b', description: 'Build the project and exit' })
   .option('config', { short: 'c', value: '<path>', description: 'Specify the config file' })
   .option('port', { short: 'p', value: '<number>', description: 'Specify the port for the server, overrides the config file' })
-  .option('livereload-port', { short: 'l', value: '<number>', description: 'Specify the port for the livereload server, overrides the config file' })
   .option('base-url', { short: 'u', value: '<path>', description: 'Set the base URL prefix for markup, overrides the config file' })
   .option('quiet', { short: 'q', description: 'Hide the header and the server/livereload info lines' })
 
@@ -43,21 +41,13 @@ try {
 const build = flags.build
 const defaultConfigPath = flags.config || positionals[0] || 'poops.json'
 const overridePort = flags.port
-const overrideLivereloadPort = flags['livereload-port']
 const overrideBaseURL = flags['base-url']
 const quiet = flags.quiet // hides the header and the address lines only — build logs, warnings and errors still print
 
 let configPath = path.join(cwd, defaultConfigPath)
 if (!pathExists(configPath)) configPath = path.join(cwd, '💩.json') // the canonical alternative config name
 
-async function resolveLiveReloadPort(config) {
-  if (!config.livereload) return null
-  let liveReloadPort = overrideLivereloadPort || config.livereload.port || 35729
-  if (!overrideLivereloadPort) liveReloadPort = await getAvailablePort(liveReloadPort, liveReloadPort + 10)
-  config.livereload_port = liveReloadPort
-}
-
-// The livereload server never fs-watches: watching the project meant every
+// Nothing fs-watches on behalf of the browser: watching the project meant every
 // output file written during a build fired its own reload (dozens of browser
 // flickers per build, some mid-write). Instead the rebuild chains in
 // setupWatchers call reload() once their compile settles; the debounce folds
@@ -68,23 +58,23 @@ async function resolveLiveReloadPort(config) {
 // the first chain's reload. One save = one refresh, after dist is current.
 //
 // reload(file) collects paths over the debounce window. If everything in the
-// window is .css, each path is sent so the livereload client hot-swaps
+// window is .css, the paths ride a `css` event so the client hot-swaps
 // stylesheets in place (no page reload, styles update without flicker);
-// anything else escalates to one full '/' refresh.
-let liveReloadServer = null
+// anything else escalates to one full `reload`.
+const reloadHub = createReloadHub()
 let reloadTimer = null
 const reloadPaths = new Set()
 function reload(file) {
-  if (!liveReloadServer) return
+  if (!config.livereload) return
   reloadPaths.add(file || '/')
   clearTimeout(reloadTimer)
   reloadTimer = setTimeout(() => {
     const paths = [...reloadPaths]
     reloadPaths.clear()
     if (paths.every((p) => p.endsWith('.css'))) {
-      paths.forEach((p) => liveReloadServer.refresh(p))
+      reloadHub.send('css', paths)
     } else {
-      liveReloadServer.refresh('/')
+      reloadHub.send('reload', '/')
     }
   }, 500)
 }
@@ -103,13 +93,6 @@ function styleOutputs(styles) {
 // Per-stage shell hooks (config.exec). Runs after a stage compiles in both
 // build and watch; see lib/exec.js. `hook(stage)` binds config + cwd here.
 const hook = (stage) => runExec(config, cwd, stage)
-
-function setupLiveReloadServer(config) {
-  if (!config.livereload) return
-  liveReloadServer = livereload.createServer({ port: config.livereload_port })
-  if (!quiet) styledLog(`🔃 {dim}LiveReload  :{/} ${liveReloadServer.config.port}`)
-  console.log()
-}
 
 function setupWatchers(config, modules) {
   if (!config.watch) return
@@ -351,13 +334,21 @@ const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
 
 // A typo'd top-level key ("stlyes") is otherwise silently ignored — warn, same
 // idea as validateExec for exec stages. `ssg` is the reactor alias; `pkg` feeds
-// banner templates; livereload_port/reactorData are set internally but tolerated
-// here in case a config hardcodes them.
-const KNOWN_CONFIG_KEYS = new Set(['watch', 'includePaths', 'scripts', 'styles', 'postcss', 'reactor', 'ssg', 'markup', 'copy', 'images', 'serve', 'livereload', 'exec', 'banner', 'pkg', 'livereload_port', 'reactorData'])
+// banner templates; reactorData is set internally but tolerated here in case a
+// config hardcodes it.
+const KNOWN_CONFIG_KEYS = new Set(['watch', 'includePaths', 'scripts', 'styles', 'postcss', 'reactor', 'ssg', 'markup', 'copy', 'images', 'serve', 'livereload', 'exec', 'banner', 'pkg', 'reactorData'])
 for (const key of Object.keys(config)) {
   if (!KNOWN_CONFIG_KEYS.has(key)) {
     log({ tag: 'info', warn: true, text: `Unknown config key "${key}" — ignored. Valid: ${[...KNOWN_CONFIG_KEYS].join(', ')}` })
   }
+}
+
+// The reload channel is an endpoint on the static server, so livereload has
+// nothing to attach to without `serve` — say so rather than idling in a mode
+// that can never reach a browser.
+if (!build && config.livereload && !config.serve) {
+  log({ tag: 'info', warn: true, text: 'Ignoring "livereload": it needs "serve" — the reload channel is served on the same port.' })
+  config.livereload = false
 }
 
 if (config.watch === true) {
@@ -417,7 +408,6 @@ function getLocalIP() {
 }
 
 async function startServer() {
-  await resolveLiveReloadPort(config)
   await poops() // Initial compilation before starting the server
 
   const base = config.serve.base && pathExists(cwd, config.serve.base)
@@ -427,14 +417,19 @@ async function startServer() {
   let port = overridePort || config.serve.port || 4040
   if (!overridePort) port = await getAvailablePort(port, port + 10)
 
+  // The hub is only wired in when livereload is on; without it the server
+  // neither answers the reload endpoint nor injects the client into pages.
+  const handler = createStaticHandler(base, config.livereload ? reloadHub : null)
+
   // eslint-disable-next-line @stylistic/space-before-function-paren
-  http.createServer(createStaticHandler(base)).listen(parseInt(port), '0.0.0.0', async () => {
+  http.createServer(handler).listen(parseInt(port), '0.0.0.0', async () => {
     if (!quiet) {
       console.log()
       styledLog(`🏠 {dim}Local server:{/} {underline|http://localhost:${port}}`)
       styledLog(`🛜 {dim} Network     :{/} {underline|http://${getLocalIP()}:${port}}`)
+      if (config.livereload) styledLog('🔃 {dim}Live reload :{/} on')
+      console.log()
     }
-    setupLiveReloadServer(config)
   })
 }
 
@@ -448,12 +443,6 @@ const die = (err) => {
 // Start the webserver
 if (!build && config.serve) {
   startServer().catch(die)
-} else if (!build && config.livereload) {
-  // livereload without serve: still needs the livereload server
-  resolveLiveReloadPort(config)
-    .then(poops)
-    .then(() => setupLiveReloadServer(config))
-    .catch(die)
 } else {
   poops().catch(die)
 }

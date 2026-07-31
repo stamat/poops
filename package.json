@@ -62,7 +62,6 @@
     "glob": "^13.0.6",
     "highlight.js": "^11.11.1",
     "liquidjs": "^10.24.0",
-    "livereload": "^0.9.3",
     "marked": "^18.0.6",
     "marked-github-alerts": "^1.0.1",
     "marked-github-emoji": "^1.0.2",

@@ -111,7 +111,6 @@ or pass a custom config. This is useful when you have multiple environments:
 | `--build`                    | `-b`  | Build the project and exit                           |
 | `--config <path>`            | `-c`  | Specify the config file                              |
 | `--port <number>`            | `-p`  | Specify the server port, overrides config            |
-| `--livereload-port <number>` | `-l`  | Specify the livereload port, overrides config        |
 | `--base-url <path>`          | `-u`  | Set the base URL prefix for markup, overrides config |
 | `--quiet`                    | `-q`  | Hide the header and the server/livereload info lines |
 
@@ -121,7 +120,7 @@ The `--base-url` flag is particularly useful for CI/CD pipelines where the deplo
 poops --build --base-url /blog
 ```
 
-The `--quiet` flag drops the `💩 Poops — vX.Y.Z` header (and its terminal bell) plus the `Local server` / `Network` / `LiveReload` lines. Handy when you run several Poops instances side by side and only want to see which one is compiling:
+The `--quiet` flag drops the `💩 Poops — vX.Y.Z` header (and its terminal bell) plus the `Local server` / `Network` / `Live reload` lines. Handy when you run several Poops instances side by side and only want to see which one is compiling:
 
 ```bash
 poops -q & poops -q -c site/poops.json
@@ -1606,63 +1605,31 @@ If you don't want to run a local server, just remove the `serve` property from t
 
 ### Live Reload (optional)
 
-Sets up a livereload server for your project.
-
-Live reload options:
-
-- `port` - the port on which the livereload server will run
-- `exclude` - an array of files and directories to exclude from livereload
-- `extraExts` - an array of extra file extensions (without the dot) that trigger a browser refresh, added to the defaults
-- `exts` - an array of file extensions that replaces the default list entirely
-
-By default a refresh is triggered by changes to: `html`, `css`, `js`, `png`, `gif`, `jpg`, `php`, `php5`, `py`, `rb`, `erb`, `coffee`. If you work with other file types, for example Slim or Nunjucks templates, add them:
+Reloads the browser when a build finishes. It is a switch, nothing more:
 
 ```json
 {
-  "livereload": {
-    "extraExts": ["slim", "njk"]
-  }
+  "serve": { "base": "dist" },
+  "livereload": true
 }
 ```
 
-`livereload` can only be `true`, which means that it will run on the default port (`35729`) or you can specify a port:
+Live reload rides the `serve` port — there is no second server and no port to
+configure, so it needs `serve` to be on. With both set, Poops answers
+`/__poops_reload` as a [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
+stream and appends a small client script to every HTML page it serves. **Your
+templates need no snippet.** Nothing is injected into your build output — the
+script exists only in the response the dev server writes.
 
-```json
-{
-  "livereload": {
-    "port": whateverPortYouWant
-  }
-}
-```
+A save triggers exactly one reload, after the build that follows it has
+finished. When everything a build wrote is CSS, the stylesheets are swapped in
+place instead: the page is not reloaded, so scroll position, open dialogs and
+form state survive a style edit.
 
-You can also exclude files and directories from livereload:
+The browser reconnects on its own, so restarting Poops picks the open tabs back
+up without touching them.
 
-```json
-{
-  "livereload": {
-    "exclude": ["some_directory/**/*", "some_other_directory/**/*"]
-  }
-}
-```
-
-In order for Livereload to work, you need to add the following script snippet to your HTML files in your development environment:
-
-```html
-<script>
-  document.write(
-    '<script src="http://' +
-      (location.host || "localhost").split(":")[0] +
-      ':35729/livereload.js?snipver=1"></' +
-      "script>",
-  );
-</script>
-```
-
-Be mindful of the port, if you have specified a custom port, you need to change the port in the snippet as well.
-
-You can also use a browser extension for livereload, for instance here is one for [Chrome](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei?hl=en). You can find also extensions for Firefox and Opera, but NOT for Safari.
-
-If you don't want to run livereload, just remove the `livereload` property from the config, or set it to false.
+To turn it off, remove the `livereload` property or set it to `false`.
 
 ### Watch (optional)
 
