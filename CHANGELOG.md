@@ -36,7 +36,29 @@ release, verbatim — no notes to paste in by hand. **A post you wrote by hand a
 overwritten** — that is the escape hatch for releases whose post is a live demo,
 which is most of them here. Write the post first, then the entry.
 
-## [Unreleased]
+## [Unreleased] — llms.txt on its own, and a corpus made of prose
+
+`llms` was the one index feature that could not turn itself on, and the corpus
+it writes carried the machinery of the pages it was made from.
+
+### Fixed
+
+- **`llms` alone now generates its files.** Page entries were collected only
+  when `searchIndex`, `sitemap`, `nav` or `feed` was configured, so a markup
+  config whose only index feature was `llms` compiled the site and wrote
+  nothing — no warning, no output. Pairing it with a sitemap was the
+  workaround; there is nothing to pair it with now.
+
+- **`llms-full.txt` no longer carries a page's machinery.** The corpus is built
+  from the Markdown source, which is read before the template engine runs, so it
+  held whatever the source held: template comments, tags and output expressions,
+  and every inline `<style>` and `<script>` on the page. A page that wraps its
+  body in a `{% set body %}…{% endset %}` capture and styles itself in a
+  `<style>` block could hand an LLM more plumbing than prose. All of it is
+  stripped now, and the prose a capture wrapped stays. Fenced blocks, inline
+  code spans and `{% raw %}` bodies are left alone — a sample documenting
+  template syntax is content. A feed's article HTML is built from the same
+  stripped source.
 
 ## [2.0.0] - 2026-07-31 — the dev loop, modernized
 
