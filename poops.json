@@ -63,7 +63,10 @@
         "logo": "poop.png",
         "lang": "en",
         "repo": "https://github.com/stamat/poops",
-        "branch": "main"
+        "branch": "main",
+        "iconLinks": [
+          { "title": "npm", "url": "https://www.npmjs.com/package/poops", "icon": "npm" }
+        ]
       },
       "data": [
         "_data/features.yaml",
