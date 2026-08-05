@@ -84,7 +84,7 @@
     "eslint": "^9.39.3",
     "jest": "^30.2.0",
     "neostandard": "^0.13.0",
-    "poops-docs-theme": "^2.0.0",
+    "poops-docs-theme": "^3.0.0",
     "postcss": "^8.5.25",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
