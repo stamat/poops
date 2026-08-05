@@ -29,6 +29,7 @@ It uses a simple config file where you define your input and output paths and it
 - [Features](#features)
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
+  - [Editor completion (`$schema`)](#editor-completion-schema)
   - [Scripts](#scripts)
     - [JSX/TSX (React) Example](#jsxtsx-react-example)
   - [Reactor (React Pre-rendering)](#reactor-react-pre-rendering)
@@ -215,6 +216,48 @@ Just create a `poops.json` file in the root of your project and add the followin
 All config properties are optional except `scripts`, `styles`, `postcss` or `markups`. You have to specify at least one of them. If you don't have anything to consume, you won't poop. 💩
 
 You can freely remove the properties that you don't need. For example, if you don't want to run a local server, just remove the `serve` property from the config.
+
+### Editor completion (`$schema`)
+
+A mistyped key mostly is not a build error. A top-level `"stlyes"` is warned about and ignored, and a typo in a **script's** options reaches esbuild, which rejects it loudly — but `"minfiy"` in a **style's** options is read by nothing and warned about by nobody. The build is green, the `.min.css` is simply never written, and you find out when you look.
+
+Poops ships a [JSON Schema](https://json-schema.org) so the editor catches that as you type it, with completion and inline docs for every key. Point `$schema` at the copy in your `node_modules`:
+
+```json
+{
+  "$schema": "./node_modules/poops/schema/poops.schema.json",
+  "scripts": [{ "in": "src/js/main.ts", "out": "dist/js/app.js" }]
+}
+```
+
+Or at the hosted copy, which needs nothing installed:
+
+```json
+{
+  "$schema": "https://stamat.info/poops/poops.schema.json"
+}
+```
+
+VS Code, JetBrains and anything else speaking the [language server protocol](https://microsoft.github.io/language-server-protocol/) read it from the file itself. To attach it without touching your config, map it in VS Code's `settings.json` instead — the same file, matched by name:
+
+```json
+{
+  "json.schemas": [
+    {
+      "fileMatch": ["poops.json", "💩.json"],
+      "url": "https://stamat.info/poops/poops.schema.json"
+    }
+  ]
+}
+```
+
+`$schema` is inert to Poops — it reads the key, recognises it, and does nothing with it. Nothing is validated at build time and nothing is added to what Poops installs into your project; the schema exists for your editor.
+
+**Blocks belonging to another package.** `poops.json` is shared: [septic](https://github.com/stamat/septic) reads a `septic` block out of the same file, and Poops has no business calling that a mistake. So an unknown top-level key is accepted in silence when a package by that name is in your `dependencies`, `devDependencies`, `peerDependencies` or `optionalDependencies` — declared is enough, and Poops never loads it. Nothing by that name declared, and the key is warned about as before, which is what catches the typo.
+
+Your editor cannot see your `node_modules`, so the schema cannot make that distinction. It allows an **object** under any name it does not know and rejects everything else: `"stlyes": [ … ]` is still flagged, `"srve": { … }` is not. That is the price of one shared config file, and the CLI still catches what the editor lets through.
+
+The schema is hand-written and version-controlled beside the code, so it can drift from it. Poops' own test suite validates it against the draft-07 meta-schema, then validates `poops.json` and every complete example in this README and the documentation site against it — so an example that stops being valid config fails the build. Its top-level keys are asserted to be exactly the set `poops.js` accepts, its `exec` stages exactly the ones that fire, and its `markup.options` a superset of the ones the markup engine reads. A per-entry `options` object — mostly esbuild's and PostCSS's, not Poops' — has no such list, so a wrong type there is caught but a missing option is not. If the editor does not offer an option this page documents, the schema is behind and that is worth reporting.
 
 ### Scripts
 

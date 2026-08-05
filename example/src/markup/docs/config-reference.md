@@ -8,6 +8,9 @@ keywords:
   [
     "config",
     "reference",
+    "schema",
+    "json schema",
+    "autocomplete",
     "copy",
     "banner",
     "serve",
@@ -35,6 +38,7 @@ deep dive; everything else is documented in full on this page.
 
 | Key                  | Purpose                                           | Documented in            |
 | -------------------- | ------------------------------------------------- | ------------------------ |
+| `$schema`            | Editor completion and validation for this file    | [↓](#schema)             |
 | `scripts`            | Bundle / transpile JS & TS (esbuild)              | [↓](#scripts)            |
 | `styles`             | Compile Sass / CSS                                | [↓](#styles)             |
 | `postcss`            | PostCSS / Tailwind pass over compiled CSS         | [↓](#postcss)            |
@@ -57,6 +61,83 @@ deep dive; everything else is documented in full on this page.
 The remaining `markup` sub-keys — `in`, `out`, `engine`, `site`, `data`, `includePaths`,
 `dateFormat`, `collections`, `baseURL`, `autoescape` — are covered in
 [Templating HTML](quick-start/templating-html).
+
+## `$schema`
+
+A mistyped key mostly is not a build error. A top-level `"stlyes"` is warned about and ignored,
+and a typo in a **script's** options reaches esbuild, which rejects it loudly — but `"minfiy"` in
+a **style's** options is read by nothing and warned about by nobody. The build is green, the
+`.min.css` is simply never written, and you find out when you look.
+
+Poops ships a [JSON Schema](https://json-schema.org) so the editor catches that as you type it,
+with completion and inline docs for every key on this page. Point `$schema` at the copy in your
+`node_modules`:
+
+```json
+{
+  "$schema": "./node_modules/poops/schema/poops.schema.json",
+  "scripts": [{ "in": "src/js/main.ts", "out": "dist/js/app.js" }]
+}
+```
+
+Or at the hosted copy, which needs nothing installed:
+
+```json
+{
+  "$schema": "https://stamat.info/poops/poops.schema.json"
+}
+```
+
+VS Code, JetBrains and anything else speaking the language server protocol read it from the file
+itself. To attach it without touching your config, map it in VS Code's `settings.json` instead —
+the same file, matched by name:
+
+```json
+{
+  "json.schemas": [
+    {
+      "fileMatch": ["poops.json", "💩.json"],
+      "url": "https://stamat.info/poops/poops.schema.json"
+    }
+  ]
+}
+```
+
+`$schema` is inert to Poops — it reads the key, recognises it, and does nothing with it. Nothing
+is validated at build time and nothing is added to what Poops installs into your project; the
+schema exists for your editor.
+
+### Blocks belonging to another package
+
+`poops.json` is shared. [septic](https://github.com/stamat/septic) reads a `septic` block out of
+the same file, and Poops has no business calling that a mistake. So an unknown top-level key is
+accepted in silence when a package by that name is in your `dependencies`, `devDependencies`,
+`peerDependencies` or `optionalDependencies` — declaring it is enough, and Poops never loads it:
+
+```json
+{
+  "styles": [{ "in": "src/scss/index.scss", "out": "dist/css/app.css" }],
+  "septic": { "db": "data/app.db" }
+}
+```
+
+With nothing by that name declared, the key is warned about as before — which is what catches the
+typo.
+
+> [!WARNING]
+> Your editor cannot see your `node_modules`, so the schema cannot make that distinction. It
+> allows an **object** under any name it does not know, and rejects everything else:
+> `"stlyes": [ … ]` is still flagged, `"srve": { … }` is not. That is the price of one shared
+> config file, and the CLI still catches what the editor lets through.
+
+> [!INFO]
+> The schema is hand-written, so it can drift from the code. Poops' test suite validates it
+> against the draft-07 meta-schema, then validates its own `poops.json` and every complete example
+> on this site against it. Its top-level keys are asserted to be exactly the set the CLI accepts,
+> its `exec` stages exactly the ones that fire, and its `markup.options` a superset of what the
+> markup engine reads. A per-entry `options` object — mostly esbuild's and PostCSS's, not Poops' —
+> has no such list, so if the editor does not offer an option this page documents, the schema is
+> behind, and that is worth reporting.
 
 ## `scripts`
 

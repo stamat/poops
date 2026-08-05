@@ -36,10 +36,62 @@ release, verbatim — no notes to paste in by hand. **A post you wrote by hand a
 overwritten** — that is the escape hatch for releases whose post is a live demo,
 which is most of them here. Write the post first, then the entry.
 
-## [Unreleased] — llms.txt on its own, and a corpus made of prose
+## [Unreleased] — a schema for poops.json, llms.txt on its own
 
-`llms` was the one index feature that could not turn itself on, and the corpus
-it writes carried the machinery of the pages it was made from.
+The config file now tells your editor what belongs in it, and stops calling a
+companion package's block a mistake. Separately, `llms` was the one index
+feature that could not turn itself on, and the corpus it writes carried the
+machinery of the pages it was made from.
+
+### Added
+
+- **A JSON Schema for `poops.json`, so the editor catches a typo you would
+  otherwise find in the output.** A top-level `"stlyes"` was warned about and
+  ignored, and a mistyped script option reaches esbuild, which rejects it — but
+  `"minfiy"` in a style's options is read by nothing and warned about by nobody.
+  The build stays green and the `.min.css` is never written.
+
+  Poops now ships `schema/poops.schema.json`, covering every key, with the
+  documentation for each one inline. Point `$schema` at it and the editor
+  completes and validates as you type:
+
+  ```json
+  {
+    "$schema": "./node_modules/poops/schema/poops.schema.json"
+  }
+  ```
+
+  The same file is published at
+  [`https://stamat.info/poops/poops.schema.json`](https://stamat.info/poops/poops.schema.json)
+  for a project that has not installed Poops yet, and can be attached by
+  filename from VS Code's `json.schemas` setting instead of by editing the
+  config. `$schema` is inert to Poops — it is recognised as a key and otherwise
+  ignored. Nothing is validated at build time and nothing was added to what
+  Poops installs into your project; the CLI's own unknown-key warning is
+  unchanged.
+
+  The schema is hand-written, so Poops' own test suite holds it to the code: it
+  is validated against the draft-07 meta-schema, and `poops.json` plus every
+  complete config example in the README and on the documentation site is
+  validated against it, so an example that stops being valid config now fails
+  the build.
+
+### Changed
+
+- **A top-level key naming a package you depend on is no longer called
+  unknown.** `poops.json` is shared — [septic](https://github.com/stamat/septic)
+  reads a `septic` block out of the same file — but every build printed
+  `Unknown config key "septic" — ignored`, a warning about something working
+  exactly as designed. The name is now checked against your `dependencies`,
+  `devDependencies`, `peerDependencies` and `optionalDependencies` first, and a
+  match passes in silence. Declaring the package is enough; Poops still never
+  loads it or reads its block. Nothing by that name declared, and the warning
+  is unchanged — which is what still catches `"stlyes"`.
+
+  Your editor cannot see `node_modules`, so the schema cannot make that call: it
+  allows an object under any name it does not know and rejects everything else,
+  meaning `"stlyes": [ … ]` is flagged there but `"srve": { … }` is not. The CLI
+  catches what the editor lets through.
 
 ### Fixed
 

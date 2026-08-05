@@ -1,4 +1,5 @@
 {
+  "$schema": "./schema/poops.schema.json",
   "scripts": [{
     "in": "example/src/js/main.ts",
     "out": "example/dist/js/scripts.js",
@@ -101,7 +102,7 @@
   },
   "copy": [
     {
-      "in": "example/src/static",
+      "in": ["example/src/static", "schema/poops.schema.json"],
       "out": "example/dist"
     }
   ],

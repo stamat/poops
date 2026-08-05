@@ -1,0 +1,694 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stamat.info/poops/poops.schema.json",
+  "title": "Poops configuration",
+  "description": "Configuration for Poops — a bundler and static site generator driven by one poops.json. https://stamat.info/poops",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "description": "A block owned by a companion package that reads the same poops.json — septic's `septic`, say. Poops ignores it, and warns unless a package by that name is in your dependencies. Nothing here can validate that, so an object under an unrecognised name is allowed through; a misspelt Poops key holding an array, string or boolean is still caught."
+  },
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "URL or path of this schema. Ignored by Poops; editors read it for completion and validation."
+    },
+    "scripts": {
+      "description": "JavaScript / TypeScript bundles, built with esbuild. One entry or an array of them.",
+      "allOf": [{ "$ref": "#/definitions/scriptEntryOrArray" }]
+    },
+    "styles": {
+      "description": "Sass / SCSS / CSS bundles, compiled with Dart Sass. One entry or an array of them.",
+      "allOf": [{ "$ref": "#/definitions/styleEntryOrArray" }]
+    },
+    "postcss": {
+      "description": "PostCSS pass over CSS — Tailwind, Autoprefixer, any PostCSS plugin. Separate pipeline from `styles`; needs `postcss` installed (npm i -D postcss).",
+      "allOf": [{ "$ref": "#/definitions/postcssEntryOrArray" }]
+    },
+    "reactor": {
+      "description": "React components rendered to static HTML at build time, with an optional hydration bundle.",
+      "allOf": [{ "$ref": "#/definitions/reactorEntryOrArray" }]
+    },
+    "markup": {
+      "description": "Templates (Nunjucks or Liquid, plus Markdown) compiled into a static site.",
+      "allOf": [{ "$ref": "#/definitions/markupEntry" }]
+    },
+    "images": {
+      "description": "Responsive image processing via poops-images (optional peer dependency — a missing install warns and skips). The value is a poops-images config object.",
+      "allOf": [{ "$ref": "#/definitions/images" }]
+    },
+    "copy": {
+      "description": "Files and directories copied into the output. One entry or an array of them.",
+      "allOf": [{ "$ref": "#/definitions/copyEntryOrArray" }]
+    },
+    "exec": {
+      "description": "Shell commands run after a pipeline stage compiles — in watch as well as in a build.",
+      "allOf": [{ "$ref": "#/definitions/exec" }]
+    },
+    "banner": {
+      "type": "string",
+      "description": "Comment stamped on top of every output file. Templatable via mustache from your package.json: {{ name }}, {{ version }}, {{ homepage }}, {{ license }}, {{ author }}, {{ description }}.",
+      "examples": ["/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */"]
+    },
+    "serve": {
+      "description": "Local dev server. Remove the key to skip serving.",
+      "allOf": [{ "$ref": "#/definitions/serve" }]
+    },
+    "livereload": {
+      "type": "boolean",
+      "description": "Reload the browser when a build finishes. Rides the `serve` port, so it needs `serve` to be on; a CSS-only build hot-swaps stylesheets instead of reloading.",
+      "default": false
+    },
+    "watch": {
+      "description": "Paths to watch for changes. `true` derives the list from every task's `in` path.",
+      "oneOf": [
+        { "type": "boolean" },
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      ]
+    },
+    "includePaths": {
+      "description": "Roots to resolve imports from (Sass @use, script imports). Defaults to [\"node_modules\"] — setting this replaces the default, so include node_modules yourself.",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ],
+      "default": ["node_modules"]
+    },
+    "pkg": {
+      "type": "object",
+      "description": "Internal. Package data used to fill banner templates; Poops reads your package.json for this on its own.",
+      "additionalProperties": true
+    },
+    "reactorData": {
+      "type": "object",
+      "description": "Internal. Rendered `reactor` HTML, set by Poops between the reactor and markup stages.",
+      "additionalProperties": true
+    }
+  },
+  "definitions": {
+    "pathOrPaths": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      ]
+    },
+
+    "esbuildSourcemap": {
+      "description": "Sourcemaps for the unminified output. Passed to esbuild, so its string modes work too.",
+      "oneOf": [
+        { "type": "boolean" },
+        { "enum": ["linked", "external", "inline", "both"] }
+      ],
+      "default": false
+    },
+
+    "esbuildTarget": {
+      "description": "esbuild target. Defaults to es2020.",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ],
+      "default": "es2020"
+    },
+
+    "minify": {
+      "type": "boolean",
+      "description": "Also write a minified twin, `<name>.min<ext>`.",
+      "default": false
+    },
+
+    "justMinified": {
+      "type": "boolean",
+      "description": "Keep only the minified file — the unminified twin is deleted after it is written. Needs `minify`.",
+      "default": false
+    },
+
+    "scriptEntryOrArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/scriptEntry" },
+        { "type": "array", "items": { "$ref": "#/definitions/scriptEntry" } }
+      ]
+    },
+
+    "scriptEntry": {
+      "type": "object",
+      "required": ["in", "out"],
+      "additionalProperties": false,
+      "properties": {
+        "in": {
+          "description": "Entry point, an array of them, or a glob (globs use / on every platform). A glob-matched index.* is named after its directory.",
+          "allOf": [{ "$ref": "#/definitions/pathOrPaths" }]
+        },
+        "out": {
+          "type": "string",
+          "description": "Output file or directory. With several inputs it must be a directory. Also accepts a template — {{dir}} (the match's directory relative to the glob's static prefix) and {{name}} (its basename) — naming one output per matched entry, extension included."
+        },
+        "options": {
+          "type": "object",
+          "description": "esbuild build options. The listed ones are what Poops documents; anything else esbuild accepts is merged through.",
+          "additionalProperties": true,
+          "properties": {
+            "sourcemap": { "$ref": "#/definitions/esbuildSourcemap" },
+            "minify": { "$ref": "#/definitions/minify" },
+            "justMinified": { "$ref": "#/definitions/justMinified" },
+            "format": {
+              "enum": ["iife", "esm", "cjs"],
+              "description": "Output format. Defaults to iife.",
+              "default": "iife"
+            },
+            "target": { "$ref": "#/definitions/esbuildTarget" },
+            "jsx": {
+              "enum": ["transform", "preserve", "automatic"],
+              "description": "JSX transform mode. `automatic` is the React 17+ runtime, which needs no React import per file.",
+              "default": "transform"
+            },
+            "nodePaths": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Extra resolution roots, merged with the top-level includePaths."
+            }
+          }
+        }
+      }
+    },
+
+    "styleEntryOrArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/styleEntry" },
+        { "type": "array", "items": { "$ref": "#/definitions/styleEntry" } }
+      ]
+    },
+
+    "styleEntry": {
+      "type": "object",
+      "required": ["in", "out"],
+      "additionalProperties": false,
+      "properties": {
+        "in": {
+          "description": "Entry point, an array of them, or a glob (globs use / on every platform, and skip Sass partials, `_*.scss`). A glob-matched index.* is named after its directory.",
+          "allOf": [{ "$ref": "#/definitions/pathOrPaths" }]
+        },
+        "out": {
+          "type": "string",
+          "description": "Output file or directory. With several inputs it must be a directory. Also accepts a {{dir}}/{{name}} template, as `scripts` does."
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sourcemap": {
+              "type": "boolean",
+              "description": "Write a .css.map beside the unminified output.",
+              "default": false
+            },
+            "minify": { "$ref": "#/definitions/minify" },
+            "justMinified": { "$ref": "#/definitions/justMinified" },
+            "tokenPaths": {
+              "description": "Directories of JSON design token files, enabling `@use \"token:<name>\"` in SCSS. W3C DTCG and Style Dictionary formats are auto-detected.",
+              "allOf": [{ "$ref": "#/definitions/pathOrPaths" }]
+            },
+            "tokenOutput": {
+              "enum": ["variables", "map"],
+              "description": "Shape design tokens compile to: flat SCSS variables, or nested Sass maps.",
+              "default": "variables"
+            },
+            "resolveAliases": {
+              "type": "boolean",
+              "description": "Resolve {path.to.token} alias references in design tokens.",
+              "default": true
+            }
+          }
+        }
+      }
+    },
+
+    "postcssEntryOrArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/postcssEntry" },
+        { "type": "array", "items": { "$ref": "#/definitions/postcssEntry" } }
+      ]
+    },
+
+    "postcssEntry": {
+      "type": "object",
+      "required": ["in", "out"],
+      "additionalProperties": false,
+      "properties": {
+        "in": { "type": "string", "description": "CSS file to process." },
+        "out": { "type": "string", "description": "Output file or directory." },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "plugins": {
+              "type": "array",
+              "description": "Plugins to load, in order. A package name, or [name, options] to configure one.",
+              "items": {
+                "oneOf": [
+                  { "type": "string" },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 2,
+                    "items": [{ "type": "string" }, { "type": "object" }]
+                  }
+                ]
+              },
+              "examples": [["@tailwindcss/postcss"], ["autoprefixer"]]
+            },
+            "minify": { "$ref": "#/definitions/minify" },
+            "justMinified": { "$ref": "#/definitions/justMinified" }
+          }
+        }
+      }
+    },
+
+    "reactorEntryOrArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/reactorEntry" },
+        { "type": "array", "items": { "$ref": "#/definitions/reactorEntry" } }
+      ]
+    },
+
+    "reactorEntry": {
+      "type": "object",
+      "required": ["component", "inject"],
+      "additionalProperties": false,
+      "properties": {
+        "component": {
+          "type": "string",
+          "description": "File default-exporting the React component, rendered at build time with renderToString."
+        },
+        "inject": {
+          "type": "string",
+          "description": "Template global the rendered HTML is exposed as, in both engines."
+        },
+        "in": {
+          "type": "string",
+          "description": "Client hydration entry. Omit it (with `out`) for server rendering only."
+        },
+        "out": { "type": "string", "description": "Output path for the client bundle." },
+        "options": {
+          "type": "object",
+          "description": "esbuild options for the client bundle — the same set a `scripts` entry takes.",
+          "additionalProperties": true,
+          "properties": {
+            "sourcemap": { "$ref": "#/definitions/esbuildSourcemap" },
+            "minify": { "$ref": "#/definitions/minify" },
+            "justMinified": { "$ref": "#/definitions/justMinified" },
+            "format": { "enum": ["iife", "esm", "cjs"], "default": "iife" },
+            "target": { "$ref": "#/definitions/esbuildTarget" },
+            "jsx": { "enum": ["transform", "preserve", "automatic"] },
+            "nodePaths": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+
+    "copyEntryOrArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/copyEntry" },
+        { "type": "array", "items": { "$ref": "#/definitions/copyEntry" } }
+      ]
+    },
+
+    "copyEntry": {
+      "type": "object",
+      "required": ["in", "out"],
+      "additionalProperties": false,
+      "properties": {
+        "in": {
+          "description": "Source path, an array of them, or a glob / extglob pattern (POSIX character classes like [[:alpha:]] are not supported).",
+          "allOf": [{ "$ref": "#/definitions/pathOrPaths" }]
+        },
+        "out": { "type": "string", "description": "Destination directory." }
+      }
+    },
+
+    "images": {
+      "type": "object",
+      "description": "poops-images configuration. Poops does not own these keys — the full reference is at https://github.com/stamat/poops-images#configuration.",
+      "additionalProperties": true,
+      "properties": {
+        "in": { "type": "string", "description": "Source images directory." },
+        "out": {
+          "type": "string",
+          "description": "Output directory. Keep it out of `in` and outside the watched sources, so generated variants don't retrigger the build."
+        },
+        "sizes": {
+          "type": "array",
+          "description": "Responsive widths to generate, plus any named crops.",
+          "items": { "type": "object", "additionalProperties": true }
+        },
+        "format": {
+          "description": "Target formats, or \"smart\" to keep whichever of JPEG/WebP comes out smaller.",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ]
+        },
+        "verbose": {
+          "type": "boolean",
+          "description": "Log every file instead of one summary line.",
+          "default": false
+        }
+      }
+    },
+
+    "exec": {
+      "type": "object",
+      "description": "A command, or an array of commands run in order, per stage. Commands run from the project root; a failure fails a `poops -b` build's exit code, and is logged and swallowed in watch so the watcher survives.",
+      "additionalProperties": false,
+      "properties": {
+        "reactor": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After reactor components render (build only)." },
+        "scripts": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After scripts compile." },
+        "images": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After images process." },
+        "markup": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After markup renders." },
+        "styles": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After the CSS is final — this fires after PostCSS, not after Sass." },
+        "copy": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After files copy." },
+        "build": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "Once, after the full initial pipeline — not per watch rebuild." }
+      }
+    },
+
+    "command": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      ]
+    },
+
+    "serve": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Port to serve on; the CLI --port/-p overrides it. A busy port is stepped over, up to +10.",
+          "default": 4040
+        },
+        "base": {
+          "type": "string",
+          "description": "Directory the built HTML lives in. Defaults to the markup `out`."
+        }
+      }
+    },
+
+    "markupEntry": {
+      "type": "object",
+      "required": ["in"],
+      "description": "Unknown keys here are the 1.x placement of the `options` keys — still read in 2.x with a warning, gone in 3.0.",
+      "additionalProperties": true,
+      "properties": {
+        "in": { "type": "string", "description": "Templates directory. Directories starting with _ are not compiled." },
+        "out": { "type": "string", "description": "Output directory. Defaults to the working directory." },
+        "options": { "$ref": "#/definitions/markupOptions" }
+      }
+    },
+
+    "markupOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "engine": {
+          "description": "Template engine: a builtin name, or a module specifier / path exporting a custom engine class.",
+          "type": "string",
+          "default": "nunjucks",
+          "examples": ["nunjucks", "liquid"]
+        },
+        "site": { "$ref": "#/definitions/site" },
+        "data": {
+          "description": "JSON or YAML data files, relative to `in`. Each becomes a global named after its basename, with spaces, dashes and dots replaced by underscores.",
+          "allOf": [{ "$ref": "#/definitions/pathOrPaths" }]
+        },
+        "includePaths": {
+          "description": "Directories added to the engine's include paths, so a layout or partial can be included by bare name.",
+          "allOf": [{ "$ref": "#/definitions/pathOrPaths" }]
+        },
+        "dateFormat": {
+          "type": "string",
+          "description": "Default format for the `date` filter, in dayjs tokens.",
+          "examples": ["MMM D, YYYY"]
+        },
+        "timeDateFormat": {
+          "type": "string",
+          "description": "Deprecated: renamed to `dateFormat` in 2.0. Still read, with a warning; gone in 3.0."
+        },
+        "collections": { "$ref": "#/definitions/collections" },
+        "baseURL": {
+          "type": "string",
+          "description": "Prefix `relativePathPrefix` resolves to, instead of a per-page relative path. For deploying under a subdirectory. The CLI --base-url/-u overrides it.",
+          "examples": ["/blog"]
+        },
+        "autoescape": {
+          "type": "boolean",
+          "description": "Escape template output by default.",
+          "default": false
+        },
+        "searchIndex": { "$ref": "#/definitions/searchIndex" },
+        "sitemap": { "$ref": "#/definitions/sitemap" },
+        "llms": { "$ref": "#/definitions/llms" },
+        "robots": { "$ref": "#/definitions/robots" },
+        "nav": { "$ref": "#/definitions/nav" },
+        "feed": { "$ref": "#/definitions/feed" }
+      }
+    },
+
+    "site": {
+      "type": "object",
+      "description": "Global data every template reads as `site`. Add anything you want available site-wide; the keys below are the ones Poops itself reads.",
+      "additionalProperties": true,
+      "properties": {
+        "title": { "type": "string", "description": "Site title. Also the default llms.txt title and feed channel title." },
+        "description": { "type": "string", "description": "Site description. Also the default llms.txt summary and feed description." },
+        "url": { "type": "string", "description": "Absolute site URL. Makes sitemap, llms.txt, robots.txt and feed links absolute." },
+        "logo": { "type": "string", "description": "Site logo, read by the SEO and JSON-LD filters." },
+        "author": { "type": "string", "description": "Default feed author." },
+        "lang": { "type": "string", "description": "Default language — the <html lang> attribute and JSON-LD inLanguage. A page's front-matter `lang` wins.", "examples": ["en"] },
+        "jsonld": {
+          "type": "object",
+          "description": "Site-wide JSON-LD defaults, merged over the generated ones and still overridable per page.",
+          "additionalProperties": true,
+          "examples": [{ "@type": "TechArticle" }]
+        },
+        "pagination": {
+          "type": "object",
+          "description": "Localised pagination wording.",
+          "additionalProperties": false,
+          "properties": {
+            "title": { "type": "string", "description": "Title for pages 2..N and taxonomy term pages. Tokens: {title}, {n}, {total}.", "default": "{title} — Page {n}" },
+            "prev": { "type": "string", "default": "Previous" },
+            "next": { "type": "string", "default": "Next" },
+            "of": { "type": "string", "default": "of" }
+          }
+        },
+        "repo": { "type": "string", "description": "Repository URL, for \"Edit this page\" links. Falls back to package.homepage." },
+        "branch": { "type": "string", "description": "Branch those edit links point at.", "default": "main" }
+      }
+    },
+
+    "collections": {
+      "type": "array",
+      "description": "Collections to build, each naming a direct subdirectory of `in`. A collection can also declare itself in its index page's front matter.",
+      "items": {
+        "oneOf": [
+          { "type": "string", "description": "Directory name, with default sorting and no pagination." },
+          {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "description": "Directory name under `in`." },
+              "paginate": { "type": "integer", "minimum": 1, "description": "Items per page. Without it the index renders once." },
+              "sort": { "$ref": "#/definitions/collectionSort" },
+              "taxonomies": { "$ref": "#/definitions/taxonomies" }
+            }
+          }
+        ]
+      }
+    },
+
+    "collectionSort": {
+      "description": "Sort order. A bare field name, or an object. Sorting by `date` compares dates and defaults to desc; any other field compares alphabetically and defaults to asc.",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "required": ["by"],
+          "additionalProperties": false,
+          "properties": {
+            "by": { "type": "string", "description": "Front-matter field to sort on.", "default": "date" },
+            "order": { "enum": ["asc", "desc"] }
+          }
+        }
+      ]
+    },
+
+    "taxonomies": {
+      "type": "array",
+      "description": "Front-matter fields turned into their own paginated term pages, rendered with the collection's own index template.",
+      "items": {
+        "oneOf": [
+          { "type": "string", "description": "Field name, also used as the URL segment." },
+          {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "description": "Front-matter field to group on." },
+              "path": { "type": "string", "description": "URL segment, and the term-page title label. Defaults to `name`.", "examples": ["tag"] },
+              "paginate": { "type": "integer", "minimum": 1, "description": "Per-term page size. Defaults to the collection's `paginate`." }
+            }
+          }
+        ]
+      }
+    },
+
+    "searchIndex": {
+      "description": "JSON search index of every page. A string names the output file and takes the defaults.",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "out": { "type": "string", "description": "Output filename, written into the markup output directory.", "default": "search-index.json" },
+            "minWordLength": { "type": "integer", "minimum": 1, "description": "Shortest word that can become a keyword.", "default": 3 },
+            "maxKeywords": { "type": "integer", "minimum": 1, "description": "Keywords kept per page.", "default": 20 },
+            "globalFrequencyCeiling": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1,
+              "description": "Drop words appearing on more than this fraction of pages — they discriminate nothing.",
+              "default": 0.8
+            },
+            "stopWords": {
+              "description": "Omit for the bundled English list, `false` to filter nothing, an inline array, or a path to a JSON array file (from the project root).",
+              "oneOf": [
+                { "type": "boolean", "enum": [false] },
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+              ]
+            }
+          }
+        }
+      ]
+    },
+
+    "sitemap": {
+      "description": "sitemap.xml of every page. A string names the output file.",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "out": { "type": "string", "description": "Output filename, written into the markup output directory.", "default": "sitemap.xml" }
+          }
+        }
+      ]
+    },
+
+    "llms": {
+      "description": "llms.txt — a Markdown index of your pages for LLMs and generative engines. A string names the output file.",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "out": { "type": "string", "description": "Output filename, written into the markup output directory.", "default": "llms.txt" },
+            "title": { "type": "string", "description": "H1 title. Defaults to site.title." },
+            "description": { "type": "string", "description": "Blockquote summary. Defaults to site.description." },
+            "intro": { "type": "string", "description": "Markdown file (from the project root) inserted as free-form context between the summary and the link sections. Avoid ## headings in it — they read as sections." },
+            "sectionTitle": { "type": "string", "description": "Heading for the lead section of root-level pages.", "default": "Pages" },
+            "full": {
+              "description": "Also write the full-content corpus — every Markdown page's body in one file. `true` derives the name from `out` (llms.txt → llms-full.txt); a string sets the path.",
+              "oneOf": [{ "type": "boolean" }, { "type": "string" }],
+              "default": false
+            },
+            "fullIntro": { "type": "string", "description": "Markdown file (from the project root) inserted into the full-content file after its header. The `full` counterpart to `intro`; a missing file warns and is skipped." }
+          }
+        }
+      ]
+    },
+
+    "robots": {
+      "description": "robots.txt. A string names the output file and writes an allow-all with a Sitemap: line.",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "out": { "type": "string", "description": "Output filename, written into the markup output directory.", "default": "robots.txt" },
+            "userAgent": { "type": "string", "description": "The User-agent line.", "default": "*" },
+            "disallow": { "allOf": [{ "$ref": "#/definitions/pathOrPaths" }], "description": "Path or paths to disallow." },
+            "allow": { "allOf": [{ "$ref": "#/definitions/pathOrPaths" }], "description": "Path or paths to explicitly allow." },
+            "sitemap": {
+              "description": "An explicit Sitemap: URL, or `false` to omit the line. Derived from your generated sitemap by default.",
+              "oneOf": [{ "type": "string" }, { "type": "boolean", "enum": [false] }]
+            }
+          }
+        }
+      ]
+    },
+
+    "nav": {
+      "description": "Navigation tree — the `nav` template global, plus a nested JSON file for client-side rendering. A string names the output file.",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "out": { "type": "string", "description": "Output filename, written into the markup output directory.", "default": "nav.json" },
+            "collections": {
+              "description": "`true` nests every collection page under its collection; `false` excludes them all; an array allowlists collections; \"index\" keeps only each collection's landing page, as a leaf.",
+              "oneOf": [
+                { "type": "boolean" },
+                { "const": "index" },
+                { "type": "array", "items": { "type": "string" } }
+              ],
+              "default": true
+            },
+            "home": { "type": "boolean", "description": "Keep the site's root index page in the tree.", "default": true },
+            "root": { "type": "string", "description": "Scope the tree to a subdirectory; its children are emitted at the top level, with the section's own index pinned first.", "examples": ["docs"] }
+          }
+        }
+      ]
+    },
+
+    "feed": {
+      "description": "RSS or Atom feed from a collection. `true` or a filename emits an RSS feed for every collection; an array generates several feeds at once.",
+      "oneOf": [
+        { "type": "boolean" },
+        { "type": "string" },
+        { "$ref": "#/definitions/feedEntry" },
+        { "type": "array", "items": { "$ref": "#/definitions/feedEntry" } }
+      ]
+    },
+
+    "feedEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "collection": { "type": "string", "description": "Collection to feed from. Omit it for a feed per collection." },
+        "out": { "type": "string", "description": "File to write. A bare filename lands in the collection's own folder; a path with a slash is used as-is under the output directory.", "default": "feed.xml" },
+        "type": { "enum": ["rss", "atom"], "default": "rss" },
+        "limit": { "type": "integer", "minimum": 1, "description": "Items kept, newest first.", "default": 20 },
+        "title": { "type": "string", "description": "Channel title. Defaults to \"<Collection> | <site.title>\"." },
+        "description": { "type": "string", "description": "Channel description. Defaults to site.description." },
+        "author": { "type": "string", "description": "Feed author. Defaults to site.author." },
+        "lang": { "type": "string", "description": "Feed language. Defaults to site.lang." },
+        "content": {
+          "type": "boolean",
+          "description": "Add each post's full article HTML — RSS <content:encoded>, Atom <content type=\"html\">. Markdown posts only.",
+          "default": false
+        }
+      }
+    }
+  }
+}

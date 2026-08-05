@@ -28,7 +28,7 @@ poops staging.json     # or 💩 staging.json
 
 Installed locally, use `npx` or a `package.json` script:
 
-```json
+```json file=package.json
 {
   "scripts": {
     "build": "npx poops"

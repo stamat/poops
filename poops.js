@@ -3,7 +3,7 @@
 import chokidar from 'chokidar'
 import Copy from './lib/copy.js'
 import runExec, { validateExec } from './lib/exec.js'
-import { pathExists, doesFileBelongToPath, pathContainsPathSegment, deriveWatchDirs, toPosix, hasOutTemplate, outTemplateBase } from './lib/utils/helpers.js'
+import { pathExists, doesFileBelongToPath, pathContainsPathSegment, deriveWatchDirs, toPosix, hasOutTemplate, outTemplateBase, KNOWN_CONFIG_KEYS, projectPackageNames } from './lib/utils/helpers.js'
 import http from 'node:http'
 import net from 'node:net'
 import os from 'node:os'
@@ -333,13 +333,18 @@ if (!pathExists(configPath)) {
 const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
 
 // A typo'd top-level key ("stlyes") is otherwise silently ignored — warn, same
-// idea as validateExec for exec stages. `pkg` feeds banner templates;
-// reactorData is set internally but tolerated here in case a config hardcodes it.
-const KNOWN_CONFIG_KEYS = new Set(['watch', 'includePaths', 'scripts', 'styles', 'postcss', 'reactor', 'markup', 'copy', 'images', 'serve', 'livereload', 'exec', 'banner', 'pkg', 'reactorData'])
-
+// idea as validateExec for exec stages. The set lives in helpers.js so the
+// published JSON Schema can be checked against it.
+//
 // Keys that meant something in 1.x. They fall through the check above, and
 // "unknown config key" would be accurate and useless — name the replacement.
 const REMOVED_CONFIG_KEYS = { ssg: 'renamed to "reactor" in 2.0' }
+
+// poops.json is shared: a companion package can own a top-level block in it and
+// read the same file (septic's `septic`). Checked after the removed-key names so
+// a 1.x key still gets its rename notice even if something by that name is
+// installed, and last of all so the common paths never touch the filesystem.
+const companionKeys = projectPackageNames(cwd)
 
 for (const key of Object.keys(config)) {
   if (KNOWN_CONFIG_KEYS.has(key)) continue
@@ -347,6 +352,7 @@ for (const key of Object.keys(config)) {
     log({ tag: 'info', warn: true, text: `Config key "${key}" is ${REMOVED_CONFIG_KEYS[key]} — ignored.` })
     continue
   }
+  if (companionKeys.has(key)) continue
   log({ tag: 'info', warn: true, text: `Unknown config key "${key}" — ignored. Valid: ${[...KNOWN_CONFIG_KEYS].join(', ')}` })
 }
 
