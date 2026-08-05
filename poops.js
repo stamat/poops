@@ -365,7 +365,7 @@ try {
   schema = JSON.parse(fs.readFileSync(new URL('./schema/poops.schema.json', import.meta.url), 'utf-8'))
 } catch {}
 
-for (const { at, key, valid } of unknownConfigKeys(config, schema)) {
+for (const { path: at, key, valid } of unknownConfigKeys(config, schema)) {
   log({ tag: 'info', warn: true, text: `Unknown key "${key}" in ${at} — ignored. Valid: ${valid.join(', ')}` })
 }
 

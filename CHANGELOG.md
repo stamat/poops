@@ -93,6 +93,11 @@ machinery of the pages it was made from.
   that the stage never runs. The schema read is the copy inside
   `node_modules/poops`, so where `$schema` points changes nothing.
 
+  The walk is [unknown-keys](https://github.com/stamat/unknown-keys), a new
+  dependency and the only one this release adds — zero dependencies of its own,
+  written for this and published separately because poops-images and septic read
+  the same file and want the same warning.
+
 ### Changed
 
 - **A top-level key naming a package you depend on is no longer called
