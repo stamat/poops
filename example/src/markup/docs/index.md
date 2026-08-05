@@ -90,6 +90,9 @@ Poops is a niche tool, not a general-purpose framework. It earns its keep in thr
 > If you're not sure whether Poops fits, the litmus test is size: small static site or design
 > system docs, yes; full application, no.
 
+Row by row against the alternatives — Vite, webpack, Rollup, Parcel, Jekyll, Eleventy, Astro, Hugo
+and Next, including the rows Poops loses: [Comparisons](comparisons/).
+
 ## Install
 
 Globally:
@@ -108,4 +111,5 @@ npm i -D poops
 > For the fastest possible start, clone the template repo
 > [💩🌪️ Shitstorm](https://github.com/stamat/shitstorm) and start editing.
 
-Ready? Head to the [Quick Start](quick-start/).
+Ready? Head to the [Quick Start](quick-start/) — and when the site builds,
+[publish it on GitHub Pages](deploying).

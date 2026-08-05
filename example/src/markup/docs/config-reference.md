@@ -64,14 +64,23 @@ The remaining `markup` sub-keys — `in`, `out`, `engine`, `site`, `data`, `incl
 
 ## `$schema`
 
-A mistyped key mostly is not a build error. A top-level `"stlyes"` is warned about and ignored,
-and a typo in a **script's** options reaches esbuild, which rejects it loudly — but `"minfiy"` in
-a **style's** options is read by nothing and warned about by nobody. The build is green, the
-`.min.css` is simply never written, and you find out when you look.
+A mistyped key is not a build error. A top-level `"stlyes"`, an `"inn"` in a styles entry, an
+`"engnie"` in `markup.options` — each is read by nothing, and the build stays green with the file
+it should have written simply missing. You find out when you look.
 
-Poops ships a [JSON Schema](https://json-schema.org) so the editor catches that as you type it,
-with completion and inline docs for every key on this page. Point `$schema` at the copy in your
-`node_modules`:
+Poops names every one of them at startup, reading the same schema your editor does:
+
+```
+[info][warn] Unknown key "inn" in styles[0] — ignored. Valid: in, out, options
+```
+
+Key names only, and only in the blocks Poops owns. `images` belongs to
+[poops-images](https://github.com/stamat/poops-images) and `site` is yours to name, so an
+unrecognised key in either passes without comment. Types are checked by nobody here:
+`"minify": "yes"` reaches the compiler and fails there, loudly.
+
+The same [JSON Schema](https://json-schema.org) drives editor completion and inline docs for
+every key on this page. Point `$schema` at the copy in your `node_modules`:
 
 ```json
 {
@@ -103,9 +112,10 @@ the same file, matched by name:
 }
 ```
 
-`$schema` is inert to Poops — it reads the key, recognises it, and does nothing with it. Nothing
-is validated at build time and nothing is added to what Poops installs into your project; the
-schema exists for your editor.
+The `$schema` key itself is inert — Poops reads it, recognises it, and does nothing with it. The
+URL is your editor's business: the startup check reads the copy inside `node_modules/poops`, so
+pointing `$schema` at the hosted file, at a stale one, or leaving it out changes nothing about
+what the CLI says. Nothing is added to what Poops installs into your project either way.
 
 ### Blocks belonging to another package
 
