@@ -130,6 +130,11 @@ typo.
 > `"stlyes": [ … ]` is still flagged, `"srve": { … }` is not. That is the price of one shared
 > config file, and the CLI still catches what the editor lets through.
 
+A companion that owns a block describes it in its own schema — [septic](https://github.com/stamat/septic)
+does — and `$schema` takes one URL, so having both checked means composing them in a local file.
+Each package's README carries its schema URL and that two-line `allOf`; this page deliberately does
+not repeat them, since a URL copied into two repos is a URL that goes stale in one.
+
 > [!INFO]
 > The schema is hand-written, so it can drift from the code. Poops' test suite validates it
 > against the draft-07 meta-schema, then validates its own `poops.json` and every complete example
@@ -263,6 +268,10 @@ Full guide: [React](quick-start/react).
 Responsive image processing — resize, convert (WebP/AVIF), crop and read EXIF — via
 [poops-images](https://github.com/stamat/poops-images). `sizes` is the responsive ladder plus any
 named crops; `format` lists output formats.
+
+Poops' schema leaves this block open, because poops-images owns the keys inside it. poops-images
+publishes a schema of its own, and its README shows how to point `images` at it so the block is
+completed and checked inside your `poops.json` too.
 
 ```json
 {

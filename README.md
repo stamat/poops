@@ -257,6 +257,8 @@ VS Code, JetBrains and anything else speaking the [language server protocol](htt
 
 Your editor cannot see your `node_modules`, so the schema cannot make that distinction. It allows an **object** under any name it does not know and rejects everything else: `"stlyes": [ … ]` is still flagged, `"srve": { … }` is not. That is the price of one shared config file, and the CLI still catches what the editor lets through.
 
+A companion that owns a block describes it in its own schema — septic does — and `$schema` takes one URL, so having both checked means composing them in a local file. Each package's README carries its schema URL and that two-line `allOf`; this one deliberately does not repeat them, since a URL copied into two repos is a URL that goes stale in one.
+
 The schema is hand-written and version-controlled beside the code, so it can drift from it. Poops' own test suite validates it against the draft-07 meta-schema, then validates `poops.json` and every complete example in this README and the documentation site against it — so an example that stops being valid config fails the build. Its top-level keys are asserted to be exactly the set `poops.js` accepts, its `exec` stages exactly the ones that fire, and its `markup.options` a superset of the ones the markup engine reads. A per-entry `options` object — mostly esbuild's and PostCSS's, not Poops' — has no such list, so a wrong type there is caught but a missing option is not. If the editor does not offer an option this page documents, the schema is behind and that is worth reporting.
 
 ### Scripts
@@ -1562,7 +1564,7 @@ npm i poops-images
 
 If the `images` key is present but poops-images is not installed, Poops logs a warning and skips image processing — the rest of the build still runs.
 
-The `images` value is a poops-images config object (see the [poops-images options reference](https://github.com/stamat/poops-images#configuration)). The most common keys:
+The `images` value is a poops-images config object (see the [poops-images options reference](https://github.com/stamat/poops-images#configuration)). Poops' schema leaves it open, since poops-images owns those keys — poops-images publishes its own schema, and its README shows how to point `images` at it for completion inside `poops.json`. The most common keys:
 
 - `in` — source images directory
 - `out` — output directory (keep it distinct from `in`, and outside your watched source, so generated variants don't retrigger the build)
