@@ -64,6 +64,11 @@
         "lang": "en",
         "repo": "https://github.com/stamat/poops",
         "branch": "main",
+        "links": [
+          { "title": "Docs", "url": "docs/" },
+          { "title": "septic", "url": "https://stamat.info/septic" },
+          { "title": "laxative", "url": "https://stamat.info/laxative" }
+        ],
         "iconLinks": [
           { "title": "npm", "url": "https://www.npmjs.com/package/poops", "icon": "npm" }
         ]
