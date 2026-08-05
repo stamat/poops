@@ -74,7 +74,7 @@
     "sass": "^1.63.4",
     "sass-path-resolver": "^1.0.2",
     "sass-token-importer": "^1.0.0",
-    "unknown-keys": "^1.0.0",
+    "unknown-keys": "^1.1.0",
     "yaml": "^2.3.1"
   },
   "devDependencies": {
