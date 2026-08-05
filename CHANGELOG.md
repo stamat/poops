@@ -38,8 +38,9 @@ which is most of them here. Write the post first, then the entry.
 
 ## [Unreleased] — a schema for poops.json, llms.txt on its own
 
-The config file now tells your editor what belongs in it, and stops calling a
-companion package's block a mistake. Separately, `llms` was the one index
+The config file now tells your editor what belongs in it — and tells Poops,
+which no longer lets a key misspelt inside a block pass in silence. It also
+stops calling a companion package's block a mistake. Separately, `llms` was the one index
 feature that could not turn itself on, and the corpus it writes carried the
 machinery of the pages it was made from.
 
@@ -65,16 +66,32 @@ machinery of the pages it was made from.
   [`https://stamat.info/poops/poops.schema.json`](https://stamat.info/poops/poops.schema.json)
   for a project that has not installed Poops yet, and can be attached by
   filename from VS Code's `json.schemas` setting instead of by editing the
-  config. `$schema` is inert to Poops — it is recognised as a key and otherwise
-  ignored. Nothing is validated at build time and nothing was added to what
-  Poops installs into your project; the CLI's own unknown-key warning is
-  unchanged.
+  config. The `$schema` key is inert to Poops — it is recognised and otherwise
+  ignored, and nothing was added to what Poops installs into your project.
 
   The schema is hand-written, so Poops' own test suite holds it to the code: it
   is validated against the draft-07 meta-schema, and `poops.json` plus every
   complete config example in the README and on the documentation site is
   validated against it, so an example that stops being valid config now fails
   the build.
+
+- **A key misspelt inside a block is now named too.** The unknown-key warning
+  stopped at the top level: `"stlyes"` was caught, `"inn"` in a styles entry was
+  not. That entry compiled nothing, `poops -b` exited 0, and the file that never
+  appeared was the only sign. Poops now checks every block it owns against the
+  schema it ships, at startup:
+
+  ```
+  [info][warn] Unknown key "inn" in styles[0] — ignored. Valid: in, out, options
+  ```
+
+  Key names only, and only where Poops owns them: `images` belongs to
+  poops-images, `site` is yours to name, and a companion's top-level block is
+  left alone — an unrecognised key in any of those passes without comment.
+  Types are not checked, so `"minify": "yes"` still reaches the compiler and
+  fails there. `exec` keeps its own warning, which says the more useful thing —
+  that the stage never runs. The schema read is the copy inside
+  `node_modules/poops`, so where `$schema` points changes nothing.
 
 ### Changed
 

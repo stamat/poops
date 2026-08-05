@@ -3,7 +3,7 @@
 import chokidar from 'chokidar'
 import Copy from './lib/copy.js'
 import runExec, { validateExec } from './lib/exec.js'
-import { pathExists, doesFileBelongToPath, pathContainsPathSegment, deriveWatchDirs, toPosix, hasOutTemplate, outTemplateBase, KNOWN_CONFIG_KEYS, projectPackageNames } from './lib/utils/helpers.js'
+import { pathExists, doesFileBelongToPath, pathContainsPathSegment, deriveWatchDirs, toPosix, hasOutTemplate, outTemplateBase, KNOWN_CONFIG_KEYS, projectPackageNames, unknownConfigKeys } from './lib/utils/helpers.js'
 import http from 'node:http'
 import net from 'node:net'
 import os from 'node:os'
@@ -354,6 +354,19 @@ for (const key of Object.keys(config)) {
   }
   if (companionKeys.has(key)) continue
   log({ tag: 'info', warn: true, text: `Unknown config key "${key}" — ignored. Valid: ${[...KNOWN_CONFIG_KEYS].join(', ')}` })
+}
+
+// The same check below the top level, off the schema the editors read: `inn` in
+// a styles entry costs the entry, and `poops -b` exits 0 having compiled
+// nothing. A missing or unparseable schema skips the check rather than taking
+// the build down over a warning.
+let schema = null
+try {
+  schema = JSON.parse(fs.readFileSync(new URL('./schema/poops.schema.json', import.meta.url), 'utf-8'))
+} catch {}
+
+for (const { at, key, valid } of unknownConfigKeys(config, schema)) {
+  log({ tag: 'info', warn: true, text: `Unknown key "${key}" in ${at} — ignored. Valid: ${valid.join(', ')}` })
 }
 
 // The reload channel is an endpoint on the static server, so livereload has
