@@ -29,7 +29,7 @@ It uses a simple config file where you define your input and output paths and it
 - [Features](#features)
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
-  - [Editor completion (`$schema`)](#editor-completion-schema)
+  - [Key checking and editor completion (`$schema`)](#key-checking-and-editor-completion-schema)
   - [Scripts](#scripts)
     - [JSX/TSX (React) Example](#jsxtsx-react-example)
   - [Reactor (React Pre-rendering)](#reactor-react-pre-rendering)
@@ -39,6 +39,7 @@ It uses a simple config file where you define your input and output paths and it
     - [Tailwind CSS Example](#tailwind-css-example)
   - [Markups](#markups)
     - [Nunjucks vs Liquid](#nunjucks-vs-liquid)
+    - [Templates from an npm package](#templates-from-an-npm-package)
     - [Custom Engines](#custom-engines)
     - [Collections & Pagination](#collections--pagination)
     - [Taxonomies (Tags & Categories)](#taxonomies-tags--categories)
@@ -46,10 +47,13 @@ It uses a simple config file where you define your input and output paths and it
       - [image](#image)
       - [googleFonts](#googlefonts)
       - [highlight](#highlight)
+      - [pagination](#pagination)
     - [Custom Filters](#custom-filters)
     - [Search Index, Sitemap, llms.txt, robots.txt & Navigation](#search-index-sitemap-llmstxt-robotstxt--navigation)
+    - [RSS / Atom feeds](#rss--atom-feeds)
   - [Images (optional)](#images-optional)
   - [Copy](#copy)
+  - [Exec (optional)](#exec-optional)
   - [Banner (optional)](#banner-optional)
   - [Local Server (optional)](#local-server-optional)
   - [Live Reload (optional)](#live-reload-optional)
@@ -75,13 +79,23 @@ It uses a simple config file where you define your input and output paths and it
 - Can add a templatable banner to output files (optional)
 - Static site generation with swappable template engines: [Nunjucks](https://mozilla.github.io/nunjucks/) (default) or [Liquid](https://liquidjs.com/) — with blogging option (optional)
 - Collections with pagination, and taxonomies — tags/categories as paginated, crawlable landing pages (with localizable labels)
+- Generates a JSON search index, `sitemap.xml`, `llms.txt`, `robots.txt` and a navigation tree from your pages
+- RSS and Atom feeds from any collection, no feed template to hand-author
+- Responsive image processing — resize, WebP/AVIF, crops, EXIF — via the optional [poops-images](https://github.com/stamat/poops-images)
+- Shell hooks per pipeline stage, so a post-processor runs on every rebuild and not just on `poops -b`
 - Has a configurable local server (optional)
 - Rebuilds on file changes (optional)
 - Live reloads on file changes (optional)
 
 ## Quick Start
 
-> For a superfast start, you can use the Poops template repository: [💩🌪️Shitstorm](https://github.com/stamat/shitstorm)
+> For a superfast start, scaffold a project instead of wiring one up:
+>
+> ```bash
+> npm create poops@latest my-app
+> ```
+>
+> [create-poops](https://github.com/stamat/create-poops) prompts for a template and clones it: `base` (the clean [💩🌪️Shitstorm](https://github.com/stamat/shitstorm) starter), `sulphuris` (+ the [sulphuris](https://www.npmjs.com/package/sulphuris) CSS framework) or `hat` (+ htmx, Alpine.js, Tailwind). Name it as the second argument to skip the prompt: `npm create poops my-app hat`.
 
 Poops requires **Node.js 22 or newer**.
 
@@ -213,7 +227,7 @@ Just create a `poops.json` file in the root of your project and add the followin
 }
 ```
 
-All config properties are optional except `scripts`, `styles`, `postcss` or `markups`. You have to specify at least one of them. If you don't have anything to consume, you won't poop. 💩
+Every property is optional, but give Poops nothing to compile — no `scripts`, `styles`, `postcss`, `markup`, `reactor`, `images` or `copy` — and it exits 0 having written nothing. If you don't have anything to consume, you won't poop. 💩
 
 You can freely remove the properties that you don't need. For example, if you don't want to run a local server, just remove the `serve` property from the config.
 
@@ -285,6 +299,7 @@ Scripts are bundled with [esbuild](https://esbuild.github.io/). Supports `.js`, 
 - `format` - the output format, can be `iife` or `esm` or `cjs` - this is a direct esbuild option
 - `target` - the target for the output, can be `es2018` or `es2019` or `es2020` or `esnext` for instance - this is a direct esbuild option. Default is `es2020`
 - `jsx` - the JSX transform mode, can be `transform` (default) or `automatic`. Use `automatic` for React 17+ JSX runtime which doesn't require importing React in every file - this is a direct esbuild option
+- `nodePaths` - extra directories to resolve bare imports from, for this entry only. Merged with the top-level [`includePaths`](#include-paths-optional) rather than replacing it - this is a direct esbuild option
 
 `scripts` property can accept an array of script configurations or just a single script configuration. If you want to bundle multiple scripts, just add them to the `scripts` array:
 
@@ -638,6 +653,9 @@ everything else under `options`.
 - `data` (optional) - is an array of JSON or YAML data files, that once loaded will be available to all templates in the markup directory. If you provide a path to a file for instance `links.json` with a `facebook` property, you can then use this data in your templates `{{ links.facebook }}`. The base name of the file will be used as the variable name, with spaces, dashes and dots replaced with underscores. So `the awesome-links.json` will be available as `{{ the_awesome_links.facebook }}` in your templates. The root directory of the data files is `in` directory. So if you have a `data` directory in your `in` directory, you can specify the data files like this `data: ["data/links.json"]`. The same goes for the YAML files.
 - `includePaths` - an array of paths to directories that will be added to the template engine's include paths. Useful if you want to separate template partials and layouts. For instance, if you have a `_includes` directory with a `header.njk` (or `header.liquid`) partial that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the partial.
 - `baseURL` (optional) - a base URL prefix to use instead of relative path prefixes. When set, `{{ relativePathPrefix }}` will always resolve to this value (with a trailing slash ensured) instead of being computed relative to each page's depth. Useful when deploying under a subdirectory (e.g. `"/blog"` for `domain.com/blog/`). When not set, relative prefixes (`./`, `../`, etc.) are used, which work for any deployment location including subdirectories and `file://` URLs.
+- `dateFormat` (optional) - the default [dayjs](https://day.js.org/) format the [`date` filter](#custom-filters) uses when called without an argument. With neither set, `date` returns the value untouched rather than guessing a format
+- `autoescape` (optional) - **Nunjucks only.** Escape template output by default, so `{{ value }}` cannot inject HTML and anything meant as markup needs `| safe`. Defaults to `false`, since a static site mostly renders content you wrote. Turn it on when templates interpolate anything you did not. The Liquid engine ignores it — liquidjs does not escape by default and Poops does not make it
+- `collections` (optional) - the collections to build, if you would rather declare them here than in front matter. See [Collections & Pagination](#collections--pagination)
 
 > [!TIP]
 > If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the global variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
@@ -757,15 +775,12 @@ An engine class implements this contract (see [`lib/markup/engines/`](lib/markup
 ```js
 export default class MyEngine {
   constructor(templatesDir, includePaths, options) {} // options: { autoescape }
-  get fileExtension() {
-    return ".liquid";
-  } // native template extension
-  get indexableExtensions() {
-    return new Set([".html"]);
-  } // extensions eligible for search index/nav
   get markupExtensions() {
     return "html|liquid|md";
-  } // glob alternation of processed extensions
+  } // glob alternation of processed extensions, no dots
+  get indexableExtensions() {
+    return new Set([".html"]);
+  } // extensions eligible for collections, search index and nav
   registerFilters({ dateFormat, markupOut }) {}
   registerTags(getOutputDir) {}
   setGlobal(key, value) {}
@@ -773,13 +788,20 @@ export default class MyEngine {
   async render(templatePath, context) {
     return "html";
   } // templatePath is an absolute file path
-  async renderString(source, context) {
-    return "html";
-  }
 }
 ```
 
-Optionally, an engine may implement `replaceOutExtensions(outputPath)` to control how source extensions map to output extensions (the default maps `.md`/`.njk`/`.liquid` to `.html`).
+That is the whole required surface. Five more members are feature-detected with a `typeof` check — implement what your engine can, skip the rest:
+
+| Member                             | Gives you                                                                                                       | Without it                                       |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `invalidate(file)`                 | Drop the compiled templates backed by a changed or deleted path (prefix-match, so a deleted directory is covered) | `clearCache()` is called on every watch compile   |
+| `clearCache()`                     | Wipe the whole template cache                                                                                     | No cache management at all                        |
+| `pagesDependingOn(file)`           | Re-render only the pages that loaded an edited partial or layout                                                  | Any markup edit triggers a full markup compile    |
+| `replaceOutExtensions(outputPath)` | Map your source extension to a different output one                                                               | The default maps `.md`/`.njk`/`.liquid` to `.html` |
+| `isMarkupSource(absPath)`          | Claim a file the glob would not call markup, so watch routes it to the markup pipeline                            | Only `markupExtensions` matches count             |
+
+The built-in engines also carry `fileExtension` and `renderString`, but the pipeline never calls either — don't implement them and don't rely on them. The full lifecycle (what Poops calls, in what order, with what) is in the [engine API docs](example/src/markup/docs/engine-api.md).
 
 The easiest starting point is extending a built-in engine — deep imports are intentionally supported for this:
 
@@ -1127,6 +1149,16 @@ Registered languages: `javascript`/`js`, `typescript`/`ts`, `css`, `scss`, `html
 
 Values are single tokens — no quotes, no spaces. A trailing `=` with nothing after it emits a valueless attribute (`expanded=` → `data-expanded=""`), for a flag you want to read with `hasAttribute` rather than as a class. The same applies to the `{% highlight %}` tag and the `highlight` filter.
 
+##### pagination
+
+Renders Previous/Next links and a "page of total" counter for a paginated collection, with `relativePathPrefix` already applied, and outputs nothing when there is only one page. Same syntax in both engines:
+
+```nunjucks
+{% pagination changelog %}
+```
+
+The page state it reads, and how to localize its labels, are under [Collections & Pagination](#collections--pagination).
+
 #### Custom Filters
 
 All filters are available in both engines. The only syntax difference is how arguments are passed: Nunjucks uses parentheses `| filter("arg")`, Liquid uses a colon `| filter: "arg"`.
@@ -1139,7 +1171,9 @@ All filters are available in both engines. The only syntax difference is how arg
 
 - `markdown` — renders a markdown string to HTML with GitHub Flavored Markdown extras: emoji shortcodes (e.g. `:rocket:` → 🚀), alert callouts (`> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`, `[!INFO]`) and footnotes (`[^1]`). Code fences are syntax-highlighted and headings get slug `id`s plus permalink anchors. Usage: `{{ "**bold** :rocket:" | markdown }}`
 
-- `date` — formats a date string. Uses [dayjs](https://day.js.org/) format tokens. A default format can be set via the `dateFormat` config option.
+- `toc` — builds an on-this-page table of contents from rendered HTML: a `<nav class="toc" aria-label="On this page">` listing every `<h2>` and `<h3>` that has an `id`, each `<li>` classed `toc-h2`/`toc-h3` so you indent with CSS rather than nested lists. It reads the same ids the markdown heading renderer emits, so the links always land. Headings classed `sr-only` are skipped — a visible entry pointing at invisible content only confuses. Returns an empty string when there is nothing to list. Feed it **rendered** HTML: on a Markdown source, run `markdown` first, or code fences containing `#` lines get read as headings. Usage: `{{ page.content | markdown | toc }}`
+
+- `date` — formats a date string. Uses [dayjs](https://day.js.org/) format tokens. A default format can be set via the `dateFormat` config option; with neither, the value is returned untouched.
   - Nunjucks: `{{ "2024-01-15" | date("MMMM D, YYYY") }}`
   - Liquid: `{{ "2024-01-15" | date: "MMMM D, YYYY" }}`
 
@@ -1392,7 +1426,7 @@ All front matter fields are passed through to the index automatically. Internal 
 
 **llms.txt** generates an [`llms.txt`](https://llmstxt.org) — a Markdown index of your pages that LLMs and generative engines (GEO) read to understand your site. It has an `# H1` title, a `> ` blockquote summary, then `- [title](url): description` links grouped by URL path: the first folder is a `## section`, a second folder nests as a `### subsection` under it, and root-level pages fall under a lead "Pages" section. So `docs/config-reference.html` lands directly under `## Docs` while `docs/quick-start/x.html` lands under `### Quick Start` inside it. Collection items (which live under `collection/…`) group the same way and are ordered newest-first by their `date`; other sections keep file order. Set `intro` to a Markdown file path (relative to the project root) to insert free-form context between the blockquote and the link sections — a file authored for LLMs, e.g. `llms-intro.md`. Avoid `##` headings in it; they read as sections. (A raw README is a poor fit — badges, install noise and its own headings collide.) `title` and `description` default to your `site.title`/`site.description`; override them (and the lead section name via `sectionTitle`) with the object form. `site.url` makes the links absolute. Collection index/pagination pages are skipped, like the search index.
 
-Set `full` to also write a companion full-content file — every page's Markdown body concatenated into one file an LLM can ingest whole (the index is the link map; this is the corpus). `true` names it after `out` with a `-full` suffix (`llms.txt` → `llms-full.txt`, `ai.txt` → `ai-full.txt`); pass a string to set the path yourself. The file opens with a `# Full Documentation Archive for {title}` header, a one-line intro naming the site and a `> ` blockquote of the `description` so a whole-file ingest starts with context, then each page becomes an `# title` (its own leading H1 if it has one) + `URL:` line + body, joined by `---`. Set `fullIntro` to a Markdown file path (from the project root) to insert your own preamble after that header — the `full` counterpart to `intro` (inserted verbatim; a missing file warns and is skipped). Only `.md`/`.markdown` sources qualify (a `.njk`/`.liquid` source is template code, not prose); `noindex` and collection-index pages are dropped. Content is the Markdown **source**, taken before the template engine ran — so the machinery a source still carries is stripped on the way out: `{% raw %}{# … #}{% endraw %}` comments, `{% raw %}{% … %}{% endraw %}` tags and `{% raw %}{{ … }}{% endraw %}` output (a `{% raw %}{% set x %}…{% endset %}{% endraw %}` capture leaves behind the prose it wrapped), plus inline `<style>` and `<script>` blocks and `<script src>`/`<link>` tags. Fenced blocks, inline code spans and `{% raw %}{% raw %}{% endraw %}` bodies keep theirs — a sample documenting template syntax is content. The strip is syntactic, not semantic: text inside a `{% raw %}{% if %}{% endraw %}` that would not have rendered still contributes. A feed's article HTML is built from the same stripped source.
+Set `full` to also write a companion full-content file — every page's Markdown body concatenated into one file an LLM can ingest whole (the index is the link map; this is the corpus). `true` names it after `out` with a `-full` suffix (`llms.txt` → `llms-full.txt`, `ai.txt` → `ai-full.txt`); pass a string to set the path yourself. The file opens with a `# Full Documentation Archive for {title}` header, a one-line intro naming the site and a `> ` blockquote of the `description` so a whole-file ingest starts with context, then each page becomes an `# title` (its own leading H1 if it has one) + `URL:` line + body, joined by `---`. Set `fullIntro` to a Markdown file path (from the project root) to insert your own preamble after that header — the `full` counterpart to `intro` (inserted verbatim; a missing file warns and is skipped). Only `.md`/`.markdown` sources qualify (a `.njk`/`.liquid` source is template code, not prose); `noindex` and collection-index pages are dropped. Content is the Markdown **source**, taken before the template engine ran — so the machinery a source still carries is stripped on the way out: `{# … #}` comments, `{% … %}` tags and `{{ … }}` output (a `{% set x %}…{% endset %}` capture leaves behind the prose it wrapped), plus inline `<style>` and `<script>` blocks and `<script src>`/`<link>` tags. Fenced blocks, inline code spans and `{% raw %}` bodies keep theirs — a sample documenting template syntax is content. The strip is syntactic, not semantic: text inside a `{% if %}` that would not have rendered still contributes. A feed's article HTML is built from the same stripped source.
 
 **robots.txt** generates a `robots.txt`. The string shorthand writes an allow-all file (`User-agent: *`, empty `Disallow:`) with a `Sitemap:` line pointing at your generated sitemap — absolute when `site.url` is set. The object form takes `out`, `userAgent`, `allow`/`disallow` (a path or array of paths), and `sitemap` (an explicit URL, or `false` to omit the line):
 
@@ -1528,7 +1562,7 @@ Liquid — a partial that recurses via `render` (save as `_partials/navtree.liqu
 
 #### RSS / Atom feeds
 
-Generate a subscription feed for a [collection](#collections) — no hand-authored feed template. Each feed lists the collection's posts newest-first (by `date`), with the channel metadata taken from your `site` data.
+Generate a subscription feed for a [collection](#collections--pagination) — no hand-authored feed template. Each feed lists the collection's posts newest-first (by `date`), with the channel metadata taken from your `site` data.
 
 ```json
 {
@@ -1551,8 +1585,11 @@ Generate a subscription feed for a [collection](#collections) — no hand-author
 - `title` — channel title (default `"<Collection> | <site.title>"`).
 - `description` — channel description (default `site.description`).
 - `author`, `lang` — default to `site.author` / `site.lang`.
+- `content` — `true` adds each post's full article HTML to its item (RSS `<content:encoded>`, Atom `<content type="html">`), so a reader shows the whole post instead of a teaser. Off by default.
 
 Shorthand forms: `"feed": true` (or a filename string) emits an RSS feed for every collection; an array of the objects above generates several feeds at once (e.g. an RSS and an Atom for the same collection). Item `<description>` uses each post's `description`, falling back to its auto-`excerpt`; links, `guid`s and `<atom:link rel="self">` are made absolute with `site.url`. `robots: noindex` posts are excluded, matching the sitemap.
+
+`content: true` renders the post's Markdown **source** to article-body HTML — the body only, no layout, nav or footer chrome. So only `.md`/`.markdown` posts get it; anything else falls back to `<description>` alone. Unrendered `{% … %}` tags in a body pass through verbatim.
 
 Point browsers and readers at it from your layout `<head>`:
 
@@ -1662,6 +1699,44 @@ You can specify a list of input paths and pass them to an output directory, for 
 }
 ```
 
+### Exec (optional)
+
+Shell commands to run after a pipeline stage compiles — a post-processor that needs the built output, like stripping comments from the unminified CSS or regenerating a reference page. `exec` is keyed by stage, each value a command string or an array of them run in order:
+
+```json
+{
+  "exec": {
+    "styles": [
+      "node script/strip-css-comments.mjs dist/styles.css",
+      "node script/gen-reference.mjs"
+    ],
+    "build": "node script/deploy.mjs"
+  }
+}
+```
+
+Why not just chain `poops -b && cmd` in an npm script: the hook runs on **every** rebuild, watch mode included, so the post-processed output never drifts while you work.
+
+**Stages:**
+
+| Stage     | Runs after                                                                     |
+| --------- | ------------------------------------------------------------------------------ |
+| `styles`  | the CSS is final — after PostCSS, in build and in watch alike                   |
+| `scripts` | scripts compile                                                                |
+| `reactor` | reactor components render. Build only — a watch re-render fires `markup`        |
+| `images`  | images process                                                                 |
+| `markup`  | markup renders                                                                 |
+| `copy`    | files copy                                                                     |
+| `build`   | once, after the full initial pipeline — not again on a watch rebuild            |
+
+Commands run from the project root, synchronously, with their output streaming live. A failing command fails a `poops -b` build's exit code; in watch it is logged and swallowed so the watcher survives. A key that is not one of the stages above never runs, so Poops names it at startup rather than letting the hook silently no-op:
+
+```
+[exec][warn] unknown stage "style" — never runs. Valid: reactor, scripts, images, markup, styles, copy, build
+```
+
+If you have nothing to post-process, remove the `exec` property from the config.
+
 ### Banner (optional)
 
 Here you can specify a banner that will be added to the top of the output files. It is templatable via mustache. The following variables are available from your project's `package.json`:
@@ -1672,6 +1747,10 @@ Here you can specify a banner that will be added to the top of the output files.
 - `license`
 - `author`
 - `description`
+
+Plus one that isn't from `package.json`:
+
+- `year` — the current year, for a copyright line
 
 Here is a sample banner template.
 
@@ -1733,6 +1812,16 @@ Sets up a watcher for your project which will rebuild your files on change.
   "watch": ["src"]
 }
 ```
+
+Or set it to `true` and Poops derives the list from every task's own `in` path — `scripts`, `styles`, `reactor` (its `component` too), `markup`, `copy`, `images`, plus any `tokenPaths`. An entry pointing at a file collapses to its parent directory, so editing a sibling import still triggers the rebuild:
+
+```json
+{
+  "watch": true
+}
+```
+
+That covers sources living under a task's own directory. Imports reaching _outside_ it — a shared folder above the entry, something in `node_modules` — are not watched; name those in an explicit array. A directory with a dot in its name is read as a file and collapses to its parent, which is the other reason to pass the array yourself.
 
 If you don't want to watch for file changes, just remove the `watch` property from the config.
 

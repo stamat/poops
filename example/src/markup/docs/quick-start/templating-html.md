@@ -278,6 +278,7 @@ passed: Nunjucks uses parentheses `{% raw %}{{ x | filter("arg") }}{% endraw %}`
 | Filter | Does | Example (Nunjucks) |
 | --- | --- | --- |
 | `slugify` | string → URL slug | `{% raw %}{{ title \| slugify }}{% endraw %}` |
+| `humanize` | slug or raw term → display label | `{% raw %}{{ "static-site" \| humanize }}{% endraw %}` |
 | `jsonify` | value → JSON string | `{% raw %}{{ obj \| jsonify }}{% endraw %}` |
 | `markdown` | Markdown → HTML (GFM) | `{% raw %}{{ text \| markdown }}{% endraw %}` |
 | `date` | format a date (dayjs tokens) | `{% raw %}{{ post.date \| date("MMM D, YYYY") }}{% endraw %}` |
@@ -462,21 +463,25 @@ reference implementations):
 ```js
 export default class MyEngine {
   constructor(templatesDir, includePaths, options) {}      // options: { autoescape }
-  get fileExtension() { return '.liquid' }                 // native template extension
-  get indexableExtensions() { return new Set(['.html']) }  // eligible for search index / nav
   get markupExtensions() { return 'html|liquid|md' }       // glob alternation of processed extensions
+  get indexableExtensions() { return new Set(['.html']) }  // eligible for collections, search index, nav
   registerFilters({ dateFormat, markupOut }) {}
   registerTags(getOutputDir) {}
   setGlobal(key, value) {}
   removeGlobal(key) {}
   async render(templatePath, context) { return 'html' }    // templatePath is an absolute path
-  async renderString(source, context) { return 'html' }
 }
 ```
 
-Optionally implement `replaceOutExtensions(outputPath)` to control how source extensions map to
-output (the default maps `.md` / `.njk` / `.liquid` to `.html`; a theme engine might flatten paths
-instead).
+That is the whole required surface. Five more are feature-detected — `invalidate`, `clearCache`
+and `pagesDependingOn` for incremental watch rebuilds, `replaceOutExtensions` to remap output
+extensions, `isMarkupSource` to claim a file the glob would not call markup. Implement what your
+engine can and skip the rest; the [Engine API](../engine-api) has the lifecycle and the contract
+for each.
+
+> [!WARNING]
+> The built-ins also carry `fileExtension` and `renderString`, but the pipeline never calls
+> either. Don't implement them and don't rely on them.
 
 The easy path is **extending a built-in** — deep imports are supported for exactly this:
 

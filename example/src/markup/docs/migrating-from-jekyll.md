@@ -32,7 +32,7 @@ Jekyll's layout, and where each part lands:
 | `_layouts/` | `_layouts/` under `markup.in` | Underscore directories are never output. Add it to `includePaths` |
 | `_includes/` | `_partials/` (any name) under `markup.in` | Also on `includePaths`; `{% raw %}{% render "site-header.liquid" %}{% endraw %}` |
 | `_data/` | `markup.options.data` | An explicit list of files: `["_data/links.json", "_data/authors.yaml"]` |
-| `_posts/` | any direct subdirectory of `markup.in` | It becomes a [collection](../static-site/blog-collections); the directory name is the collection name |
+| `_posts/` | any direct subdirectory of `markup.in` | It becomes a [collection](static-site/blog-collections); the directory name is the collection name |
 | `_drafts/` | `published: false` in front matter | The page is skipped and kept out of the collection |
 | `_sass/` | anywhere; `styles[].in` points at your entry | Dart Sass, with `includePaths` for the load path |
 | `assets/` | `copy`, or `styles`/`scripts` entries | Static files get copied; sources get compiled |
@@ -44,7 +44,7 @@ Jekyll's layout, and where each part lands:
 | --- | --- |
 | `title`, `description`, `author` | `markup.options.site.title`, `.description`, … — anything under `site` reaches every template |
 | `url` | `markup.options.site.url` — used by the `canonical`, `og` and `jsonld` filters and by `sitemap.xml` |
-| `baseurl` | `markup.options.baseURL`, or the `--base-url` flag in CI. Leave it unset and paths stay relative — [see deploying](../deploying) |
+| `baseurl` | `markup.options.baseURL`, or the `--base-url` flag in CI. Leave it unset and paths stay relative — [see deploying](deploying) |
 | `collections:` | `markup.options.collections`, or `collection: true` in the directory's index front matter |
 | `paginate: 10` | `paginate: 10` on the collection |
 | `defaults:` (front-matter defaults) | **no equivalent** — set the field per page, or read `site` in the layout as the fallback |
@@ -81,7 +81,7 @@ A minimal blog, whole:
 | `title`, `description` | same |
 | `date` | same, and now **required** on posts you care about ordering |
 | `published: false` | same |
-| `categories`, `tags` | any field becomes a [taxonomy](../static-site/blog-collections) when the collection declares it: `taxonomies: [tags]` |
+| `categories`, `tags` | any field becomes a [taxonomy](static-site/blog-collections) when the collection declares it: `taxonomies: [tags]` |
 | `permalink` | **gone** — the file path is the URL |
 | `excerpt_separator` | **gone** — `page.excerpt` is the first prose paragraph, capped at 160 characters |
 | `sitemap: false` | `robots: noindex` — drops the page from the sitemap and `llms.txt`, keeps it in your on-site search index |
@@ -124,7 +124,7 @@ Both engines are available; `engine: "liquid"` keeps your templates closest. The
 5. **Run `poops -b` and read the errors.** Unknown tags are the Liquid dialect; empty output is
    usually a `site.posts` that is now `blog.items`.
 6. **Delete `Gemfile`, `Gemfile.lock`, `_config.yml`, `_site/`.** Add `dist/` to `.gitignore`.
-7. **Replace the GitHub Pages branch build with [a workflow](../deploying)** — Pages no longer
+7. **Replace the GitHub Pages branch build with [a workflow](deploying)** — Pages no longer
    builds the site for you, and this is the step that catches people after the site already works
    locally.
 

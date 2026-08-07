@@ -70,6 +70,17 @@ on every page Poops has built.
   the "#" a theme reveals through `.heading-anchor::before` still clicks — and a theme
   styling `[aria-label="Permalink"]` rather than the class is the one selector this breaks.
 
+- **Config Poops has always accepted is finally written down.** `exec` had no section in
+  the README at all, only two passing mentions of a key nothing introduced. `watch: true`,
+  the per-entry `nodePaths`, `markup.options.autoescape` and `dateFormat`, the `feed`'s
+  `content`, the `toc` filter and the banner's `{{ year }}` were each real, tested and
+  undocumented — some in the README, some on the docs site, `nodePaths` and `{{ year }}`
+  in neither. Two engine-contract listings also still advertised `fileExtension` and
+  `renderString`, which the pipeline stopped calling, while omitting the `invalidate` /
+  `pagesDependingOn` pair that incremental rebuilds actually run on. Nothing changed in the
+  code; the pages now say what it does. A new test walks every link in the README and the
+  documentation site, so the eleven dead ones found writing this are the last of them.
+
 ## [2.1.0] - 2026-08-05 — a schema for poops.json, llms.txt on its own
 
 The config file now tells your editor what belongs in it — and tells Poops,

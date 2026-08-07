@@ -47,7 +47,7 @@
     },
     "banner": {
       "type": "string",
-      "description": "Comment stamped on top of every output file. Templatable via mustache from your package.json: {{ name }}, {{ version }}, {{ homepage }}, {{ license }}, {{ author }}, {{ description }}.",
+      "description": "Comment stamped on top of every output file. Templatable via mustache from your package.json: {{ name }}, {{ version }}, {{ homepage }}, {{ license }}, {{ author }}, {{ description }}, plus {{ year }} for the current year.",
       "examples": ["/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */"]
     },
     "serve": {

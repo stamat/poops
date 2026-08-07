@@ -52,15 +52,17 @@ deep dive; everything else is documented in full on this page.
 | `markup.nav`         | Navigation-tree data                              | [↓](#markup-nav)         |
 | `markup.feed`        | RSS / Atom feed from a collection                 | [↓](#markup-feed)        |
 | `copy`               | Copy static assets into the output                | [↓](#copy)               |
+| `exec`               | Shell hooks run after a pipeline stage            | [↓](#exec)               |
 | `banner`             | Comment stamped on every output file              | [↓](#banner)             |
 | `serve`              | Local dev server                                  | [↓](#serve)              |
 | `livereload`         | Reload the browser on changes                     | [↓](#livereload)         |
 | `watch`              | Paths to watch (or `true` to auto-derive)         | [↓](#watch)              |
 | `includePaths`       | Import-resolution roots (Sass `@use`, JS imports) | [↓](#includepaths)       |
 
-The remaining `markup` sub-keys — `in`, `out`, `engine`, `site`, `data`, `includePaths`,
-`dateFormat`, `collections`, `baseURL`, `autoescape` — are covered in
-[Templating HTML](quick-start/templating-html).
+The remaining `markup` sub-keys — `in`, `out`, `engine`, `site`, `data`, `includePaths` and
+`baseURL` — are covered in [Templating HTML](quick-start/templating-html), and `collections` in
+[Building a blog with collections](static-site/blog-collections). `dateFormat` and `autoescape`
+are below, under [`markup`](#markup).
 
 ## `$schema`
 
@@ -162,8 +164,10 @@ glob-matched `index.*` is named after its directory, relative to the glob's stat
 `src/elements/*/index.ts` builds one bundle per component. `out` also accepts a template —
 `{% raw %}{{dir}}{% endraw %}` (the match's directory relative to that static prefix) and
 `{% raw %}{{name}}{% endraw %}` (its basename without extension) — naming one output per matched
-entry, extension included. Per-entry `options` cover `sourcemap`, `minify`, `justMinified`, `format`
-and `target`.
+entry, extension included. Per-entry `options` cover `sourcemap`, `minify`, `justMinified`, `format`,
+`target`, `jsx` and `nodePaths` — the last one adding import-resolution roots for this entry alone,
+merged with the top-level [`includePaths`](#includepaths) rather than replacing it. The same
+`options` apply to a [`reactor`](#reactor) entry's client bundle.
 
 ```json
 {
@@ -251,6 +255,13 @@ JSON-LD defaults — `{% raw %}"jsonld": { "@type": "TechArticle" }{% endraw %}`
 merged over the generated ones and still overridable per page. Add anything else you want globally
 available — e.g. `repo` and `branch` to drive "Edit on GitHub" links (see
 [Building a documentation site](static-site/docs-site)).
+
+Two options that live nowhere else:
+
+| Option | Meaning |
+| --- | --- |
+| `dateFormat` | Default [dayjs](https://day.js.org/) format for the `date` filter when it is called without an argument. With neither set, `date` returns the value untouched rather than guessing a format. |
+| `autoescape` | **Nunjucks only.** Escape template output by default, so `{% raw %}{{ value }}{% endraw %}` cannot inject HTML and anything meant as markup needs `\| safe`. Default `false`. The Liquid engine ignores it — liquidjs does not escape by default and Poops does not make it. |
 
 Full guide: [Templating HTML](quick-start/templating-html).
 
@@ -374,7 +385,8 @@ Stages:
 
 A comment stamped on top of every output file. Templatable via mustache from your project's
 `package.json` — available variables: `name`, `version`, `homepage`, `license`, `author`,
-`description`:
+`description`, plus `year` (the current year, for a copyright line) which comes from the clock
+rather than the manifest:
 
 ```nunjucks
 {% raw %}{

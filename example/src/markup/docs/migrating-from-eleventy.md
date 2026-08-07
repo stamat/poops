@@ -19,8 +19,8 @@ Read the four hard stops first.
 | The thing | What happens | What you do |
 | --- | --- | --- |
 | **`permalink`** | Not supported, templated or otherwise. Output path mirrors source path | Put the files where the URLs go. `about/index.njk` → `dist/about/index.html` still works, because it is a real directory |
-| **`addFilter` / `addShortcode`** | No API to register them | Use the [bundled filters and tags](../config-reference), or move the logic into the template. A whole template language can be [a custom engine](../engine-api); a single filter cannot |
-| **`addCollection`** | Collections are directories, not queries | A collection is a direct subdirectory of `markup.in`. Cross-cutting queries — "everything tagged X across the site" — become [taxonomies within one collection](../static-site/blog-collections), or they go |
+| **`addFilter` / `addShortcode`** | No API to register them | Use the [bundled filters and tags](config-reference), or move the logic into the template. A whole template language can be [a custom engine](engine-api); a single filter cannot |
+| **`addCollection`** | Collections are directories, not queries | A collection is a direct subdirectory of `markup.in`. Cross-cutting queries — "everything tagged X across the site" — become [taxonomies within one collection](static-site/blog-collections), or they go |
 | **`eleventyComputed`** | No computed data layer | Compute in the template, or put the value in front matter |
 
 ## Config, key by key
@@ -37,7 +37,7 @@ Everything in `eleventy.config.js` that has an equivalent:
 | `addGlobalData("site", …)` | `markup.options.site` |
 | `setTemplateFormats` | fixed: `.html`, `.md`, and `.njk` or `.liquid` |
 | `addPlugin(pluginRss)` | `markup.options.feed` |
-| `addPlugin(EleventyHtmlBasePlugin)` | `{% raw %}{{ relativePathPrefix }}{% endraw %}` in templates, plus `baseURL` or `--base-url` when you [deploy under a subpath](../deploying) |
+| `addPlugin(EleventyHtmlBasePlugin)` | `{% raw %}{{ relativePathPrefix }}{% endraw %}` in templates, plus `baseURL` or `--base-url` when you [deploy under a subpath](deploying) |
 | `eleventy-plugin-vite`, or your own bundler | `styles`, `scripts`, `postcss` — top-level keys in the same file |
 | `addFilter`, `addShortcode`, `addTransform`, `addCollection` | **no equivalent** |
 
@@ -108,7 +108,7 @@ out of the collection directory instead.
 | `{% raw %}{{ page.url }}{% endraw %}` | same, and `page.filePath`, `page.excerpt`, `page.wordcount` come free |
 | `{% raw %}{{ post.data.title }}{% endraw %}` | `{% raw %}{{ post.title }}{% endraw %}` — items are flat, no `data` wrapper |
 | `{% raw %}{{ "now" \| date: … }}{% endraw %}` via a plugin | `{% raw %}{{ post.date \| date("MMM D, YYYY") }}{% endraw %}` — [dayjs](https://day.js.org/) tokens, with a `dateFormat` default |
-| A shortcode you wrote for images | the `{% raw %}{% image %}{% endraw %}` tag, with [`poops-images`](../static-site/images-gallery) doing the resizing |
+| A shortcode you wrote for images | the `{% raw %}{% image %}{% endraw %}` tag, with [`poops-images`](static-site/images-gallery) doing the resizing |
 | A shortcode for code samples | `{% raw %}{% highlight 'javascript' %}{% endraw %}`, or a Markdown fence — both highlighted at build time |
 | `eleventy-plugin-syntaxhighlight` | nothing to install; it is on by default |
 
