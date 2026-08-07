@@ -36,7 +36,9 @@ release, verbatim — no notes to paste in by hand. **A post you wrote by hand a
 overwritten** — that is the escape hatch for releases whose post is a live demo,
 which is most of them here. Write the post first, then the entry.
 
-## [Unreleased] — a dependency vouches for a config key, the heading anchor leaves the tab order
+## [Unreleased]
+
+## [2.2.0] - 2026-08-07 — a dependency vouches for a config key, the heading anchor leaves the tab order
 
 A companion's block passed in silence only when you depended on the companion by
 name, which a package that arrives through another one never is. Separately, the
