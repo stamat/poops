@@ -36,7 +36,28 @@ release, verbatim — no notes to paste in by hand. **A post you wrote by hand a
 overwritten** — that is the escape hatch for releases whose post is a live demo,
 which is most of them here. Write the post first, then the entry.
 
-## [Unreleased]
+## [Unreleased] — site config carries the banner's package.json tokens
+
+A footer wanting to print your version had nowhere to get it. `poops.json` is
+JSON, so a value cannot compute one, and a theme rendering `site.footer` renders
+it verbatim — which left the number hardcoded in a second file, silently wrong
+from the next release on.
+
+### Added
+
+- **`markup.options.site` values are filled from `package.json`, with the same tokens a
+  banner uses.** `"footer": "MyLib v{{ version }} — MIT licensed"` now prints the version
+  the manifest holds, filled at build time from the one place it lives. `{{ name }}`,
+  `{{ homepage }}`, `{{ license }}`, `{{ author }}`, `{{ description }}` and `{{ year }}`
+  fill the same way, at any depth — a `title` inside `site.links` gets them too — and the
+  `pkg` option still says which `package.json` to read.
+
+### Fixed
+
+- **A banner token with no matching `package.json` field no longer prints `undefined`.**
+  `{{ homepage }}` in a package that declares none put that literal word at the top of
+  every built file, which reads as Poops being broken rather than as a field you never
+  filled in. The token is now left as written, naming what is missing.
 
 ## [2.2.0] - 2026-08-07 — a dependency vouches for a config key, the heading anchor leaves the tab order
 
