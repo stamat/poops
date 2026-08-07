@@ -36,7 +36,39 @@ release, verbatim — no notes to paste in by hand. **A post you wrote by hand a
 overwritten** — that is the escape hatch for releases whose post is a live demo,
 which is most of them here. Write the post first, then the entry.
 
-## [Unreleased]
+## [Unreleased] — a dependency vouches for a config key, the heading anchor leaves the tab order
+
+A companion's block passed in silence only when you depended on the companion by
+name, which a package that arrives through another one never is. Separately, the
+permalink anchor beside every heading was hidden from screen readers and still
+reachable by keyboard — a tab stop with nothing to announce, once per heading,
+on every page Poops has built.
+
+### Added
+
+- **A direct dependency can vouch for a companion's config key.** A `septic` block
+  passed in silence only when `septic` itself sat in your package.json — but laxative
+  brings septic, so a laxative app declares `laxative` and the warning fired on every
+  build. A dependency now vouches through its own manifest,
+  `"poops": { "companionKeys": ["septic"] }`, read one directory deep and never loaded.
+  Nothing declared and nothing vouched still warns, which is what catches the typo.
+
+### Fixed
+
+- **The heading permalink is no longer a tab stop on nothing.** Every heading gets an
+  anchor, and it carried `aria-hidden="true"` while staying focusable — so a keyboard
+  reached it, and a screen reader had nothing to announce when it landed. That is a link
+  with no accessible name in the tab order, once per heading, on every page Poops has ever
+  built. It also carried `aria-label="Permalink"`, which `aria-hidden` had already made
+  unreadable to anyone.
+
+  The anchor now says the same thing three ways instead of three different things: it is
+  decoration, so it takes `tabindex="-1"` beside the `aria-hidden` it always had, and the
+  dead `aria-label` is gone. The heading beside it is already the name of the place.
+  **DOM change:** `<a class="heading-anchor" href="#id" tabindex="-1" aria-hidden="true">`,
+  where it was `aria-label="Permalink" aria-hidden="true"`. Nothing changes for a mouse —
+  the "#" a theme reveals through `.heading-anchor::before` still clicks — and a theme
+  styling `[aria-label="Permalink"]` rather than the class is the one selector this breaks.
 
 ## [2.1.0] - 2026-08-05 — a schema for poops.json, llms.txt on its own
 

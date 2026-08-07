@@ -81,6 +81,7 @@ It uses a simple config file where you define your input and output paths and it
 
 ## Quick Start
 
+> [!TIP]
 > For a superfast start, you can use the Poops template repository: [💩🌪️Shitstorm](https://github.com/stamat/shitstorm)
 
 Poops requires **Node.js 22 or newer**.
@@ -261,7 +262,7 @@ VS Code, JetBrains and anything else speaking the [language server protocol](htt
 
 The `$schema` key itself is inert — Poops reads it, recognises it, and does nothing with it. The URL is your editor's business: the startup check reads the copy inside `node_modules/poops`, so pointing `$schema` at the hosted file, at a stale one, or leaving it out changes nothing about what the CLI says. Nothing is added to what Poops installs into your project either way.
 
-**Blocks belonging to another package.** `poops.json` is shared: [septic](https://github.com/stamat/septic) reads a `septic` block out of the same file, and Poops has no business calling that a mistake. So an unknown top-level key is accepted in silence when a package by that name is in your `dependencies`, `devDependencies`, `peerDependencies` or `optionalDependencies` — declared is enough, and Poops never loads it. Nothing by that name declared, and the key is warned about as before, which is what catches the typo.
+**Blocks belonging to another package.** `poops.json` is shared: [septic](https://github.com/stamat/septic) reads a `septic` block out of the same file, and Poops has no business calling that a mistake. So an unknown top-level key is accepted in silence when a package by that name is in your `dependencies`, `devDependencies`, `peerDependencies` or `optionalDependencies` — declared is enough, and Poops never loads it. A key can also arrive one step removed — [laxative](https://github.com/stamat/laxative) brings septic, so your package.json says `laxative` and never `septic` — and for that a direct dependency vouches for the key in its own manifest: `"poops": { "companionKeys": ["septic"] }`. Only direct dependencies are read, one directory deep. Nothing declared and nothing vouched, and the key is warned about as before, which is what catches the typo.
 
 Your editor cannot see your `node_modules`, so the schema cannot make that distinction. It allows an **object** under any name it does not know and rejects everything else: `"stlyes": [ … ]` is still flagged, `"srve": { … }` is not. That is the price of one shared config file, and the CLI still catches what the editor lets through.
 
@@ -399,7 +400,8 @@ If you only need server-side rendering without client hydration, omit `in` and `
 
 Poops does not need `react` or `react-dom` as its own dependency — they are resolved from your project's `node_modules`. In watch mode, changes to files in the reactor component's directory trigger re-rendering and client re-bundling. Markup is recompiled only when the rendered output actually changes. Changes to other JS/TS files only trigger the scripts pipeline — the two are independent.
 
-**Note:** If you don't need server-side pre-rendering, you can bundle a React app entirely through the regular `scripts` pipeline — just point `in` to your `.jsx`/`.tsx` entry file and use `createRoot` on the client. The `reactor` config is only needed when you want build-time HTML rendering with optional hydration.
+> [!NOTE]
+> If you don't need server-side pre-rendering, you can bundle a React app entirely through the regular `scripts` pipeline — just point `in` to your `.jsx`/`.tsx` entry file and use `createRoot` on the client. The `reactor` config is only needed when you want build-time HTML rendering with optional hydration.
 
 ### Styles
 
@@ -623,6 +625,7 @@ everything else under `options`.
 }
 ```
 
+> [!WARNING]
 > **Deprecated:** Poops 1.x also read these keys directly on `markup`
 > (`"markup": { "site": … }`). That still works in 2.x and warns; it stops
 > working in 3.0. Move them into `options`.
@@ -637,7 +640,8 @@ everything else under `options`.
 - `includePaths` - an array of paths to directories that will be added to the template engine's include paths. Useful if you want to separate template partials and layouts. For instance, if you have a `_includes` directory with a `header.njk` (or `header.liquid`) partial that you want to include in your markup, you can add it to the include paths and then include the templates like this `{% include "header.njk" %}`, without specifying the full path to the partial.
 - `baseURL` (optional) - a base URL prefix to use instead of relative path prefixes. When set, `{{ relativePathPrefix }}` will always resolve to this value (with a trailing slash ensured) instead of being computed relative to each page's depth. Useful when deploying under a subdirectory (e.g. `"/blog"` for `domain.com/blog/`). When not set, relative prefixes (`./`, `../`, etc.) are used, which work for any deployment location including subdirectories and `file://` URLs.
 
-**💡 NOTE:** If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the global variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
+> [!TIP]
+> If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the global variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
 
 **"Edit this page on GitHub" links.** Every page exposes `page.filePath` — its source file path relative to your project root, with posix separators (e.g. `src/markup/docs/index.md`). That is exactly the path GitHub's editor expects, so an edit link is one line in your layout:
 
@@ -1502,7 +1506,8 @@ Nunjucks — a self-recursing macro:
 {{ navtree(nav) }}
 ```
 
-Note the `!= null` check: the homepage node's `url` is an empty string (a valid link — `relativePathPrefix` resolves it), while synthesized section nodes have no `url` at all. A plain `{% if item.url %}` would wrongly demote the homepage to a `<span>`. Node titles already have `navTitle` applied, so `{{ item.title }}` is all you need.
+> [!IMPORTANT]
+> Note the `!= null` check: the homepage node's `url` is an empty string (a valid link — `relativePathPrefix` resolves it), while synthesized section nodes have no `url` at all. A plain `{% if item.url %}` would wrongly demote the homepage to a `<span>`. Node titles already have `navTitle` applied, so `{{ item.title }}` is all you need.
 
 Liquid — a partial that recurses via `render` (save as `_partials/navtree.liquid`). Liquid treats empty strings as truthy, so the plain `if` is safe here:
 
@@ -1619,7 +1624,8 @@ You can specify a list of input paths and pass them to an output directory, for 
 }
 ```
 
-**💡 NOTE:** Copy property can also accept the list of objects containing `in` and `out` properties. For instance:
+> [!TIP]
+> Copy property can also accept the list of objects containing `in` and `out` properties. For instance:
 
 ```JSON
 {
@@ -1636,7 +1642,8 @@ You can specify a list of input paths and pass them to an output directory, for 
 }
 ```
 
-**💡 NOTE:** Copy can also accept **GLOB** and **EXTGLOB** patterns as input paths, except POSIX character classes (e.g. `[[:alpha:]]`):
+> [!TIP]
+> Copy can also accept **GLOB** and **EXTGLOB** patterns as input paths, except POSIX character classes (e.g. `[[:alpha:]]`):
 
 ```JSON
 {
