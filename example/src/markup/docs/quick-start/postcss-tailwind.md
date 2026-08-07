@@ -35,6 +35,9 @@ Sass `styles` pipeline — use it for [Tailwind CSS](https://tailwindcss.com/),
 - **`in` / `out`** — input and output CSS files.
 - **`options.plugins`** — array of plugin names. Each is a string, or a tuple `["name", { opts }]`.
 - **`options.minify` / `options.justMinified`** — same behaviour as the other pipelines.
+- **Source maps** — an input ending in a `sourceMappingURL` has its map composed through the pass
+  and written beside the output, so a Sass output post-processed here still traces to its `.scss`.
+  An input carrying no map produces none.
 
 Pass options to a plugin with the tuple form:
 

@@ -59,6 +59,12 @@ from the next release on.
   every built file, which reads as Poops being broken rather than as a field you never
   filled in. The token is now left as written, naming what is missing.
 
+- **A PostCSS pass no longer leaves a stale source map beside its output.** Poops wrote the
+  processed CSS and threw away the map PostCSS had composed for it, so whatever map the Sass
+  stage left on disk stayed there describing lines the pass had since moved — a debugger
+  pointing confidently at the wrong rule. The composed map is now written next to the output,
+  shifted past the banner line like every other stage. An input with no map still produces none.
+
 ## [2.2.0] - 2026-08-07 — a dependency vouches for a config key, the heading anchor leaves the tab order
 
 A companion's block passed in silence only when you depended on the companion by

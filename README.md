@@ -545,6 +545,8 @@ Each PostCSS entry has the following properties:
 - `minify` - whether to minify the output using `esbuild`. Default is `false`
 - `justMinified` - output only the minified file. Default is `false`
 
+**Source maps:** an input CSS ending in a `sourceMappingURL` has its map composed with the one PostCSS produces, written next to the output. Point `in` at a Sass output built with `"sourcemap": true` and a rule still traces to the `.scss` line it came from, through both passes. An input carrying no map produces none.
+
 `postcss` property can accept an array of configurations or a single configuration:
 
 ```json

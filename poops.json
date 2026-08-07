@@ -37,11 +37,10 @@
   }],
   "styles": [{
     "in": "example/src/scss/index.scss",
-    "out": "example/dist/css/styles.css",
+    "out": "example/.tmp/styles.css",
     "options": {
       "sourcemap": true,
-      "minify": true,
-      "justMinified": false,
+      "minify": false,
       "tokenPaths": ["example/src/tokens"]
     }
   }, {
@@ -50,6 +49,20 @@
     "options": {
       "minify": true,
       "justMinified": true
+    }
+  }],
+  "postcss": [{
+    "in": "example/.tmp/styles.css",
+    "out": "example/dist/css/styles.css",
+    "options": {
+      "plugins": [
+        ["@fullhuman/postcss-purgecss", {
+          "content": ["example/dist/**/*.html", "example/dist/js/*.js"]
+        }],
+        ["postcss-discard-comments", { "removeAll": true }]
+      ],
+      "minify": true,
+      "justMinified": false
     }
   }],
   "markup": {

@@ -1,5 +1,6 @@
 node_modules
 example/dist
+example/.tmp
 .DS_Store
 .vscode
 .claude
