@@ -82,7 +82,7 @@ It uses a simple config file where you define your input and output paths and it
 - Generates a JSON search index, `sitemap.xml`, `llms.txt`, `robots.txt` and a navigation tree from your pages
 - RSS and Atom feeds from any collection, no feed template to hand-author
 - Responsive image processing — resize, WebP/AVIF, crops, EXIF — via the optional [poops-images](https://github.com/stamat/poops-images)
-- Shell hooks per pipeline stage, so a post-processor runs on every rebuild and not just on `poops -b`
+- Shell hooks before and after every pipeline stage, so a generator or a post-processor runs on every rebuild and not just on `poops -b`
 - Has a configurable local server (optional)
 - Rebuilds on file changes (optional)
 - Live reloads on file changes (optional)
@@ -281,7 +281,7 @@ Your editor cannot see your `node_modules`, so the schema cannot make that disti
 
 A companion that owns a block describes it in its own schema — septic does — and `$schema` takes one URL, so having both checked means composing them in a local file. Each package's README carries its schema URL and that two-line `allOf`; this one deliberately does not repeat them, since a URL copied into two repos is a URL that goes stale in one.
 
-The schema is hand-written and version-controlled beside the code, so it can drift from it. Poops' own test suite validates it against the draft-07 meta-schema, then validates `poops.json` and every complete example in this README and the documentation site against it — so an example that stops being valid config fails the build. Its top-level keys are asserted to be exactly the set `poops.js` accepts, its `exec` stages exactly the ones that fire, and its `markup.options` a superset of the ones the markup engine reads. A per-entry `options` object — mostly esbuild's and PostCSS's, not Poops' — has no such list, so a wrong type there is caught but a missing option is not. If the editor does not offer an option this page documents, the schema is behind and that is worth reporting.
+The schema is hand-written and version-controlled beside the code, so it can drift from it. Poops' own test suite validates it against the draft-07 meta-schema, then validates `poops.json` and every complete example in this README and the documentation site against it — so an example that stops being valid config fails the build. Its top-level keys are asserted to be exactly the set `poops.js` accepts, its `exec` keys exactly the ones that fire, and its `markup.options` a superset of the ones the markup engine reads. A per-entry `options` object — mostly esbuild's and PostCSS's, not Poops' — has no such list, so a wrong type there is caught but a missing option is not. If the editor does not offer an option this page documents, the schema is behind and that is worth reporting.
 
 ### Scripts
 
@@ -1703,11 +1703,12 @@ You can specify a list of input paths and pass them to an output directory, for 
 
 ### Exec (optional)
 
-Shell commands to run after a pipeline stage compiles — a post-processor that needs the built output, like stripping comments from the unminified CSS or regenerating a reference page. `exec` is keyed by stage, each value a command string or an array of them run in order:
+Shell commands to run around a pipeline stage compiling — a generator that has to write before the stage reads, like fetching content the templates render, or a post-processor that needs the built output, like stripping comments from the unminified CSS. `exec` is keyed by stage, each value a command string or an array of them run in order. A bare stage key runs **after** the stage, `pre:<stage>` runs **before** it:
 
 ```json
 {
   "exec": {
+    "pre:markup": "node script/fetch-posts.mjs",
     "styles": [
       "node script/strip-css-comments.mjs dist/styles.css",
       "node script/gen-reference.mjs"
@@ -1717,27 +1718,31 @@ Shell commands to run after a pipeline stage compiles — a post-processor that 
 }
 ```
 
-Why not just chain `poops -b && cmd` in an npm script: the hook runs on **every** rebuild, watch mode included, so the post-processed output never drifts while you work.
+Why not just chain `cmd && poops -b && cmd` in an npm script: the hooks run on **every** rebuild, watch mode included, so neither the generated input nor the post-processed output drifts while you work.
 
 **Stages:**
 
-| Stage     | Runs after                                                                     |
-| --------- | ------------------------------------------------------------------------------ |
-| `styles`  | the CSS is final — after PostCSS, in build and in watch alike                   |
-| `scripts` | scripts compile                                                                |
-| `reactor` | reactor components render. Build only — a watch re-render fires `markup`        |
-| `images`  | images process                                                                 |
-| `markup`  | markup renders                                                                 |
-| `copy`    | files copy                                                                     |
-| `build`   | once, after the full initial pipeline — not again on a watch rebuild            |
+| Stage     | `pre:` runs before                                                             | the bare key runs after                                                 |
+| --------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| `styles`  | Sass compiles                                                                  | the CSS is final — past PostCSS, in build and in watch alike             |
+| `scripts` | scripts compile                                                                | scripts compile                                                          |
+| `reactor` | reactor components render. Build only — a watch re-render fires `markup`       | reactor components render. Build only, same reason                       |
+| `images`  | images process                                                                 | images process                                                           |
+| `markup`  | markup renders                                                                 | markup renders                                                           |
+| `copy`    | files copy                                                                     | files copy                                                               |
+| `build`   | once, before the pipeline starts — not again on a watch rebuild                | once, after the full initial pipeline — not again on a watch rebuild      |
 
-Commands run from the project root, synchronously, with their output streaming live. A failing command fails a `poops -b` build's exit code; in watch it is logged and swallowed so the watcher survives. A key that is not one of the stages above never runs, so Poops names it at startup rather than letting the hook silently no-op:
+Note the asymmetry on `styles`: the pair brackets the whole style pipeline, so `pre:styles` fires ahead of Sass while `styles` fires past PostCSS.
+
+`post:<stage>` is the explicit spelling of the bare key, for configs that read better with `pre:markup` above `post:markup` than above something that looks like a typo. It is an alias, not a third hook — but a config setting both fires both, bare first.
+
+Commands run from the project root, synchronously, with their output streaming live. A failing command fails a `poops -b` build's exit code; in watch it is logged and swallowed so the watcher survives. A key that is not one of the stages above, in one of the three spellings, never runs — so Poops names it at startup rather than letting the hook silently no-op:
 
 ```
-[exec][warn] unknown stage "style" — never runs. Valid: reactor, scripts, images, markup, styles, copy, build
+[exec][warn] unknown stage "style" — never runs. Valid: reactor, scripts, images, markup, styles, copy, build — each also as pre:<stage> and post:<stage>
 ```
 
-If you have nothing to post-process, remove the `exec` property from the config.
+If you have nothing to generate or post-process, remove the `exec` property from the config.
 
 ### Banner (optional)
 

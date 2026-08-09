@@ -45,6 +45,17 @@ from the next release on.
 
 ### Added
 
+- **`exec` hooks can run before a stage, not only after it.** A generator that has to write
+  before the stage reads — fetching posts the templates render, writing a data file — had
+  nowhere to go. Hijacking an earlier stage's hook worked in a build, where the pipeline order
+  put it first, and then silently stopped working in watch, because a markup-only edit never
+  fires the earlier stage. Every stage now also takes `pre:<stage>`, fired in build and watch
+  alike: `"pre:markup": "node script/fetch-posts.mjs"`. `pre:build` runs once before the
+  pipeline starts, which is where clearing `dist` or fetching content belongs, and `pre:styles`
+  fires ahead of Sass — the pair brackets the whole style pipeline, since `styles` fires past
+  PostCSS. `post:<stage>` is accepted as the explicit spelling of a bare `<stage>`, so a config
+  can read `pre:markup` above `post:markup` instead of above something that looks like a typo.
+
 - **`markup.options.site` values are filled from `package.json`, with the same tokens a
   banner uses.** `"footer": "MyLib v{{ version }} — MIT licensed"` now prints the version
   the manifest holds, filled at build time from the one place it lives. `{{ name }}`,

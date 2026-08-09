@@ -60,8 +60,8 @@ pipeline you can opt into or ignore:
 
 Poops is not a plugin ecosystem. There is no plugin API to learn, no `poops.config.js` with
 callbacks. If a feature isn't built in, you compose it from the pipelines above (for example,
-PostCSS for Tailwind) or you contribute it. That constraint is the point — the config stays
-small and readable.
+PostCSS for Tailwind), hang a shell command off a stage with [`exec`](config-reference#exec), or
+you contribute it. That constraint is the point — the config stays small and readable.
 
 ## Who it's for
 

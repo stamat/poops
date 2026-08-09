@@ -52,7 +52,7 @@ deep dive; everything else is documented in full on this page.
 | `markup.nav`         | Navigation-tree data                              | [↓](#markup-nav)         |
 | `markup.feed`        | RSS / Atom feed from a collection                 | [↓](#markup-feed)        |
 | `copy`               | Copy static assets into the output                | [↓](#copy)               |
-| `exec`               | Shell hooks run after a pipeline stage            | [↓](#exec)               |
+| `exec`               | Shell hooks run before or after a pipeline stage  | [↓](#exec)               |
 | `banner`             | Comment stamped on every output file              | [↓](#banner)             |
 | `serve`              | Local dev server                                  | [↓](#serve)              |
 | `livereload`         | Reload the browser on changes                     | [↓](#livereload)         |
@@ -151,7 +151,7 @@ not repeat them, since a URL copied into two repos is a URL that goes stale in o
 > The schema is hand-written, so it can drift from the code. Poops' test suite validates it
 > against the draft-07 meta-schema, then validates its own `poops.json` and every complete example
 > on this site against it. Its top-level keys are asserted to be exactly the set the CLI accepts,
-> its `exec` stages exactly the ones that fire, and its `markup.options` a superset of what the
+> its `exec` keys exactly the ones that fire, and its `markup.options` a superset of what the
 > markup engine reads. A per-entry `options` object — mostly esbuild's and PostCSS's, not Poops' —
 > has no such list, so if the editor does not offer an option this page documents, the schema is
 > behind, and that is worth reporting.
@@ -348,13 +348,16 @@ like `[[:alpha:]]`):
 
 ## `exec`
 
-Shell commands to run after a pipeline stage compiles — a post-processor that needs the built
-output, like stripping comments from the unminified CSS or regenerating a reference page. Keyed
-by stage, each value a command string or an array run in order:
+Shell commands to run around a pipeline stage compiling — a generator that has to write before
+the stage reads, like fetching content the templates render, or a post-processor that needs the
+built output, like stripping comments from the unminified CSS. Keyed by stage, each value a
+command string or an array run in order. A bare stage key runs **after** the stage, `pre:<stage>`
+runs **before** it:
 
 ```json
 {
   "exec": {
+    "pre:markup": "node script/fetch-posts.mjs",
     "styles": [
       "node script/strip-css-comments.mjs dist/styles.css",
       "node script/gen-reference.mjs"
@@ -364,22 +367,29 @@ by stage, each value a command string or an array run in order:
 }
 ```
 
-Unlike chaining `poops -b && cmd` in an npm script, the hook runs on **every** rebuild — in
-watch/dev too — so the post-processed output never drifts while you work. Commands run from the
-project root; a failing command fails a `-b` build's exit code but is logged and swallowed in
-watch so the watcher survives.
+Unlike chaining `cmd && poops -b && cmd` in an npm script, the hooks run on **every** rebuild — in
+watch/dev too — so neither the generated input nor the post-processed output drifts while you
+work. Commands run from the project root; a failing command fails a `-b` build's exit code but is
+logged and swallowed in watch so the watcher survives.
 
 Stages:
 
-| Stage     | Runs after                                                              |
-| --------- | ----------------------------------------------------------------------- |
-| `styles`  | CSS is final (after PostCSS) — use this for anything reading the built CSS |
-| `scripts` | scripts compile                                                         |
-| `reactor` | reactor components render (build only)                                  |
-| `images`  | images process                                                         |
-| `markup`  | markup renders                                                         |
-| `copy`    | files copy                                                             |
-| `build`   | once, after the full initial pipeline (not per watch rebuild)          |
+| Stage     | `pre:` runs before                        | the bare key runs after                                                    |
+| --------- | ----------------------------------------- | --------------------------------------------------------------------------- |
+| `styles`  | Sass compiles                             | CSS is final (past PostCSS) — use this for anything reading the built CSS   |
+| `scripts` | scripts compile                           | scripts compile                                                             |
+| `reactor` | reactor components render (build only)    | reactor components render (build only)                                      |
+| `images`  | images process                            | images process                                                              |
+| `markup`  | markup renders                            | markup renders                                                              |
+| `copy`    | files copy                                | files copy                                                                  |
+| `build`   | once, before the pipeline starts          | once, after the full initial pipeline (neither per watch rebuild)           |
+
+`styles` is the one asymmetric pair, and deliberately: it brackets the whole style pipeline, so
+`pre:styles` fires ahead of Sass while `styles` fires past PostCSS.
+
+`post:<stage>` is the explicit spelling of the bare key, for configs that read better with
+`pre:markup` above `post:markup` than above something that looks like a typo. It is an alias, not
+a third hook — though a config setting both fires both, bare first.
 
 ## `banner`
 

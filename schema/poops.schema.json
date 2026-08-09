@@ -358,16 +358,30 @@
 
     "exec": {
       "type": "object",
-      "description": "A command, or an array of commands run in order, per stage. Commands run from the project root; a failure fails a `poops -b` build's exit code, and is logged and swallowed in watch so the watcher survives.",
+      "description": "A command, or an array of commands run in order, per stage. A bare stage key runs after the stage, `post:` is its explicit spelling, `pre:` runs before it instead. Commands run from the project root; a failure fails a `poops -b` build's exit code, and is logged and swallowed in watch so the watcher survives.",
       "additionalProperties": false,
       "properties": {
+        "pre:reactor": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "Before reactor components render (build only)." },
         "reactor": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After reactor components render (build only)." },
+        "post:reactor": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After reactor components render (build only)." },
+        "pre:scripts": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "Before scripts compile." },
         "scripts": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After scripts compile." },
+        "post:scripts": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After scripts compile." },
+        "pre:images": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "Before images process." },
         "images": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After images process." },
+        "post:images": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After images process." },
+        "pre:markup": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "Before markup renders — where a generator writing data the templates read belongs." },
         "markup": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After markup renders." },
+        "post:markup": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After markup renders." },
+        "pre:styles": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "Before Sass compiles — the far end of the style pipeline, since `styles` fires after PostCSS." },
         "styles": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After the CSS is final — this fires after PostCSS, not after Sass." },
+        "post:styles": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After the CSS is final — this fires after PostCSS, not after Sass." },
+        "pre:copy": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "Before files copy." },
         "copy": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After files copy." },
-        "build": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "Once, after the full initial pipeline — not per watch rebuild." }
+        "post:copy": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "After files copy." },
+        "pre:build": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "Once, before the pipeline starts — not per watch rebuild." },
+        "build": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "Once, after the full initial pipeline — not per watch rebuild." },
+        "post:build": { "allOf": [{ "$ref": "#/definitions/command" }], "description": "Once, after the full initial pipeline — not per watch rebuild." }
       }
     },
 
