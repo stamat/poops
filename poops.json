@@ -80,8 +80,8 @@
         "branch": "main",
         "links": [
           { "title": "Docs", "url": "docs/" },
-          { "title": "septic", "url": "https://stamat.info/septic" },
-          { "title": "laxative", "url": "https://stamat.info/laxative" }
+          { "title": "septic", "url": "https://stamat.info/septic", "icon": "<span aria-hidden=\"true\">🚽</span>" },
+          { "title": "laxative", "url": "https://stamat.info/laxative", "icon": "<span aria-hidden=\"true\">💊</span>" }
         ],
         "iconLinks": [
           { "title": "npm", "url": "https://www.npmjs.com/package/poops", "icon": "npm" }
