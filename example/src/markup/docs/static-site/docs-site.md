@@ -168,9 +168,19 @@ The tree is exposed two ways:
 | `order` | Number that sorts a page among its siblings. Unordered pages fall to the bottom, alphabetically. |
 | `navTitle` | Sidebar label that overrides `title`. |
 | `nav: false` | Hide the page from the sidebar (still indexed and in the sitemap). |
+| `navGroup` | Section heading to file the page under, without moving the file or changing its url. |
 
 So a hand-authored sequence wins over alphabetical: give your intro `order: 0`, the next section
 `order: 1`, and so on.
+
+The tree otherwise comes from the url alone, which is why `navGroup` exists: grouping pages that
+live side by side would mean a subdirectory, and a subdirectory means every link to those pages
+changes. `navGroup: "No pattern"` synthesizes a section next to the page's ungrouped siblings and
+nests the page inside it, url untouched. The label is used as written, the section sorts where its
+first child would, and grouping is per directory — the same name in two directories opens two
+sections. A page that is itself a section (a directory's index page, or the homepage) cannot be
+grouped: its subpages would stay behind on the ungrouped path and split the section in two, so
+Poops warns and leaves that page where it is.
 
 ## Rendering the sidebar
 

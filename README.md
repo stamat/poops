@@ -1494,8 +1494,9 @@ The string shorthand sets the output filename. For docs sites, use the object fo
 - `order` — a number that sorts a page within its sibling level (optional). Pages without `order` fall to the bottom, sorted alphabetically by title — so a hand-authored docs sequence (`1`, `2`, `3`) wins over alphabetical. This applies to the homepage too: give it `order: 0` in its front matter to pin it to the top, otherwise it sorts last like any page without `order`.
 - `nav: false` — hide a page from the sidebar (it stays in the search index and sitemap).
 - `navTitle` — a sidebar label that overrides `title`.
+- `navGroup` — a section heading to file the page under, without moving the file. The tree otherwise comes from the url alone, so grouping pages that live side by side used to mean a subdirectory and a changed url. `navGroup: "No pattern"` synthesizes a section beside the page's ungrouped siblings and nests the page in it; the url, and every link to it, stays as it was. The label is used as written, not humanized, and the section sorts where its first child would. Grouping is per directory — the same name in two directories opens two sections, one in each — and a directory named like a group is never merged into it. **`navGroup` is refused, with a warning, on a page that is also a section** (a directory's index page, or the homepage): its subpages would stay behind on the ungrouped path and split the section in two.
 
-**Navigation output format** — each node has a `title`, a `url` (omitted on synthesized section nodes that have no index page of their own), an `order` when set, and `children` when it has subpages:
+**Navigation output format** — each node has a `title`, a `url` (omitted on synthesized section nodes — a directory with no index page of its own, or a `navGroup`), an `order` when set, and `children` when it has subpages:
 
 ```json
 [

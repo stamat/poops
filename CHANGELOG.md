@@ -63,6 +63,17 @@ from the next release on.
   fill the same way, at any depth — a `title` inside `site.links` gets them too — and the
   `pkg` option still says which `package.json` to read.
 
+- **A page can join a sidebar section without moving.** The nav tree is built from urls, so
+  grouping pages that already sit side by side meant a subdirectory — and a subdirectory
+  changes their url, every link pointing at them and every search result that has been
+  indexed, to buy one heading in a sidebar. `navGroup: "No APG pattern"` in front matter
+  synthesizes that section beside the page's ungrouped siblings and nests the page inside it,
+  url untouched. The label is used as written rather than humanized, the section sorts where
+  its first child would, and grouping is per directory — the same name in two directories
+  opens a section in each, instead of one reaching across the tree. A page that is itself a
+  section (a directory's index page, or the homepage) is refused with a warning: its
+  subpages would stay behind on the ungrouped path and split the section in two.
+
 ### Fixed
 
 - **A banner token with no matching `package.json` field no longer prints `undefined`.**

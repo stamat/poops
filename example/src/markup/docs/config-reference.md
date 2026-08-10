@@ -590,7 +590,8 @@ Each node has `title`, `url` (omitted on synthesized section nodes), `order` whe
 ```
 
 Front matter shaping the tree: `order` (sort among siblings), `navTitle` (sidebar label),
-`nav: false` (hide from sidebar). If nothing survives filtering, an empty array is written.
+`nav: false` (hide from sidebar), `navGroup` (a section to file the page under, without changing
+its url). If nothing survives filtering, an empty array is written.
 
 ## `markup.feed`
 
