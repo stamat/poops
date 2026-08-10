@@ -131,6 +131,10 @@
     "hash": "dc3bb9e07749691f4f41cba69c37d809cd319bf8",
     "updated": "2026-08-10T02:02:56.024Z"
   },
+  "example/src/markup/changelog/v2.4.0.md": {
+    "hash": "17f558bf3a5ae928a2299984852d00bc5764a587",
+    "updated": "2026-08-10T18:13:04.481Z"
+  },
   "example/src/markup/docs/comparisons/astro-hugo-next.md": {
     "hash": "9fccb2c6942986d8010c0c123ac4a8837358ec27",
     "updated": "2026-08-05T19:15:00.785Z"
