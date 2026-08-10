@@ -17,6 +17,7 @@ keywords:
     "livereload",
     "watch",
     "includePaths",
+    "lastUpdated",
     "searchIndex",
     "sitemap",
     "llms",
@@ -45,6 +46,7 @@ deep dive; everything else is documented in full on this page.
 | `reactor`            | Render React components to static HTML            | [↓](#reactor)            |
 | `images`             | Responsive image processing                       | [↓](#images)             |
 | `markup`             | Templates → static site                           | [↓](#markup)             |
+| `markup.lastUpdated` | Per-page "last updated" dates, without git        | [↓](#markup-lastupdated) |
 | `markup.searchIndex` | JSON search index of every page                   | [↓](#markup-searchindex) |
 | `markup.sitemap`     | `sitemap.xml` generation                          | [↓](#markup-sitemap)     |
 | `markup.llms`        | `llms.txt` index for LLMs / GEO                    | [↓](#markup-llms)        |
@@ -472,6 +474,27 @@ Paths to resolve imports from (Sass `@use`, script imports). `node_modules` is t
 }
 ```
 
+## `markup.lastUpdated`
+
+Gives every page an `updated` date without hand-maintaining one, and without git. `true` writes
+the index to `.poops-updates.json`; a string names the file.
+
+```json
+{
+  "markup": { "options": { "lastUpdated": true } }
+}
+```
+
+The index holds one content hash per source file. A page's date moves only when its body changes
+— front matter is outside the hash, so a retitle is not an edit — and the date used is the file's
+mtime at that build. Templates read it as `page.updated`; it also feeds `dateModified`,
+`article:modified_time` and the sitemap's `<lastmod>`. A page with its own `updated` in front
+matter keeps it and stays out of the index.
+
+**The index file has to be committed** — it is the entire memory of the feature, and a clone
+without it restamps every page. That also means running a build before you commit; a build prints
+`Updated dates changed for N pages — commit .poops-updates.json` whenever the file moved.
+
 ## `markup.searchIndex`
 
 Writes a JSON search index of every page. A string sets the output filename with defaults; the
@@ -502,7 +525,8 @@ auto-extracted ones. Pages with `published: false` are excluded.
 
 ## `markup.sitemap`
 
-Writes a standard `sitemap.xml` with `<loc>` and `<lastmod>` (from front matter `date`). If
+Writes a standard `sitemap.xml` with `<loc>` and `<lastmod>` (front matter `updated`, falling back
+to `date` — see [`markup.lastUpdated`](#markup-lastupdated)). If
 `site.url` is set, it is prepended to all URLs. Collection index/pagination pages are included
 here but excluded from the search index. A string sets the filename; the object form takes
 `out`.

@@ -49,6 +49,7 @@ It uses a simple config file where you define your input and output paths and it
       - [highlight](#highlight)
       - [pagination](#pagination)
     - [Custom Filters](#custom-filters)
+    - [Last updated dates](#last-updated-dates)
     - [Search Index, Sitemap, llms.txt, robots.txt & Navigation](#search-index-sitemap-llmstxt-robotstxt--navigation)
     - [RSS / Atom feeds](#rss--atom-feeds)
   - [Images (optional)](#images-optional)
@@ -658,6 +659,7 @@ everything else under `options`.
 - `dateFormat` (optional) - the default [dayjs](https://day.js.org/) format the [`date` filter](#custom-filters) uses when called without an argument. With neither set, `date` returns the value untouched rather than guessing a format
 - `autoescape` (optional) - **Nunjucks only.** Escape template output by default, so `{{ value }}` cannot inject HTML and anything meant as markup needs `| safe`. Defaults to `false`, since a static site mostly renders content you wrote. Turn it on when templates interpolate anything you did not. The Liquid engine ignores it — liquidjs does not escape by default and Poops does not make it
 - `collections` (optional) - the collections to build, if you would rather declare them here than in front matter. See [Collections & Pagination](#collections--pagination)
+- `lastUpdated` (optional) - keep a "last updated" date per page without hand-maintaining one. `true` writes the index to `.poops-updates.json`; a string names the file. See [Last updated dates](#last-updated-dates)
 
 > [!TIP]
 > If, for instance, you are building a simple static onepager for your library, and want to pass a version variable from your `package.json`, Poops automatically reads your `package.json` if it exists in your working directory and sets the global variable `package` to the parsed JSON. So you can use it in your markup files, for example like this: `{{ package.version }}`.
@@ -1349,6 +1351,51 @@ Pass a named crop/resize group as the second argument to get that group's srcset
   {% endfor %}
   ```
 
+#### Last updated dates
+
+A page can always carry its own `updated` in front matter, and Poops uses it for `dateModified`, `article:modified_time` and the sitemap's `<lastmod>`. Keeping it right by hand is the part nobody does.
+
+The file's modification time can't stand in for it: `git clone` sets every file's mtime to checkout time, so on CI every page reads as edited today. `lastUpdated` keeps an index of content hashes instead — a page's date only moves when its body actually changes, and every build after that reads the same date back:
+
+```json
+{
+  "markup": {
+    "in": "src/markup",
+    "out": "dist",
+    "options": {
+      "lastUpdated": true
+    }
+  }
+}
+```
+
+That writes `.poops-updates.json` in your project root; a string names a different file. Pages get `page.updated`, so a template prints it like any other field:
+
+```nunjucks
+{% if page.updated %}<p>Last updated {{ page.updated | date("D MMMM YYYY") }}</p>{% endif %}
+```
+
+**Commit the index file.** It is the entire memory of the feature — the dates only survive a clone if it travels with the pages it describes. A build says so whenever it changes:
+
+```
+[markup] Updated dates changed for 3 pages — commit .poops-updates.json
+```
+
+That also means a build has to run before you commit. Commit an edit without one and the index is a build behind: the next build to see that page stamps it with whatever mtime it then has, which on CI is clone time.
+
+What moves a date and what doesn't:
+
+| Change to a page               | Date moves | Why                                                        |
+| ------------------------------ | ---------- | ---------------------------------------------------------- |
+| Body edited                    | yes        | the hash covers the body                                   |
+| Title, tags, any front matter  | no         | front matter sits outside the hash — retagging isn't editing |
+| File touched, content the same | no         | mtime is not the signal, the hash is                       |
+| Reformatted, one space added   | yes        | a hash can't tell a typo fix from a rewrite                |
+| `updated` written by hand      | no         | yours wins, and that page stays out of the index entirely  |
+| Page deleted                   | —          | its entry is dropped on the next full build                |
+
+The date itself is the file's mtime at the build that first saw the change — the real edit time, taken on the machine that made the edit.
+
 #### Search Index, Sitemap, llms.txt, robots.txt & Navigation
 
 Poops can automatically generate a JSON search index, an XML sitemap, an `llms.txt`, a `robots.txt` and a navigation tree from your compiled pages. All are generated in a single pass during the markup compilation phase.
@@ -1424,7 +1471,7 @@ All front matter fields are passed through to the index automatically. Internal 
 ]
 ```
 
-**Sitemap** generates a standard `sitemap.xml` with `<loc>` and `<lastmod>` (from front matter `date`). If `site.url` is set in your markup config, it is prepended to all URLs. Collection index/pagination and taxonomy term pages are included in the sitemap but excluded from the search index.
+**Sitemap** generates a standard `sitemap.xml` with `<loc>` and `<lastmod>` (front matter `updated`, falling back to `date`; see [Last updated dates](#last-updated-dates)). If `site.url` is set in your markup config, it is prepended to all URLs. Collection index/pagination and taxonomy term pages are included in the sitemap but excluded from the search index.
 
 **llms.txt** generates an [`llms.txt`](https://llmstxt.org) — a Markdown index of your pages that LLMs and generative engines (GEO) read to understand your site. It has an `# H1` title, a `> ` blockquote summary, then `- [title](url): description` links grouped by URL path: the first folder is a `## section`, a second folder nests as a `### subsection` under it, and root-level pages fall under a lead "Pages" section. So `docs/config-reference.html` lands directly under `## Docs` while `docs/quick-start/x.html` lands under `### Quick Start` inside it. Collection items (which live under `collection/…`) group the same way and are ordered newest-first by their `date`; other sections keep file order. Set `intro` to a Markdown file path (relative to the project root) to insert free-form context between the blockquote and the link sections — a file authored for LLMs, e.g. `llms-intro.md`. Avoid `##` headings in it; they read as sections. (A raw README is a poor fit — badges, install noise and its own headings collide.) `title` and `description` default to your `site.title`/`site.description`; override them (and the lead section name via `sectionTitle`) with the object form. `site.url` makes the links absolute. Collection index/pagination pages are skipped, like the search index.
 

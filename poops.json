@@ -99,6 +99,7 @@
       "dateFormat": "MMM D, YYYY",
       "searchIndex": "search-index.json",
       "sitemap": "sitemap.xml",
+      "lastUpdated": "meta/updates.json",
       "llms": {
         "out": "llms.txt",
         "intro": "example/src/llms-intro.md",

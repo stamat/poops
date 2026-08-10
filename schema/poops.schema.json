@@ -461,6 +461,11 @@
           "description": "Escape template output by default.",
           "default": false
         },
+        "lastUpdated": {
+          "description": "Per-page `updated` dates from a committed index of content hashes, no git needed. `true` writes `.poops-updates.json`; a string names the file. Commit it — it is where the dates live.",
+          "oneOf": [{ "type": "boolean" }, { "type": "string" }],
+          "default": false
+        },
         "searchIndex": { "$ref": "#/definitions/searchIndex" },
         "sitemap": { "$ref": "#/definitions/sitemap" },
         "llms": { "$ref": "#/definitions/llms" },
