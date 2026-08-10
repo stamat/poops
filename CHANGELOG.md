@@ -36,7 +36,9 @@ release, verbatim — no notes to paste in by hand. **A post you wrote by hand a
 overwritten** — that is the escape hatch for releases whose post is a live demo,
 which is most of them here. Write the post first, then the entry.
 
-## [Unreleased] — site config carries the banner's package.json tokens
+## [Unreleased]
+
+## [2.3.0] - 2026-08-10 — site config carries the banner's package.json tokens
 
 A footer wanting to print your version had nowhere to get it. `poops.json` is
 JSON, so a value cannot compute one, and a theme rendering `site.footer` renders
