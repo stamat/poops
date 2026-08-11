@@ -36,7 +36,9 @@ release, verbatim — no notes to paste in by hand. **A post you wrote by hand a
 overwritten** — that is the escape hatch for releases whose post is a live demo,
 which is most of them here. Write the post first, then the entry.
 
-## [Unreleased] — metadata describes what the reader gets
+## [Unreleased]
+
+## [2.5.0] - 2026-08-11 — metadata describes what the reader gets
 
 A page whose body was built from template tags described itself with their
 source. `# {{ site.title }}` over `{{ site.description }}` shipped an
