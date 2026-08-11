@@ -300,6 +300,34 @@ passed: Nunjucks uses parentheses `{% raw %}{{ x | filter("arg") }}{% endraw %}`
 `srcset`, `exif` and `images` need the [poops-images](https://github.com/stamat/poops-images)
 compile cache — see [Images & galleries](../static-site/images-gallery).
 
+### Escaping: put `escape` on every value you write into an attribute
+
+Poops renders with [`autoescape`](../config-reference) off, because a static site mostly renders
+content you wrote, and turning it on would mean `{% raw %}| safe{% endraw %}` on `content`, on
+`markdown`, and on every bundled filter that returns HTML. The cost is that a value you interpolate
+yourself lands verbatim:
+
+```nunjucks
+{% raw %}<meta name="robots" content="{{ page.robots }}">{% endraw %}
+```
+
+Front matter of `robots: 'noindex" onload="x'` makes that
+`<meta name="robots" content="noindex" onload="x">` — the attribute closed by its own content, and a
+second one appended. Prose does this by accident: one `"` in a sentence truncates the value to the
+words before it, on a green build, with nothing to see until someone reads the page's source. Both
+engines ship `escape`, and it works whether or not `autoescape` is on:
+
+```nunjucks
+{% raw %}<meta name="robots" content="{{ page.robots | escape }}">{% endraw %}
+```
+
+The rule is per attribute, not per page: `href`, `alt`, `aria-label`, `title`, `content`,
+`datetime` — anything where a `"` would end the value early. Element text is safer (a `"` between
+tags is just a quote) but a `<` still opens a tag, so escape a title that can contain one.
+
+The bundled `description`, `og`, `canonical`, `jsonld` and `breadcrumb` filters escape what they
+emit, which is the reason to prefer them over hand-writing those tags.
+
 ### Social & structured data (Open Graph, JSON-LD)
 
 Four filters turn a page's front matter into the metadata search engines, generative engines (GEO)
