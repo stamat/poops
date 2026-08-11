@@ -110,10 +110,10 @@ engine can support, skip the rest.
 | `pagesDependingOn(file)` | Return the page paths whose last render loaded `file` — powers incremental rebuilds: only affected pages re-render on a partial/layout edit. | Any markup edit triggers a full markup compile. |
 | `replaceOutExtensions(outputPath)` | Remap the output filename's extension when your engine's source extension differs from the emitted one. | Poops's default extension mapping applies. |
 | `isMarkupSource(absPath)` | Claim a file the glob wouldn't classify as markup (engine-specific source formats), so watch routes its changes to the markup pipeline. | Only `markupExtensions` matches count. |
+| `renderString(source, context)` | Render a template string, awaited. Poops uses it to resolve a page body whose first paragraph is template tags, so the auto-`excerpt` describes what a reader gets. | Such a page gets an empty `excerpt`, and `og`/`jsonld` fall back to `site.description`. |
 
-`renderString` and `fileExtension` exist on the builtin engines but the
-pipeline never calls them — don't rely on them, don't feel obliged to
-implement them.
+`fileExtension` exists on the builtin engines but the pipeline never calls
+it — don't rely on it, don't feel obliged to implement it.
 
 ## Reference implementations
 

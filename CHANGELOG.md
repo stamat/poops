@@ -36,7 +36,38 @@ release, verbatim — no notes to paste in by hand. **A post you wrote by hand a
 overwritten** — that is the escape hatch for releases whose post is a live demo,
 which is most of them here. Write the post first, then the entry.
 
-## [Unreleased]
+## [Unreleased] — metadata describes what the reader gets
+
+A page whose body was built from template tags described itself with their
+source. `# {{ site.title }}` over `{{ site.description }}` shipped an
+`og:description` reading "site.description" and an anchor at `#site-title`,
+while the page itself rendered the real title and the real description right
+underneath. The build stayed green through both, and the only symptom was a link
+preview nobody looks at until someone shares the page.
+
+### Fixed
+
+- **`page.excerpt` is taken after the template engine has run.** A first
+  paragraph written as `{{ site.description }}`, or supplied by an
+  `{% include %}` ahead of the prose, is resolved before the text is taken, so
+  the description is the one a reader gets. The excerpt now reads the rendered
+  body's first `<p>` rather than guessing at the markdown source — headings,
+  comments, code fences and tables are skipped because they are not paragraphs,
+  and link text comes through without its URL. When nothing usable resolves the
+  excerpt is empty and `og`/`jsonld`/`<meta name="description">` fall through to
+  `site.description` — the old behaviour was to strip the braces and ship
+  `site.description` as a literal string, which then beat the very value it was
+  standing in front of. Only pages whose first paragraph is a tag pay for the
+  extra render.
+
+  A collection item is read without a page context, so its `excerpt` is empty in
+  that case rather than resolved; listings and feeds fall back to the item's
+  `description`. The item's own page still resolves it.
+
+- **Heading `id`s are slugged from the rendered heading.** `# {{ site.title }}`,
+  `# {{ page.title }}` and `# My Site` now all anchor at `#my-site`, so swapping
+  which variable feeds a heading no longer remints every bookmarked URL. The
+  `toc` filter slugs from the same text, so its links still land.
 
 ## [2.4.0] - 2026-08-10 — last updated dates that survive a clone
 

@@ -869,6 +869,8 @@ sort: date
 - `date` - falls back to the file's modification time if not set, with a build warning. Set a real `date` in front matter — mtime is meaningless on CI checkouts (git clone resets it), so undated posts will reshuffle between deploys.
 - `wordcount`, `excerpt` (first paragraph, plain text — a meta-description fallback), `fileName`, `filePath`, `collection`
 
+  A collection item is read without a page context, so an item whose first paragraph is built from template tags gets an empty `excerpt` rather than a guess — listings and feeds fall back to its `description`. The same page gets its excerpt resolved when it is built on its own.
+
 An item with `published: false` in its front matter is excluded from the collection and its page is not built.
 
 **Using collections in templates.** Every collection is available as a global variable named after it, on every page:
@@ -1173,7 +1175,7 @@ All filters are available in both engines. The only syntax difference is how arg
 
 - `jsonify` — serializes a value to JSON. Usage: `{{ myObject | jsonify }}`
 
-- `markdown` — renders a markdown string to HTML with GitHub Flavored Markdown extras: emoji shortcodes (e.g. `:rocket:` → 🚀), alert callouts (`> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`, `[!INFO]`) and footnotes (`[^1]`). Code fences are syntax-highlighted and headings get slug `id`s plus permalink anchors. Usage: `{{ "**bold** :rocket:" | markdown }}`
+- `markdown` — renders a markdown string to HTML with GitHub Flavored Markdown extras: emoji shortcodes (e.g. `:rocket:` → 🚀), alert callouts (`> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`, `[!INFO]`) and footnotes (`[^1]`). Code fences are syntax-highlighted and headings get slug `id`s plus permalink anchors — a heading built from a template tag is slugged from the words it renders, not from the tag, so `# {{ site.title }}` and `# {{ page.title }}` anchor wherever `# My Site` would. Usage: `{{ "**bold** :rocket:" | markdown }}`
 
 - `toc` — builds an on-this-page table of contents from rendered HTML: a `<nav class="toc" aria-label="On this page">` listing every `<h2>` and `<h3>` that has an `id`, each `<li>` classed `toc-h2`/`toc-h3` so you indent with CSS rather than nested lists. It reads the same ids the markdown heading renderer emits, so the links always land. Headings classed `sr-only` are skipped — a visible entry pointing at invisible content only confuses. Returns an empty string when there is nothing to list. Feed it **rendered** HTML: on a Markdown source, run `markdown` first, or code fences containing `#` lines get read as headings. Usage: `{{ page.content | markdown | toc }}`
 
@@ -1199,7 +1201,7 @@ All filters are available in both engines. The only syntax difference is how arg
   - Nunjucks: `{{ page | og(site) }}`
   - Liquid: `{{ page | og: site }}`
 
-  Emits `og:title`, `og:description` (a missing `description` falls back to the page's auto-`excerpt`, then `site.description`), `og:type`, `og:url` (made absolute with `site.url`), `og:site_name` (from `site.title`), `og:locale` (`page.lang`/`site.lang`), `og:image` (`page.image`/`site.image`, made absolute), and `twitter:card` (`summary_large_image` when there's an image, else `summary`). For articles it adds `article:published_time`, `article:modified_time` and `article:author`. Attribute values are escaped. Set an `og` object in front matter to add or override any tag (e.g. `og:image:alt`, a fixed `twitter:card`):
+  Emits `og:title`, `og:description` (a missing `description` falls back to the page's auto-`excerpt`, then `site.description` — the excerpt is taken after the template engine has run, so a first paragraph written as `{{ site.description }}` or supplied by an `{% include %}` is resolved, and one that resolves to nothing usable falls through rather than shipping the tag's source text), `og:type`, `og:url` (made absolute with `site.url`), `og:site_name` (from `site.title`), `og:locale` (`page.lang`/`site.lang`), `og:image` (`page.image`/`site.image`, made absolute), and `twitter:card` (`summary_large_image` when there's an image, else `summary`). For articles it adds `article:published_time`, `article:modified_time` and `article:author`. Attribute values are escaped. Set an `og` object in front matter to add or override any tag (e.g. `og:image:alt`, a fixed `twitter:card`):
 
   ```yaml
   ---

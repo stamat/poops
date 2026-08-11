@@ -35,11 +35,19 @@ Common fields: `title`, `description`, `layout`, `date`, `order`, `published`, `
 Any custom field you add is yours to use in templates and it flows into the search index.
 
 Poops also computes read-only fields on `page`: `content` (the rendered body), `url`, `wordcount`,
-`excerpt`, and `filePath`. `excerpt` is the first prose paragraph as plain text (headings and
-comments skipped, capped at 160 chars) — use it as the fallback for a missing `description`, e.g. in
+`excerpt`, and `filePath`. `excerpt` is the first prose paragraph as plain text (headings, comments
+and code skipped, capped at 160 chars) — use it as the fallback for a missing `description`, e.g. in
 the meta tag below or the `og`/`jsonld` filters. `filePath` is the source file's path relative to
 your project root (posix separators), for building "Edit on GitHub" links — see
 [Building a documentation site](docs-site).
+
+The excerpt describes what a reader gets, so it is taken after the template engine has run: a first
+paragraph written as `{% raw %}{{ site.description }}{% endraw %}`, or supplied by an
+`{% raw %}{% include %}{% endraw %}`, is resolved before the text is taken. When it resolves to
+nothing usable the excerpt is empty and `description` falls through to `site.description` — never to
+the tag's source text. Heading `id`s come from the same place: a heading written as
+`{% raw %}# {{ site.title }}{% endraw %}` anchors at the words it renders, so swapping which
+variable feeds it does not remint the URL.
 
 ## Layouts
 
