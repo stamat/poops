@@ -45,6 +45,19 @@ while the page itself rendered the real title and the real description right
 underneath. The build stayed green through both, and the only symptom was a link
 preview nobody looks at until someone shares the page.
 
+### Added
+
+- **A `description` filter emits `<meta name="description">`, escaped.**
+  `{{ page | description(site) }}` (Liquid: `{{ page | description: site }}`)
+  reads the same chain `og` and `jsonld` do — front matter `description`, then
+  the page's auto-`excerpt`, then `site.description` — so the three cannot
+  disagree, and emits nothing when none of them is set. Poops renders with
+  autoescape off, so a layout writing that tag by hand ships the front matter
+  verbatim: one `"` in a sentence closes the attribute and truncates the
+  description to the words before it, silently, on a green build. Poops' own
+  v2.4.0 post described itself as `A ` for exactly that reason. Escaping now
+  happens in one named place rather than in every layout that remembers.
+
 ### Fixed
 
 - **`page.excerpt` is taken after the template engine has run.** A first

@@ -36,9 +36,9 @@ Any custom field you add is yours to use in templates and it flows into the sear
 
 Poops also computes read-only fields on `page`: `content` (the rendered body), `url`, `wordcount`,
 `excerpt`, and `filePath`. `excerpt` is the first prose paragraph as plain text (headings, comments
-and code skipped, capped at 160 chars) — use it as the fallback for a missing `description`, e.g. in
-the meta tag below or the `og`/`jsonld` filters. `filePath` is the source file's path relative to
-your project root (posix separators), for building "Edit on GitHub" links — see
+and code skipped, capped at 160 chars) — the fallback for a missing `description`, used by the
+`description`, `og` and `jsonld` filters. `filePath` is the source file's path relative to your
+project root (posix separators), for building "Edit on GitHub" links — see
 [Building a documentation site](docs-site).
 
 The excerpt describes what a reader gets, so it is taken after the template engine has run: a first
@@ -60,7 +60,7 @@ Nunjucks layout defines a `content` block:
 <head>
   <meta charset="UTF-8">
   <title>{{ page.title or site.title }}</title>
-  <meta name="description" content="{{ page.description or page.excerpt or site.description }}">
+  {{ page | description(site) }}
   <link rel="stylesheet" href="{{ relativePathPrefix }}css/styles.min.css">
 </head>
 <body>

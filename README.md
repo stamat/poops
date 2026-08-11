@@ -1217,6 +1217,10 @@ All filters are available in both engines. The only syntax difference is how arg
   - Nunjucks: `{{ page | canonical(site) }}`
   - Liquid: `{{ page | canonical: site }}`
 
+- `description` — generates the `<meta name="description">` tag, from the same chain `og` and `jsonld` use: front matter `description`, then the page's auto-`excerpt`, then `site.description`. Put it in your layout `<head>`. Returns nothing when none of the three is set. **Prefer it over writing the tag by hand:** Poops renders with autoescape off, so `content="{{ page.description }}"` ships the front matter verbatim, and one `"` in a sentence closes the attribute and truncates the description to the words before it.
+  - Nunjucks: `{{ page | description(site) }}`
+  - Liquid: `{{ page | description: site }}`
+
 - `jsonld` — generates a schema.org JSON-LD `<script type="application/ld+json">` block from a page's front matter and your `site` data, for GEO (Generative Engine Optimization) and structured data. Put it in your layout `<head>`. The `@type` auto-detects: `BlogPosting` when the page has a `date`, otherwise `WebPage`.
   - Nunjucks: `{{ page | jsonld(site) }}`
   - Liquid: `{{ page | jsonld: site }}`

@@ -291,6 +291,7 @@ passed: Nunjucks uses parentheses `{% raw %}{{ x | filter("arg") }}{% endraw %}`
 | `srcset` | build a `srcset` for an image | `{% raw %}{{ 'photo.jpg' \| srcset }}{% endraw %}` |
 | `exif` | EXIF object for an image | `{% raw %}{{ 'photo.jpg' \| exif }}{% endraw %}` |
 | `images` | list images in a directory | `{% raw %}{{ 'static/img' \| images }}{% endraw %}` |
+| `description` | `<meta name="description">`, escaped | `{% raw %}{{ page \| description(site) }}{% endraw %}` |
 | `og` | Open Graph + Twitter card `<meta>` | `{% raw %}{{ page \| og(site) }}{% endraw %}` |
 | `canonical` | `<link rel="canonical">` dedup tag | `{% raw %}{{ page \| canonical(site) }}{% endraw %}` |
 | `jsonld` | schema.org JSON-LD for GEO | `{% raw %}{{ page \| jsonld(site) }}{% endraw %}` |
@@ -301,14 +302,21 @@ compile cache — see [Images & galleries](../static-site/images-gallery).
 
 ### Social & structured data (Open Graph, JSON-LD)
 
-Two filters turn a page's front matter into the metadata search engines, generative engines (GEO)
-and social platforms read. Drop both in your layout `<head>`:
+Four filters turn a page's front matter into the metadata search engines, generative engines (GEO)
+and social platforms read. Drop them all in your layout `<head>`:
 
 ```nunjucks
-{% raw %}{{ page | canonical(site) }}
+{% raw %}{{ page | description(site) }}
+{{ page | canonical(site) }}
 {{ page | og(site) }}
 {{ page | jsonld(site) }}{% endraw %}
 ```
+
+`description` emits `<meta name="description">` from front matter `description`, then the page's
+auto-`excerpt`, then `site.description` — the same chain `og` and `jsonld` read, so the three cannot
+disagree. Write the tag with this rather than by hand: Poops renders with autoescape off, so
+`{% raw %}content="{{ page.description }}"{% endraw %}` ships the front matter verbatim, and one
+`"` in a sentence closes the attribute and truncates the description to the words before it.
 
 `canonical` emits a `<link rel="canonical">` with the page's authoritative absolute URL (`site.url` +
 its `url`) — the dedup signal that stops query-string and duplicate URLs splitting your ranking.
