@@ -134,6 +134,23 @@ const greet = (name) => `Hello, ${name}!`;
 > `python`, `ruby`, `php`, `go`, `rust`, `yaml`, `sql`, `diff` and more. Omit the language to let
 > highlight.js auto-detect.
 
+Mermaid diagrams are the exception. highlight.js has no mermaid grammar, so a ```` ```mermaid ```` fence
+would fall through to auto-detection and come back wrapped in spans for a language it guessed —
+it is left alone instead, and compiles to `<pre class="mermaid">`, which is the markup
+[mermaid](https://mermaid.js.org/config/usage.html) looks for.
+
+````markdown
+```mermaid
+flowchart TD
+  poops[poops] ==>|builds| theme[poops-docs-theme]
+  theme -->|documents| poops
+```
+````
+
+Poops ships no mermaid and injects no script — load it on the pages that want diagrams, and no
+page without one carries the library. A fence on a page that never loads mermaid shows its
+diagram source as text, which reads on its own.
+
 ## Useful filters
 
 Poops adds template filters usable in both engines — `slugify`, `markdown`, `toc`, `date`,
