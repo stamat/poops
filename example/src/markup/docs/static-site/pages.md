@@ -139,17 +139,52 @@ would fall through to auto-detection and come back wrapped in spans for a langua
 it is left alone instead, and compiles to `<pre class="mermaid">`, which is the markup
 [mermaid](https://mermaid.js.org/config/usage.html) looks for.
 
-````markdown
 ```mermaid
 flowchart TD
   poops[poops] ==>|builds| theme[poops-docs-theme]
   theme -->|documents| poops
 ```
-````
 
 Poops ships no mermaid and injects no script — load it on the pages that want diagrams, and no
 page without one carries the library. A fence on a page that never loads mermaid shows its
 diagram source as text, which reads on its own.
+
+This page loads it, so the fence above renders. The script is written into the Markdown source by
+hand — Markdown passes raw HTML through, so a page that wants diagrams carries its own loader and
+no other page pays for it:
+
+```html
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'
+  const nodes = document.querySelectorAll('pre.mermaid')
+  for (const n of nodes) n.dataset.src ??= n.textContent
+  const render = () => {
+    mermaid.initialize({ startOnLoad: false, theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'default' })
+    for (const n of nodes) { n.innerHTML = n.dataset.src; n.removeAttribute('data-processed') }
+    mermaid.run({ nodes })
+  }
+  render()
+  new MutationObserver(render).observe(document.documentElement, { attributeFilter: ['data-theme'] })
+</script>
+```
+
+> [!INFO]
+> The source is stashed in `data-src` before the first render because mermaid replaces the
+> element with its SVG. Without the copy, the theme toggle hands mermaid its own output to parse
+> the second time round.
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'
+  const nodes = document.querySelectorAll('pre.mermaid')
+  for (const n of nodes) n.dataset.src ??= n.textContent
+  const render = () => {
+    mermaid.initialize({ startOnLoad: false, theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'default' })
+    for (const n of nodes) { n.innerHTML = n.dataset.src; n.removeAttribute('data-processed') }
+    mermaid.run({ nodes })
+  }
+  render()
+  new MutationObserver(render).observe(document.documentElement, { attributeFilter: ['data-theme'] })
+</script>
 
 ## Useful filters
 
