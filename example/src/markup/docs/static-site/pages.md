@@ -5,7 +5,7 @@ navTitle: Building pages
 description: Layouts, partials, front matter and Markdown — the building blocks of every Poops page.
 order: 1
 keywords:
-  ["pages", "layout", "partials", "front matter", "markdown", "includes"]
+  ["pages", "layout", "partials", "front matter", "markdown", "includes", "mermaid", "diagrams"]
 ---
 
 # Building pages
