@@ -1141,6 +1141,40 @@ The language argument is optional. If omitted, highlight.js will attempt to auto
 
 Registered languages: `javascript`/`js`, `typescript`/`ts`, `css`, `scss`, `html`, `xml`, `json`, `bash`/`sh`, `shell`, `python`/`py`, `ruby`/`rb`, `php`, `java`, `c`, `cpp`, `csharp`/`cs`, `go`, `rust`/`rs`, `yaml`/`yml`, `markdown`/`md`, `sql`, `diff`.
 
+**Mermaid fences are not highlighted.** highlight.js has no mermaid grammar, so a ```` ```mermaid ```` fence used to fall through to auto-detection and come out wrapped in spans for whatever language it guessed. It now compiles to the markup [mermaid documents](https://mermaid.js.org/config/usage.html) — `<pre class="mermaid">`, no `<code>` element, the diagram source escaped inside:
+
+````md
+```mermaid
+flowchart TD
+  poops[poops] ==>|builds| theme[poops-docs-theme]
+  theme -->|documents| poops
+
+  poops ==> boe[book-of-elementals] & hg[hydrargyri] & septic[septic] & sulph[sulphuris] & more[…14 more]
+  theme --> boe & hg & septic & sulph
+```
+````
+
+```html
+<pre class="mermaid">flowchart TD
+  poops[poops] ==&gt;|builds| theme[poops-docs-theme]
+  theme --&gt;|documents| poops
+
+  poops ==&gt; boe[book-of-elementals] &amp; hg[hydrargyri] &amp; septic[septic] &amp; sulph[sulphuris] &amp; more[…14 more]
+  theme --&gt; boe &amp; hg &amp; septic &amp; sulph</pre>
+```
+
+`>` and `&` come out escaped, which is what mermaid wants — it reads the element's `textContent`, and that hands the characters back exactly as they were written.
+
+Poops ships no mermaid and injects no script — **loading it is yours to do**, which keeps a 700 KB library off every page that has no diagram:
+
+```html
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'
+</script>
+```
+
+Two honest caveats. Rendering happens in the browser, so a diagram pops in after paint — unlike code blocks, which are highlighted at build time precisely to avoid that; a `min-height` on `pre.mermaid` bounds the jump. And with the script absent or JS off, the fence shows its diagram source as text, which reads fine but is not a picture. For zero client JS, render the diagrams to SVG in an `exec` script before the markup stage and emit those instead.
+
 **Fence info strings.** Only the first word names the language. Anything after it is carried onto the `<code>` element instead of being dropped: a bare word becomes a class, a `key=value` token becomes a `data-` attribute. This is how a fence marks itself for a later stage — a post-`markup` `exec` script that turns `code.preview` blocks into live demos, for example — without a marker comment in the markdown.
 
 ````md
