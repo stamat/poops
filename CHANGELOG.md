@@ -46,6 +46,8 @@ A ```` ```mermaid ```` fence came out of the build as syntax-highlighted CSS. hi
 
 ### Changed
 
+- **`book-of-spells` 1.5 → 2.5, `poops-docs-theme` 4.2 → 4.5.** The one that shows: `removeAccents` in book-of-spells now folds letters whose mark is written through the glyph — `Đ Ł Ø Ħ Þ ß` and friends — which `slugify` inherits, and `slugify` is what Poops builds heading anchors, collection slugs and permalinks from. `Đorđe Balašević` used to slug to `ore-balasevic` because the unfolded letter was deleted outright; it is `dorde-balasevic` now. **A site with those letters in a heading or a title will move the URLs they generate** — worth a redirect if anything links to the old ones.
+
 - **`mermaid` is never syntax-highlighted,** through fences, the `{% highlight %}` tag and the `highlight` filter alike. Only the language name is special — a JavaScript fence that mentions mermaid is still highlighted as JavaScript.
 
 Poops ships no mermaid and injects no script, so a page with no diagram carries no library, and a diagram on a page that never loads one shows its source as readable text. The trade against the code-fence story is real and stated in the README: highlighting happens at build time to avoid layout shift, and a browser-rendered diagram pops in after paint.
