@@ -36,7 +36,9 @@ release, verbatim — no notes to paste in by hand. **A post you wrote by hand a
 overwritten** — that is the escape hatch for releases whose post is a live demo,
 which is most of them here. Write the post first, then the entry.
 
-## [Unreleased] — a mermaid fence is a diagram, not a guess
+## [Unreleased]
+
+## [3.0.0] - 2026-08-22 — a mermaid fence is a diagram, not a guess
 
 A ```` ```mermaid ```` fence came out of the build as syntax-highlighted CSS. highlight.js has no mermaid grammar, so the fence fell through to auto-detection, which took `graph TD; A-->B;` for selectors and wrapped the diagram source in `hljs-selector-tag` spans. Mermaid could still read it — `textContent` drops the spans — but only if you told it to look at `code.language-mermaid`, and the page flashed the wrongly-coloured source first.
 
