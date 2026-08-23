@@ -87,6 +87,15 @@ function outsideFences(lines) {
 
 const lines = fs.readFileSync(CHANGELOG, 'utf8').split('\n')
 const prose = outsideFences(lines)
+
+// An unclosed fence swallows every heading under it, so the [Unreleased] search
+// below comes up empty and the release would ship with no entry. Skipping that
+// silently is how a release goes out with its changelog untouched.
+if (!prose[prose.length - 1]) {
+  console.error('CHANGELOG.md has an unclosed code fence — every heading below it is invisible to this script. Close it and re-run.')
+  process.exit(1)
+}
+
 const start = lines.findIndex((line, i) => prose[i] && /^## \[Unreleased\]/.test(line))
 
 if (start === -1) {
